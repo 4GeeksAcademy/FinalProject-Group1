@@ -43,50 +43,30 @@ def generate_sitemap(app):
 
 
 
-def es_correo_valido(correo: str) -> bool:
-    patron = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
-    if re.fullmatch(patron, correo):
+def val_email(correo: str) -> bool:
+    pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+    if re.fullmatch(pattern, correo):
         return True
     else:
         return False
 
 PASSWORD_REGEX = r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()\-_=+{};:,<.>]).{8,}$"
 
-def validar_contrasena(password: str) -> bool:
+
+def val_password(password: str) -> bool:
     """
-    Verifica si una contraseña cumple con los requisitos de seguridad:
+    Verifica si una contraseña cumple con los requisitos de seguridad principales
+    mediante una única expresión regular (regex).
+
+    Requisitos:
     - Mínimo 8 caracteres.
     - Al menos una letra minúscula.
     - Al menos una letra mayúscula.
     - Al menos un número.
-    - Al menos un carácter especial (!@#$%^&*()...).
-    - Lógica extra para evitar 3 números consecutivos.
+    - Al menos un carácter especial (!@#$%^&*()_-+=;:,<.>).
     """
+    # Usamos re.fullmatch para asegurar que toda la cadena coincida con el patrón.
+    if re.fullmatch(PASSWORD_REGEX, password):
+        return True
     
-    if not re.fullmatch(PASSWORD_REGEX, password):
-        return False
-        
-    if _contiene_numeros_consecutivos(password):
-        return False
-    return True
-
-def _contiene_numeros_consecutivos(password: str) -> bool:
-    """
-    Función interna para verificar si existen 3 números consecutivos (e.g., '123' o '987').
-    """
-    for i in range(len(password) - 2):
-        char1 = password[i]
-        char2 = password[i+1]
-        char3 = password[i+2]
-        
-        if char1.isdigit() and char2.isdigit() and char3.isdigit():
-            
-            num1 = int(char1)
-            num2 = int(char2)
-            num3 = int(char3)
-
-
-            if (num2 == num1 + 1 and num3 == num2 + 1) or \
-               (num2 == num1 - 1 and num3 == num2 - 1):
-                return True
     return False
