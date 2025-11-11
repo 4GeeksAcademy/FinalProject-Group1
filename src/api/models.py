@@ -8,7 +8,7 @@ from typing import Optional
 db = SQLAlchemy()
 
 class User(db.Model):
-    id_usuario: Mapped[int] = mapped_column(primary_key=True)
+    id_user: Mapped[int] = mapped_column(primary_key=True)
     username: Mapped[str] = mapped_column(String(30), unique=True, nullable=False)
     email: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
     fullname: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
@@ -17,7 +17,7 @@ class User(db.Model):
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now (timezone.utc), nullable=False)
     password: Mapped[str] = mapped_column(String(255), nullable=False)
     salt: Mapped[str] = mapped_column(String(50), nullable = False)
-    foto_perfil: Mapped[str] = mapped_column(String(255), nullable=False)
+    profile: Mapped[str] = mapped_column(String(255), nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean(), nullable = True)
 
 
@@ -26,11 +26,11 @@ class User(db.Model):
 
     def serialize(self):
         return {
-            "id": self.id_usuario,
+            "id": self.id_user,
             "username": self.username,
             "email": self.email,
             "fullname": self.fullname,
             "rol": self.rol,
             "is_Active": self.is_active,
-            "image": self.foto_perfil
+            "image": self.profile
         }

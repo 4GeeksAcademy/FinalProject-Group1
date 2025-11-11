@@ -43,16 +43,16 @@ def generate_sitemap(app):
 
 
 
-def es_correo_valido(correo: str) -> bool:
-    patron = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
-    if re.fullmatch(patron, correo):
+def val_email(correo: str) -> bool:
+    pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+    if re.fullmatch(pattern, correo):
         return True
     else:
         return False
 
 PASSWORD_REGEX = r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()\-_=+{};:,<.>]).{8,}$"
 
-def validar_contrasena(password: str) -> bool:
+def val_password(password: str) -> bool:
     """
     Verifica si una contraseña cumple con los requisitos de seguridad:
     - Mínimo 8 caracteres.
@@ -66,11 +66,11 @@ def validar_contrasena(password: str) -> bool:
     if not re.fullmatch(PASSWORD_REGEX, password):
         return False
         
-    if _contiene_numeros_consecutivos(password):
+    if _consecutives_numbers(password):
         return False
     return True
 
-def _contiene_numeros_consecutivos(password: str) -> bool:
+def _consecutives_numbers(password: str) -> bool:
     """
     Función interna para verificar si existen 3 números consecutivos (e.g., '123' o '987').
     """
