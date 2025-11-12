@@ -1,6 +1,10 @@
 
 import click
 from api.models import db, User
+from werkzeug.security import generate_password_hash
+from base64 import b64encode
+import os
+
 
 """
 In this file, you can add as many commands as you want using the @app.cli.command decorator
@@ -29,6 +33,34 @@ def setup_commands(app):
 
         print("All test users created")
 
-    @app.cli.command("insert-test-data")
-    def insert_test_data():
-        pass
+@app.cli.command("insert-test-data")
+def insert_test_data():
+        ADMIN_EMAIL = "admin@recetas.com"
+        ADMIN_USERNAME = "admin_recetas"
+        ADMIN_PASSWORD = "PasswordSeguraAdmin1!"
+        if User.query.filter_by(email=ADMIN_EMAIL).first():
+            print("El usuario administrador ya existe. Omitiendo la creación.")
+            return
+
+        print(f"Creando usuario administrador: {ADMIN_EMAIL}")
+        salt_admin = b64encode(os.urandom(16)).decode("utf-8")
+        hashed_password_admin = generate_password_hash(f"{ADMIN_PASSWORD}{salt_admin}")
+        foto_url = "https://ui-avatars.com/api/?name=Admin&size=128&background=27ae60&rounded=true"
+        admin_user = User(
+            email=ADMIN_EMAIL,
+            username=ADMIN_USERNAME,
+            fullname="Administrador Recetas",
+            rol="administrador",  
+            password=hashed_password_admin,
+            salt=salt_admin,
+            foto_perfil=foto_url,
+            is_active=True
+        )
+        db.session.add(admin_user)
+        try:
+            db.session.commit()
+            print("✅ Usuario administrador creado exitosamente.")
+        except Exception as e:
+            db.session.rollback()
+            print(f"❌ Error al crear el usuario administrador: {e}")
+pass

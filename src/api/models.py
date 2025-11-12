@@ -34,3 +34,7 @@ class User(db.Model):
             "is_Active": self.is_active,
             "image": self.foto_perfil
         }
+    """metodo de verificación de contraseña Eli"""
+    def check_password(self, password):
+        from werkzeug.security import check_password_hash
+        return check_password_hash(self.password, f"{password}{self.salt}")
