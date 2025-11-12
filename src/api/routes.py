@@ -24,6 +24,7 @@ def health_check():
     return jsonify({"status": "OK"}), 200
 
 
+
 @api.route("/register", methods=["POST"])
 def register_user():
 
