@@ -45,13 +45,13 @@ def register_user():
     if not val_password(password):
         return jsonify({"message": "Password is invalid. Requires 8+ chars, upper/lower case, number, special char, and no 3 consecutive numbers."}), 400
     if User.query.filter_by(email=email).first():
-        return jsonify({"message": "The email address is already registered."}), 409
+        return jsonify({"message": "The email address is already registered."}), 422
     if User.query.filter_by(username=username).first():
         return jsonify({"message": "The username is already registered"}), 409
 
     salt = b64encode(os.urandom(16)).decode("utf-8")
     hashed_password = generate_password_hash(f"{data['password']}{salt}")
-
+ 
     new_user = User(
         email=email,
         password=hashed_password,
