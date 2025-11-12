@@ -15,6 +15,7 @@ const initialUserState = {
 
 const urlBase = import.meta.env.VITE_BACKEND_URL
 
+
 // Definición de los requisitos de la contraseña con sus RegEx correspondientes
 const passwordRequirements = [
     { key: 'minLength', label: 'Mínimo 8 caracteres', regex: /.{8,}/ },
@@ -151,6 +152,7 @@ const Register = () => {
     }
 
 
+
     return (
         <div className="container">
             <Toaster position="top-center" richColors />
@@ -161,7 +163,7 @@ const Register = () => {
                     </div>
                     <div className="col-12 col-md-6">
                         <form
-                            className="border border-secundary p-5 bg-verde"
+                            className="border border-secundary form-group p-5 bg-verde"
                             onSubmit={handleSubmit}
                         >
                             <div className="form-group mb-3">
@@ -221,9 +223,9 @@ const Register = () => {
                                         onClick={togglePasswordVisibility}
                                     >
                                         {showPassword ? (
-                                            <i class="fa-solid fa-eye-slash"></i>
+                                            <i className="fa-solid fa-eye-slash"></i>
                                         ) : (
-                                            <i class="fa-solid fa-eye"></i>
+                                            <i className="fa-solid fa-eye"></i>
                                         )}
 
                                     </button>
