@@ -76,12 +76,12 @@ def register_user():
         db.session.rollback()
         return jsonify({"message": "Error creating user", "Error": f"{error.args}"}), 500
     
-    """ruta de login Eli"""
-    @api.route("/login", methods=["POST"])
-    def login_user():
-        data_form = request.form
-        email = data_form.get("email")
-        password = data_form.get("password")
+"""ruta de login Eli"""
+@api.route("/login", methods=["POST"])
+def login_user():
+    data_form = request.form
+    email = data_form.get("email")
+    password = data_form.get("password")
     if not email or not password:
         return jsonify({"message": "Email y contraseña son requeridos"}), 400
     user = User.query.filter_by(email=email).first()
@@ -90,19 +90,20 @@ def register_user():
         return jsonify({"message": "Email o contraseña incorrectos"}), 401
     if not user.check_password(password):
         return jsonify({"message": "Email o contraseña incorrectos"}), 401
+    
     expires = timedelta(days=1)
     access_token = create_access_token(
-        identity=user.id_usuario, 
-        expires_delta=expires,
-        additional_claims={
-            "id": user.id_usuario,
-            "username": user.username,
-            "rol": user.rol
-            }
-    )
+    identity=user.id_usuario, 
+    expires_delta=expires,
+    additional_claims={
+        "id": user.id_usuario,
+        "username": user.username,
+        "rol": user.rol
+        }
+)
     return jsonify({
         "message": "Login exitoso",
         "access_token": access_token,
         "user": user.serialize()
-    }), 200
+        }), 200
 

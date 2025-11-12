@@ -90,3 +90,6 @@ def _contiene_numeros_consecutivos(password: str) -> bool:
                (num2 == num1 - 1 and num3 == num2 - 1):
                 return True
     return False
+
+def es_administrador(claims: dict) -> bool:
+    return claims.get("rol") == "administrador"
