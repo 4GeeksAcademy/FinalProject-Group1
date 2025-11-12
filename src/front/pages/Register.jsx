@@ -4,7 +4,7 @@ import { useNavigate, Link } from "react-router-dom"
 import { Toaster, toast } from "sonner"
 import "../styles/register.css"
 
-
+  
 const initialUserState = {
     fullname: "",
     username: "",
@@ -21,7 +21,7 @@ const passwordRequirements = [
     { key: 'lowerCase', label: 'Al menos una letra minúscula', regex: /[a-z]/ },
     { key: 'upperCase', label: 'Al menos una letra mayúscula', regex: /[A-Z]/ },
     { key: 'number', label: 'Al menos un número', regex: /[0-9]/ },
-    { key: 'specialChar', label: 'Al menos un caracter especial (!@#$%^&*...)', regex: /[!@#$%^&*()-+]/ },
+    { key: 'specialChar', label: 'Al menos un caracter especial (!@#$%^&*...)', regex: /[!@#$%^&*()-+\.]/ },
 ];
 
 const Register = () => {
@@ -138,19 +138,19 @@ const Register = () => {
                     navigate("/")
                 }, 1500)
             } else if (response.status === 409) {
-                toast.error("El usuario ya existe. Intenta con otro nombre de usuario o correo.");
-            } else if (response.status === 400) {
-                toast.error("Datos incompletos o inválidos.");
+                toast.error("El nombre de usuario ya existe. Intenta con otro.");
+            } else if (response.status === 422) {
+                toast.error("El correo ya está registrado, inicia sesión.");
             } else {
                 toast.error("Error al registrar usuario, intenta nuevamente")
             }
-        } catch (error) {
+        } catch (error) { 
             console.error("Error de conexión:", error);
             toast.error("Error de conexión con el servidor. Intenta de nuevo más tarde.");
         }
     }
-
-
+ 
+ 
     return (
         <div className="container">
             <Toaster position="top-center" richColors />
