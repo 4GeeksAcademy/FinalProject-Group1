@@ -23,6 +23,15 @@ CORS(api)
 def health_check():
     return jsonify({"status": "OK"}), 200
 
+@api.route("/users/<int:user_id>", methods=["GET"])
+def getUser(user_id):
+    user = User.query.get(user_id)
+    if user:
+        return jsonify(user.serialize()), 200
+    else:
+        return jsonify({"message": "User not found"}), 404
+
+
 
 
 @api.route("/register", methods=["POST"])
