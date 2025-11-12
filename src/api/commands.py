@@ -33,8 +33,8 @@ def setup_commands(app):
 
         print("All test users created")
 
-@app.cli.command("insert-test-data")
-def insert_test_data():
+    @app.cli.command("insert-test-data")
+    def insert_test_data():
         ADMIN_EMAIL = "admin@recetas.com"
         ADMIN_USERNAME = "admin_recetas"
         ADMIN_PASSWORD = "PasswordSeguraAdmin1!"
