@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
 from datetime import datetime
 from base64 import b64encode
+from datetime import datetime, timezone
 import os
 from werkzeug.security import generate_password_hash
 from api.models import db, User
@@ -17,7 +18,7 @@ def check_rate_limit(email):
     now = datetime.now()
     
     if email in requests_per_email:
-        requests = [r for r in requests_per_email[email] if (now - r).seconds < 3600]
+        requests = [r for r in requests_per_email[email] if (now - r).total_seconds() < 3600]
         requests_per_email[email] = requests
         
         if len(requests) >= 3:
@@ -49,8 +50,8 @@ def request_recovery():
     message = "If your email is registered, you will receive a link shortly"
     
     if user:
-        print(f"Generando token para user_id: {user.id_usuario}")
-        token = generate_token(user.id_usuario)
+        print(f"Generando token para user_id: {user.id_user}")
+        token = generate_token(user.id_user)
         print(f"Token generado: {token}")
         
         email_sent = send_recovery_email(email, token)
@@ -97,7 +98,7 @@ def reset_password():
     salt = b64encode(os.urandom(16)).decode("utf-8")
     user.password = generate_password_hash(f"{new_password}{salt}")
     user.salt = salt
-    user.updated_at = datetime.now()
+    user.updated_at = datetime.now(timezone.utc)
     
     try:
         db.session.commit()
