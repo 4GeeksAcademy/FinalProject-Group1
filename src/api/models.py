@@ -4,6 +4,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from typing import List
 from datetime import datetime, timezone
 from typing import Optional
+from werkzeug.security import check_password_hash ;"""libreria para verificar contraseñas hasheadas"""
 
 db = SQLAlchemy()
 
@@ -34,7 +35,7 @@ class User(db.Model):
             "is_Active": self.is_active,
             "image": self.foto_perfil
         }
-    """metodo de verificación de contraseña Eli"""
-    def check_password(self, password):
-        from werkzeug.security import check_password_hash
-        return check_password_hash(self.password, f"{password}{self.salt}")
+def check_password(self, password_ingresada: str) -> bool:
+    hashed_password_with_salt = f"{password_ingresada}{self.salt}"
+    return check_password_hash(self.password, hashed_password_with_salt)
+User.check_password = check_password 
