@@ -80,3 +80,41 @@ def register_user():
     except Exception as error:
         db.session.rollback()
         return jsonify({"message": "Error creating user", "Error": f"{error.args}"}), 500
+
+@api.route("/change-password", methods=["PUT"])
+@jwt_required()
+def change_password():
+    # Obtener el ID del usuario actual desde el token JWT
+    current_user_id = get_jwt_identity()
+    user = User.query.get(current_user_id)
+
+    if not user:
+        return jsonify({"message": "User not found"}), 404
+
+    data = request.get_json(silent=True)
+    if data is None:
+        return jsonify({"message": "Invalid JSON or no data provided"}), 400
+
+    current_password = data.get("current_password")
+    new_password = data.get("new_password")
+
+    # Validación de campos de la password
+    if not current_password or not new_password:
+        return jsonify({"message": "Current and new password are required"}), 400
+
+    # Verificar que la contraseña actual sea correcta
+    is_valid = check_password_hash(user.password, f"{current_password}{user.salt}")
+    if not is_valid:
+        return jsonify({"message": "Current password is incorrect"}), 401
+
+    # Validar la nueva contraseña con los parametros que definimoss
+    from api.utils import val_password
+    if not val_password(new_password):
+        return jsonify({"message": "New password is invalid. It must have 8+ chars, uppercase, lowercase, number, and special char."}), 400
+
+    # Generar y guardar la nueva contraseña hasheada
+    new_hashed_password = generate_password_hash(f"{new_password}{user.salt}")
+    user.password = new_hashed_password
+    db.session.commit()
+
+    return jsonify({"message": "Password updated successfully"}), 200
