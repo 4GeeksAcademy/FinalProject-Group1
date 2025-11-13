@@ -2,7 +2,7 @@
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
 from flask import Flask, request, jsonify, url_for, Blueprint
-from api.models import db, User
+from api.models import db, User, Category
 from api.utils import generate_sitemap, APIException,  val_email, val_password
 from flask_cors import CORS
 import os
@@ -22,7 +22,6 @@ CORS(api)
 @api.route("/health-check", methods=["GET"])
 def health_check():
     return jsonify({"status": "OK"}), 200
-
 
 
 @api.route("/register", methods=["POST"])
@@ -71,3 +70,55 @@ def register_user():
     except Exception as error:
         db.session.rollback()
         return jsonify({"message": "Error creating user", "Error": f"{error.args}"}), 500
+
+# Endpoint para Category
+
+
+@api.route("/categories", methods=["GET"])
+def get_categories():
+    categories = Category.query.order_by(Category.name_category).all()
+    data = [category.serialize() for category in categories]
+    return jsonify(data), 200
+
+
+@api.route("/categories", methods=["POST"])
+def create_category():
+    data = request.get_json(Silent=True)
+
+    if data is None:
+        return jsonify({"message": "Data not provided"}), 400
+
+    name_category = data.get("name_category")
+    description = data.get("description")
+
+    if not name_category or not name_category.strip():
+        return jsonify({"message": "Category name is required"}), 400
+
+    name_category = name_category.strip()
+
+    existing_category = Category.query.filter_by(
+        name_category=name_category
+    ).first()
+
+    if existing_category:
+        return jsonify({"message": "Category already exists"}), 409
+
+        new_category = Category(
+            name_category=name_category,
+            description=description
+        )
+
+    db.session.add(new_category)
+
+    try:
+        db.session.commit()
+        return jsonify({
+            "message": "Category created successfully",
+            "category": new_category.serialize()
+        }), 201
+    except Exception as error:
+        db.session.rollback()
+        return jsonify({
+            "message": "Error creating category",
+            "error": f"{error.args}"
+        }), 500
