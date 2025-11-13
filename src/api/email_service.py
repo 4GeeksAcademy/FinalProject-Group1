@@ -1,14 +1,17 @@
 import os
+import logging
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
+
+# Configurar logger para este módulo
+logger = logging.getLogger(__name__)
 
 def send_recovery_email(email, token):
     # Construir enlace de recuperación
     frontend_url = os.getenv('FRONTEND_URL')
     recovery_link = f"{frontend_url}/reset-password?token={token}"
     
-    print(f"Preparando email para: {email}")
-    print(f"Link de recuperación: {recovery_link}")
+    logger.debug(f"Preparando email de recuperación para: {email}")
     
     message = Mail(
         from_email=os.getenv('SENDGRID_FROM_EMAIL'),
@@ -24,16 +27,21 @@ def send_recovery_email(email, token):
     
     try:
         api_key = os.getenv('SENDGRID_API_KEY')
-        print(f"API Key existe: {api_key is not None}")
-        print(f"From email: {os.getenv('SENDGRID_FROM_EMAIL')}")
+        
+        if not api_key:
+            logger.error("SENDGRID_API_KEY no configurado en variables de entorno")
+            return False
         
         sg = SendGridAPIClient(api_key)
         response = sg.send(message)
         
-        print(f"SendGrid response status: {response.status_code}")
-        print(f"Email enviado exitosamente")
-        return True
+        if response.status_code == 202:
+            logger.info(f"Email enviado exitosamente a {email} (Status: {response.status_code})")
+            return True
+        else:
+            logger.warning(f"Email enviado con status inesperado: {response.status_code}")
+            return False
+            
     except Exception as e:
-        print(f"Error enviando email: {e}")
-        print(f"Tipo de error: {type(e).__name__}")
+        logger.error(f"Error al enviar email a {email}: {type(e).__name__} - {str(e)}")
         return False
