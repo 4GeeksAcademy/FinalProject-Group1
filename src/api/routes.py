@@ -89,7 +89,6 @@ def create_category():
         return jsonify({"message": "Data not provided"}), 400
 
     name_category = data.get("name_category")
-    description = data.get("description")
 
     if not name_category or not name_category.strip():
         return jsonify({"message": "Category name is required"}), 400
@@ -105,7 +104,7 @@ def create_category():
 
     new_category = Category(
         name_category=name_category,
-        description=description
+
     )
 
     db.session.add(new_category)
@@ -122,3 +121,41 @@ def create_category():
             "message": "Error creating category",
             "error": f"{error.args}"
         }), 500
+
+
+@api.route("/categories/<int:id>", methods=["PUT"])
+def edit_category():
+    data = request.get_json(silent=True)
+
+    if data is None:
+        return jsonify({"message": "Data not provided"}), 400
+    
+    category = Category.query.get(id)
+
+    new_name = data.get.id("name_category")
+
+    if new_name is not None:
+        new_name = new_name.strip()
+        if new_name == "":
+            return jsonify({"message": "Category name cannot be empty"}), 400
+        
+    if new_name and new_name != category.name_category:
+        existing = Category.query.filter_by(name_category=new_name).first()
+        if existing:
+            return jsonify({"message": "Category name already exists"}), 400
+        
+    if new_name:
+        category.name_category.id = new_name
+
+
+@api.route("/categories", methods=["DELETE"])
+def delete_category():
+    
+    category = Category.query.get(id)
+
+    data = ""
+
+    delete_category = data.get("name_category")
+
+    if delete_category:
+        pass

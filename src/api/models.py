@@ -49,7 +49,6 @@ class Category(db.Model):
 
     id_category: Mapped[int] = mapped_column(primary_key=True)
     name_category: Mapped[str] = mapped_column(String(55), unique=True, nullable=False)
-    description: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(
         timezone=True), default=lambda: datetime.now(timezone.utc), nullable=False)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(
@@ -62,5 +61,4 @@ class Category(db.Model):
         return {
             "id": self.id_category,
             "name_category": self.name_category,
-            "description": self.description,
         }
