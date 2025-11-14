@@ -83,7 +83,7 @@ def get_categories():
 
 @api.route("/categories", methods=["POST"])
 def create_category():
-    data = request.get_json(Silent=True)
+    data = request.get_json(silent=True)
 
     if data is None:
         return jsonify({"message": "Data not provided"}), 400
@@ -103,10 +103,10 @@ def create_category():
     if existing_category:
         return jsonify({"message": "Category already exists"}), 409
 
-        new_category = Category(
-            name_category=name_category,
-            description=description
-        )
+    new_category = Category(
+        name_category=name_category,
+        description=description
+    )
 
     db.session.add(new_category)
 
