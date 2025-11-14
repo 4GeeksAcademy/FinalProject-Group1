@@ -69,7 +69,6 @@ def request_recovery():
 @bp.route('/validate/<token>', methods=['GET'])
 def validate_recovery_token(token):
     user_id = validate_token(token)
-    
     if user_id is None:
         logger.warning(f"Token inválido o expirado recibido")
         return jsonify({'valid': False, 'message': 'Invalid or expired token'}), 400

@@ -11,6 +11,7 @@ def send_recovery_email(email, token):
     frontend_url = os.getenv('FRONTEND_URL')
     recovery_link = f"{frontend_url}/reset-password?token={token}"
     
+    
     logger.debug(f"Preparando email de recuperación para: {email}")
     
     message = Mail(

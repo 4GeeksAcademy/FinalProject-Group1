@@ -146,7 +146,6 @@ const Register = () => {
                 toast.error("Error al registrar usuario, intenta nuevamente")
             }
         } catch (error) { 
-            console.error("Error de conexión:", error);
             toast.error("Error de conexión con el servidor. Intenta de nuevo más tarde.");
         }
     }
@@ -215,7 +214,9 @@ const Register = () => {
                                         value={user.password}
                                         required
                                         onFocus={() => setIsPasswordFocused(true)}
-                                        onBlur={() => setIsPasswordFocused(false)} />
+                                        onBlur={() => setIsPasswordFocused(false)}
+                                        autoComplete="new-password"  
+                                        />
                                     <button
                                         type="button"
                                         className="btn btn-outline-secondary"
