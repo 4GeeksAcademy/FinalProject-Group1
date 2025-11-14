@@ -68,13 +68,20 @@ app.register_blueprint(api, url_prefix='/api')
 app.register_blueprint(password_recovery_bp)
 
 logger.info(f"Aplicación iniciada en modo: {ENV}")
+<<<<<<< HEAD
 
 # Handle/serialize errors like a JSON object
 
+=======
+>>>>>>> develop
 # Setup the Flask-JWT-Extended extension
 app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY")  # Change this!
 jwt = JWTManager(app)
 
+<<<<<<< HEAD
+=======
+# Handle/serialize errors like a JSON object
+>>>>>>> develop
 @app.errorhandler(APIException)
 def handle_invalid_usage(error):
     return jsonify(error.to_dict()), error.status_code
