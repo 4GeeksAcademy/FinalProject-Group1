@@ -50,7 +50,7 @@ def val_email(correo: str) -> bool:
     else:
         return False
 
-PASSWORD_REGEX = r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()\-_=+{};:,<.>]).{8,}$"
+PASSWORD_REGEX = r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()\-_=+{};:,<.\>]).{8,}$"
 
 
 def val_password(password: str) -> bool:

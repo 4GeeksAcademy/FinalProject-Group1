@@ -23,7 +23,7 @@ class User(db.Model):
     password: Mapped[str] = mapped_column(String(255), nullable=False)
     salt: Mapped[str] = mapped_column(String(50), nullable=False)
     profile: Mapped[str] = mapped_column(String(
-        255), nullable=False, default=lambda context: "https://ui-avatars.com/api/?name={}&size=128&background=random&rounded=true".format(context.get_current_parameters()['username']))
+        255), nullable=False, default="https://ui-avatars.com/api/?name=User&size=128&background=random&rounded=true")
     is_active: Mapped[bool] = mapped_column(
         Boolean(), nullable=True, default=True)
 
