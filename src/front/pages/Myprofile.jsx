@@ -1,8 +1,11 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
+import useGlobalReducer from "../hooks/useGlobalReducer.jsx";
 
 export const Myprofile = () => {
 
     const urlBase = import.meta.env.VITE_BACKEND_URL;
+
+    const { store, dispatch } = useGlobalReducer()
 
     const [user, setUser] = useState({
         image: "",
@@ -10,6 +13,8 @@ export const Myprofile = () => {
         fullname: "",
         email: ""
     });
+
+
 
     const [editing, setEditing] = useState({
         image: false,
@@ -32,13 +37,32 @@ export const Myprofile = () => {
             return;
         }
 
-      
+
         console.log("Guardando contraseña:", passwordData);
 
         setError("");
         setPasswordData({ current: "", newPass: "", repeatNew: "" });
         setShowPasswordModal(false);
     };
+
+    useEffect(() => {
+        const loadUser = async () => {
+            try {
+                const backendUrl = import.meta.env.VITE_BACKEND_URL;
+                const response = await fetch(`${backendUrl}/users/${store.currentUserId}`);
+
+                if (!response.ok) throw new Error("Error loading user");
+
+                const data = await response.json();
+                setUser(data);
+            } catch (error) {
+                console.error("Error cargando el usuario:", error);
+            }
+        };
+
+        loadUser();
+    }, []);
+
 
     return (
         <div className="container">
@@ -57,13 +81,17 @@ export const Myprofile = () => {
                                 <h2>Profile Details</h2>
                             </div>
 
-                         
+
                             <div className="form-control d-flex align-items-center">
-                                <img src="https://via.placeholder.com/150" alt="Profile" />
-                                <button className="btn btn-sm btn-info mx-2">Edit</button>
+                                <img src={user.image || "imagen random"} alt="Profile" />
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    className="form-control mx2"
+                                ></input>
                             </div>
 
-                       
+
                             <div className="form-control">
                                 <label>Full Name</label>
                                 {editing.fullname ? (
@@ -152,14 +180,12 @@ export const Myprofile = () => {
                             <div className="form-control">
                                 <label>Email</label>
                                 {editing.email ? (
-                                    <div className="d-flex align-items-center">
+                                    <div className="d-flex align-items-center flex-wrap">
                                         <input
-                                            className="form-control mx-2"
+                                            className="form-control mx-2 mb-2 flex-grow-1"
                                             type="email"
                                             value={user.email}
-                                            onChange={(event) => {
-                                                setUser({ ...user, email: event.target.value });
-                                            }}
+                                            onChange={(event) => setUser({ ...user, email: event.target.value })}
                                             onKeyDown={(event) => {
                                                 if (event.key === "Enter") {
                                                     event.preventDefault();
@@ -170,19 +196,25 @@ export const Myprofile = () => {
                                             autoFocus
                                         />
                                         <button
-                                            className="btn btn-success btn-sm"
-                                            onClick={() => setEditing({ ...editing, email: false })}
+                                            className="btn btn-success btn-sm mb-2"
+                                            onClick={async () => {
+                                                setEditing({ ...editing, email: false });
+                                            }}
                                         >
                                             Save
                                         </button>
                                     </div>
                                 ) : (
-                                    <div className="d-flex align-items-center">
-                                        <div className="form-control mx-2 mb-0" type="email">
-                                            {user.email || <div>Email</div>}
-                                        </div>
+                                    <div className="d-flex align-items-center flex-wrap">
+                                        <input
+                                            readOnly
+                                            className="form-control mx-2 mb-0 flex-grow-1"
+                                            type="email"
+                                            value={user.email || ""}
+                                            placeholder="Email"
+                                        />
                                         <button
-                                            className="btn btn-secondary btn-sm"
+                                            className="btn btn-secondary btn-sm mb-0"
                                             onClick={() => setEditing({ ...editing, email: true })}
                                         >
                                             Edit
@@ -190,11 +222,12 @@ export const Myprofile = () => {
                                     </div>
                                 )}
                             </div>
+
                             <div className="form-control">
                                 <label>Password</label>
                                 <input className="mx-2" type="password" placeholder="Password" disabled />
                                 <button
-                                    className="btn btn-sm btn-info"
+                                    className="btn btn-sm btn-secondary mx-2"
                                     onClick={() => setShowPasswordModal(true)}
                                 >
                                     Edit
@@ -230,7 +263,7 @@ export const Myprofile = () => {
                                         }
                                     />
                                 </div>
-                                
+
                                 <div className="mb-3">
                                     <label>New Password</label>
                                     <input

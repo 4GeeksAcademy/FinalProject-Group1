@@ -2,6 +2,7 @@
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
 from flask import Flask, request, jsonify, url_for, Blueprint
+# from flask_jwt_extended import jwt_required, get_jwt_identity
 from api.models import db, User
 from api.utils import generate_sitemap, APIException,  val_email, val_password
 from flask_cors import CORS
@@ -26,10 +27,52 @@ def health_check():
 @api.route("/users/<int:user_id>", methods=["GET"])
 def getUser(user_id):
     user = User.query.get(user_id)
-    if user:
-        return jsonify(user.serialize()), 200
-    else:
+    if not user:
         return jsonify({"message": "User not found"}), 404
+
+    return jsonify(user.serialize()), 200
+
+    
+
+@api.route("/users/<int:user_id>", methods=["PUT"])
+# @api.route("user/", methods=["PUT"])
+# @jwt_required
+def updateUser(user_id): #quitar el user_id y dejarlo vacio
+    # current_user_id = get_jwt_identity()
+    user = User.query.get(user_id) #reemplazar "user_id" por "current_user_id"
+    if not user:
+        return jsonify({"message": "User not found"}), 404
+
+    data = request.get_json() #or {}
+    if data is None:
+        return jsonify({"message": "Invalid JSON or no data provided"}), 400
+    
+    
+    #Nos traemos los campos a actualizar
+
+    email = data.get("email")
+    fullname = data.get("fullname")
+    username = data.get("username")
+
+    #validaciones de los campos
+    if email:
+        if not val_email(email):
+            return jsonify({"message": "Email is invalid,"}), 400
+        user.email = email
+    if fullname:
+        user.fullname = fullname
+    if username:
+        user.username = username
+
+    try:
+        db.session.commit()
+        return jsonify({
+            "message": "user updated succesfuly",
+            "user": user.serialize()
+        }), 200
+    except Exception as error:
+        db.session.rollback()
+        return jsonify({"message": "Error updating user", "Error": f"{error.args}"}), 500
 
 
 
@@ -84,7 +127,7 @@ def register_user():
 @api.route("/change-password", methods=["PUT"])
 @jwt_required()
 def change_password():
-    # Obtener el ID del usuario actual desde el token JWT
+    # Obtener el ID del usuario actual usando el token JWT
     current_user_id = get_jwt_identity()
     user = User.query.get(current_user_id)
 
@@ -118,3 +161,4 @@ def change_password():
     db.session.commit()
 
     return jsonify({"message": "Password updated successfully"}), 200
+
