@@ -2,8 +2,12 @@
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
 from flask import Flask, request, jsonify, url_for, Blueprint
+<<<<<<< HEAD
+from api.models import db, User, Category
+=======
 # from flask_jwt_extended import jwt_required, get_jwt_identity
 from api.models import db, User
+>>>>>>> develop
 from api.utils import generate_sitemap, APIException,  val_email, val_password
 from flask_cors import CORS
 import os
@@ -76,7 +80,6 @@ def updateUser(user_id): #quitar el user_id y dejarlo vacio
 
 
 
-
 @api.route("/register", methods=["POST"])
 def register_user():
 
@@ -124,6 +127,94 @@ def register_user():
         db.session.rollback()
         return jsonify({"message": "Error creating user", "Error": f"{error.args}"}), 500
 
+# Endpoint para Category
+
+
+@api.route("/categories", methods=["GET"])
+def get_categories():
+    categories = Category.query.order_by(Category.name_category).all()
+    data = [category.serialize() for category in categories]
+    return jsonify(data), 200
+
+
+@api.route("/categories", methods=["POST"])
+def create_category():
+    data = request.get_json(silent=True)
+
+    if data is None:
+        return jsonify({"message": "Data not provided"}), 400
+
+    name_category = data.get("name_category")
+
+    if not name_category or not name_category.strip():
+        return jsonify({"message": "Category name is required"}), 400
+
+    name_category = name_category.strip()
+
+    existing_category = Category.query.filter_by(
+        name_category=name_category
+    ).first()
+
+    if existing_category:
+        return jsonify({"message": "Category already exists"}), 409
+
+    new_category = Category(
+        name_category=name_category,
+
+    )
+
+    db.session.add(new_category)
+
+    try:
+        db.session.commit()
+        return jsonify({
+            "message": "Category created successfully",
+            "category": new_category.serialize()
+        }), 201
+    except Exception as error:
+        db.session.rollback()
+        return jsonify({
+            "message": "Error creating category",
+            "error": f"{error.args}"
+        }), 500
+
+
+@api.route("/categories/<int:id>", methods=["PUT"])
+def edit_category():
+    data = request.get_json(silent=True)
+
+    if data is None:
+        return jsonify({"message": "Data not provided"}), 400
+    
+    category = Category.query.get(id)
+
+    new_name = data.get.id("name_category")
+
+    if new_name is not None:
+        new_name = new_name.strip()
+        if new_name == "":
+            return jsonify({"message": "Category name cannot be empty"}), 400
+        
+    if new_name and new_name != category.name_category:
+        existing = Category.query.filter_by(name_category=new_name).first()
+        if existing:
+            return jsonify({"message": "Category name already exists"}), 400
+        
+    if new_name:
+        category.name_category.id = new_name
+
+
+@api.route("/categories", methods=["DELETE"])
+def delete_category():
+    
+    category = Category.query.get(id)
+
+    data = ""
+
+    delete_category = data.get("name_category")
+
+    if delete_category:
+        pass
 @api.route("/change-password", methods=["PUT"])
 @jwt_required()
 def change_password():
