@@ -178,7 +178,7 @@ def login_user():
    
     is_admin = user.rol == "administrador"
     additional_claims = {"is_administrator": is_admin, "rol": user.rol}
-    token = create_access_token(identity=user.id_user, expires_delta=timedelta(
+    token = create_access_token(identity=str(user.id_user), expires_delta=timedelta(
         days=1), additional_claims=additional_claims)
  
     return jsonify({"msg": "Login successful", "token": token, "user_info": user.serialize()}), 200
