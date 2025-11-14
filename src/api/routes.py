@@ -162,3 +162,23 @@ def change_password():
 
     return jsonify({"message": "Password updated successfully"}), 200
 
+@api.route("/login", methods=["POST"])
+def login_user():
+    data = request.get_json()
+    username = data.get("username").strip()
+    password = data.get("password").strip() 
+ 
+    if not username or not password:
+        return jsonify({"message": "Username and password are required"}), 400
+    user = User.query.filter_by(username=username).one_or_none() 
+    if user is None:  
+        return jsonify({"message": "Ivalid username"}), 401 
+    if not check_password_hash(user.password, f"{password}{user.salt}"): 
+        return jsonify({"message": "Ivalid credentials"}), 401
+   
+    is_admin = user.rol == "administrador"
+    additional_claims = {"is_administrator": is_admin, "rol": user.rol}
+    token = create_access_token(identity=user.id_user, expires_delta=timedelta(
+        days=1), additional_claims=additional_claims)
+ 
+    return jsonify({"msg": "Login successful", "token": token, "user_info": user.serialize()}), 200
