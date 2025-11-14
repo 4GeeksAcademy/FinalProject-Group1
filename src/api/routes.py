@@ -2,6 +2,7 @@
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
 from flask import Flask, request, jsonify, url_for, Blueprint
+# from flask_jwt_extended import jwt_required, get_jwt_identity
 from api.models import db, User
 from api.utils import generate_sitemap, APIException,  val_email, val_password
 from flask_cors import CORS
@@ -22,6 +23,57 @@ CORS(api)
 @api.route("/health-check", methods=["GET"])
 def health_check():
     return jsonify({"status": "OK"}), 200
+
+@api.route("/users/<int:user_id>", methods=["GET"])
+def getUser(user_id):
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({"message": "User not found"}), 404
+
+    return jsonify(user.serialize()), 200
+
+    
+
+@api.route("/users/<int:user_id>", methods=["PUT"])
+# @api.route("user/", methods=["PUT"])
+# @jwt_required
+def updateUser(user_id): #quitar el user_id y dejarlo vacio
+    # current_user_id = get_jwt_identity()
+    user = User.query.get(user_id) #reemplazar "user_id" por "current_user_id"
+    if not user:
+        return jsonify({"message": "User not found"}), 404
+
+    data = request.get_json() #or {}
+    if data is None:
+        return jsonify({"message": "Invalid JSON or no data provided"}), 400
+    
+    
+    #Nos traemos los campos a actualizar
+
+    email = data.get("email")
+    fullname = data.get("fullname")
+    username = data.get("username")
+
+    #validaciones de los campos
+    if email:
+        if not val_email(email):
+            return jsonify({"message": "Email is invalid,"}), 400
+        user.email = email
+    if fullname:
+        user.fullname = fullname
+    if username:
+        user.username = username
+
+    try:
+        db.session.commit()
+        return jsonify({
+            "message": "user updated succesfuly",
+            "user": user.serialize()
+        }), 200
+    except Exception as error:
+        db.session.rollback()
+        return jsonify({"message": "Error updating user", "Error": f"{error.args}"}), 500
+
 
 
 
@@ -71,3 +123,42 @@ def register_user():
     except Exception as error:
         db.session.rollback()
         return jsonify({"message": "Error creating user", "Error": f"{error.args}"}), 500
+
+@api.route("/change-password", methods=["PUT"])
+@jwt_required()
+def change_password():
+    # Obtener el ID del usuario actual usando el token JWT
+    current_user_id = get_jwt_identity()
+    user = User.query.get(current_user_id)
+
+    if not user:
+        return jsonify({"message": "User not found"}), 404
+
+    data = request.get_json(silent=True)
+    if data is None:
+        return jsonify({"message": "Invalid JSON or no data provided"}), 400
+
+    current_password = data.get("current_password")
+    new_password = data.get("new_password")
+
+    # Validación de campos de la password
+    if not current_password or not new_password:
+        return jsonify({"message": "Current and new password are required"}), 400
+
+    # Verificar que la contraseña actual sea correcta
+    is_valid = check_password_hash(user.password, f"{current_password}{user.salt}")
+    if not is_valid:
+        return jsonify({"message": "Current password is incorrect"}), 401
+
+    # Validar la nueva contraseña con los parametros que definimoss
+    from api.utils import val_password
+    if not val_password(new_password):
+        return jsonify({"message": "New password is invalid. It must have 8+ chars, uppercase, lowercase, number, and special char."}), 400
+
+    # Generar y guardar la nueva contraseña hasheada
+    new_hashed_password = generate_password_hash(f"{new_password}{user.salt}")
+    user.password = new_hashed_password
+    db.session.commit()
+
+    return jsonify({"message": "Password updated successfully"}), 200
+
