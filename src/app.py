@@ -12,7 +12,10 @@ from api.routes import api
 from api.admin import setup_admin
 from api.commands import setup_commands
 from api.password_recovery import bp as password_recovery_bp
-from flask_cors import CORS 
+from flask_cors import CORS
+from flask_jwt_extended import JWTManager
+
+# from models import Person
 
 ENV = "development" if os.getenv("FLASK_DEBUG") == "1" else "production"
 static_file_dir = os.path.join(os.path.dirname(
@@ -65,6 +68,9 @@ app.register_blueprint(api, url_prefix='/api')
 app.register_blueprint(password_recovery_bp)
 
 logger.info(f"Aplicación iniciada en modo: {ENV}")
+# Setup the Flask-JWT-Extended extension
+app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY")  # Change this!
+jwt = JWTManager(app)
 
 # Handle/serialize errors like a JSON object
 @app.errorhandler(APIException)

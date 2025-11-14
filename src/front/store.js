@@ -1,5 +1,6 @@
 export const initialStore=()=>{
   return{
+    currentUserId: 5,
     message: null,
     todos: [
       {
