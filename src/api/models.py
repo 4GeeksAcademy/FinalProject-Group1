@@ -8,7 +8,6 @@ import enum
 
 db = SQLAlchemy()
 
-
 class User(db.Model):
     id_user: Mapped[int] = mapped_column(primary_key=True)
     username: Mapped[str] = mapped_column(
@@ -27,6 +26,10 @@ class User(db.Model):
         255), nullable=False, default="https://ui-avatars.com/api/?name=User&size=128&background=random&rounded=true")
     is_active: Mapped[bool] = mapped_column(
         Boolean(), nullable=True, default=True)
+
+    recipe_user: Mapped[List["Recipe"]] = relationship(
+        back_populates="user_recipe")
+
 
     def __repr__(self):
         return f'<User {self.username}>'
