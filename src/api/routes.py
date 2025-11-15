@@ -262,9 +262,99 @@ def login_user():
     if not check_password_hash(user.password, f"{password}{user.salt}"): 
         return jsonify({"message": "Ivalid credentials"}), 401
    
-    is_admin = user.rol == "administrador"
+    is_admin = user.rol == "admin"
     additional_claims = {"is_administrator": is_admin, "rol": user.rol}
     token = create_access_token(identity=str(user.id_user), expires_delta=timedelta(
         days=1), additional_claims=additional_claims)
  
     return jsonify({"msg": "Login successful", "token": token, "user_info": user.serialize()}), 200
+
+
+
+def admin_required():
+    def wrapper(fn):
+        @wraps(fn)
+        @jwt_required()
+        def decorator(*args, **kwargs):
+            claims = get_jwt()
+            if claims.get("is_administrator", False) is True:
+                return fn(*args, **kwargs)
+            else:
+                return jsonify({"msg": "Acceso denegado. Se requiere rol de administrador."}), 403
+        return decorator
+    return wrapper
+
+
+@api.route("/me", methods=["GET"])
+@jwt_required()
+def me():
+    user_id = get_jwt_identity()
+    user = User.query.get(user_id)
+    if user is None:
+        return jsonify({"message": "User not found or deleted."}), 404
+    return jsonify({"user": user.serialize()}), 200
+
+
+@api.route("/recipes", methods=["POST"])
+@admin_required()
+def create_recipe():
+    data_form = request.form
+    data_files = request.files
+
+    user_id = get_jwt_identity()
+
+    image_file = data_files.get("image")
+    ingredients_str = data_form.get("ingredients_json")
+
+    required_fields = ["title", "steps", "prep_time_min",
+                       "difficulty", "portions", "category_id"]
+    if any(item not in data_form for item in required_fields) or not image_file or not ingredients_str:
+        return jsonify({"message": "Required fields or the image are missing."}), 400
+
+    try:
+        ingredients_list = json.loads(ingredients_str)
+        if not isinstance(ingredients_list, list):
+            raise ValueError("Ingredients must be a list of objects.")
+    except Exception as error:
+        return jsonify({"message": "Ingredients must be a list of objects", "details": str(error)}), 400
+
+    try:
+        image_url = cloudinary_service.upload_image(
+            image_file, folder_name="recipe_images")
+    except Exception as error:
+        return jsonify({"message": f"Image upload failed. Details: {str(error)}"}), 500
+
+    try:
+        new_recipe = Recipe(
+            title=data_form.get("title"),
+            steps=data_form.get("steps"),
+            image=image_url,
+            difficulty=difficultyEnum(data_form.get("difficulty").strip().lower()),
+            preparation_time_min=int(data_form.get("prep_time_min")),
+            portions=int(data_form.get("portions")),
+            state_recipe=stateRecipeEnum.PUBLISHED,
+            user_id=user_id,
+            category_id=int(data_form.get("category_id"))
+        )
+
+        ingredient_objects = []
+        for item in ingredients_list:
+            unit_enum_value = UnitEnum(item.get("unit_measure").strip().lower())
+            new_ingredient = Ingredient(
+                name=item.get("name"),
+                quantity=float(item.get("quantity")),
+                unit_measure=unit_enum_value,
+                density_id=int(item.get("density_id"))
+            )
+            ingredient_objects.append(new_ingredient)
+
+        new_recipe.ingredient_recipe = ingredient_objects
+
+        db.session.add(new_recipe)
+        db.session.commit()
+
+        return jsonify({"message": "Recipe created and successfully published."}), 201
+
+    except Exception as error:
+        db.session.rollback()
+        return jsonify({"message": "Error saving the recipe to the database.", "details": str(error)}), 400
