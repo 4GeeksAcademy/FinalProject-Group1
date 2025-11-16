@@ -13,6 +13,10 @@ import Register from "./pages/Register";
 import { Myprofile } from "./pages/Myprofile";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
+import CreateRecipe from "./pages/CreateRecipe";
+import Login from "./pages/Login";
+import EditRecipe from "./pages/EditRecipe";
+
 
 export const router = createBrowserRouter(
     createRoutesFromElements(
@@ -33,6 +37,9 @@ export const router = createBrowserRouter(
         <Route path="/myprofile" element={<Myprofile />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/create-recipe" element={<CreateRecipe/>}/>
+        <Route path="/recipes-edit/:recipe_id" element={<EditRecipe/>}/>
+        <Route path="/login" element={<Login/>}/>
       </Route>
     )
 );

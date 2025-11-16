@@ -1,6 +1,17 @@
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
+import useGlobalReducer from "../hooks/useGlobalReducer";
+
 
 export const Navbar = () => {
+
+	const { store, dispatch } = useGlobalReducer()
+
+	const logout = () => {
+		dispatch({ type: "SET_TOKEN", payload: null })
+		dispatch({ type: "SET_USER", payload: null })
+		localStorage.removeItem("token")
+		localStorage.removeItem("user")
+	}
 
 	return (
 		<nav className="container navbar navbar-expand-lg bg-body-tertiary">
@@ -16,8 +27,28 @@ export const Navbar = () => {
 						</li>
 						<form className="d-flex" role="search">
 							<input className="form-control me-2" type="search" placeholder="Search" aria-label="Search" />
-							<button  className="btn btn-outline-success" type="submit">Search</button>
+							<button className="btn btn-outline-success" type="submit">Search</button>
 						</form>
+						<li>
+							{
+								store.token ? (
+									<div>
+										<button
+											className="btn btn-outline-secondary ms-3 text-black"
+											onClick={() => logout()}
+										>Cerrar sesión</button>
+									</div>
+								) : (
+									<div>
+										<NavLink
+											to={"/login"}
+											className={"btn btn-outline-light text-black"}>
+											Iniciar Sesión
+										</NavLink>
+									</div>
+								)
+							}
+						</li>
 						<li className="nav-item dropdown">
 							<a id="Settings" className="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
 								Settings
