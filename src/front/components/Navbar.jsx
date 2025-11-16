@@ -27,6 +27,11 @@ export const Navbar = () => {
 								<li><a className="dropdown-item" href="#">Log out</a></li>
 							</ul>
 						</li>
+						<li className="d-flex nav-item">
+							<div className="bg-secondary rounded-circle pt-1" style={{ width: "40px", height: "40px" }}>
+								Foto
+							</div>
+						</li>
 					</ul>
 				</div>
 			</div>

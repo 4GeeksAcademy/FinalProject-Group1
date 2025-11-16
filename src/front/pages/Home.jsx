@@ -27,6 +27,7 @@ export const Home = () => {
 		}
 
 	}
+	
 
 	useEffect(() => {
 		loadMessage()
