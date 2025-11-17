@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import useGlobalReducer from '../hooks/useGlobalReducer';
 
+
 export const Login = () => {
 
     const [username, setUsername] = useState('');
@@ -9,10 +10,10 @@ export const Login = () => {
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(false);
 
-    const { actions } = useGlobalReducer();
+    const { dispatch } = useGlobalReducer();
     const navigate = useNavigate();
 
-    const API_URL = 'import.meta.env.VITE_BACKEND_URL';
+    const API_URL = import.meta.env.VITE_BACKEND_URL;
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -27,25 +28,24 @@ export const Login = () => {
         }
 
         try {
-            const response = await fetch(API_URL, {
+            const response = await fetch(`${API_URL}/login`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({ username, password })
             });
-
             const data = await response.json();
 
             if (response.ok) {
                 const { token, user_info } = data;
+                console.log ("Login exitoso, token recibido:", user_info);
+                localStorage.setItem('access_token', token); 
+                dispatch({ type: "SET_USER", payload: user_info })
+                dispatch({ type: "SET_TOKEN", payload: data.token })
 
-                localStorage.setItem('access_token', token);
-
-                actions.setAuthData(token, user_info);
-
-                console.log(data.msg);
-                navigate('/admin-panel');
+                localStorage.setItem("token", data.token)
+                navigate('/');
 
             } else {
                 const errorMessage = data.message || 'Error desconocido al iniciar sesión.';
