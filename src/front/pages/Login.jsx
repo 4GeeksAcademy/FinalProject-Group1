@@ -1,18 +1,19 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import useGlobalReducer from '../hooks/useGlobalReducer'; 
+import useGlobalReducer from '../hooks/useGlobalReducer';
+
 
 export const Login = () => {
-    
+
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState(null);
-    const [loading, setLoading] = useState(false); 
-    
-    const { actions } = useGlobalReducer(); 
+    const [loading, setLoading] = useState(false);
+
+    const { dispatch } = useGlobalReducer();
     const navigate = useNavigate();
 
-    const API_URL = 'http://localhost:3001/api/login';
+    const API_URL = import.meta.env.VITE_BACKEND_URL;
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -27,27 +28,26 @@ export const Login = () => {
         }
 
         try {
-            const response = await fetch(API_URL, {
+            const response = await fetch(`${API_URL}/login`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({ username, password })
             });
-
             const data = await response.json();
 
-            if (response.ok) { 
+            if (response.ok) {
                 const { token, user_info } = data;
-
+                console.log ("Login exitoso, token recibido:", user_info);
                 localStorage.setItem('access_token', token); 
+                dispatch({ type: "SET_USER", payload: user_info })
+                dispatch({ type: "SET_TOKEN", payload: data.token })
 
-                actions.setAuthData(token, user_info); 
+                localStorage.setItem("token", data.token)
+                navigate('/');
 
-                console.log(data.msg);
-                navigate('/admin-panel'); 
-
-            } else { 
+            } else {
                 const errorMessage = data.message || 'Error desconocido al iniciar sesión.';
                 setError(errorMessage);
 
@@ -71,7 +71,7 @@ export const Login = () => {
                         <div className="card-body">
                             <form onSubmit={handleSubmit}>
                                 {error && <div className="alert alert-danger">{error}</div>}
-                                
+
                                 {/* Campo de Usuario */}
                                 <div className="mb-3">
                                     <label htmlFor="username">Usuario</label>
@@ -100,7 +100,7 @@ export const Login = () => {
                                     {loading ? 'Cargando...' : 'Ingresar'}
                                 </button>
                             </form>
-                            
+
                             {/* Enlaces requeridos */}
                             <div className="mt-3 text-center">
                                 <Link to="/register" className="me-3">Registrarme</Link>
