@@ -8,6 +8,8 @@ import { Demo } from "./pages/Demo";
 import Register from "./pages/Register";
 import { Myprofile } from "./pages/Myprofile";
 import { Login } from "./pages/login"; 
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 
 export const router = createBrowserRouter(
     createRoutesFromElements(
@@ -24,5 +26,8 @@ export const router = createBrowserRouter(
         <Route path="/admin-panel" element={<h1>Panel de Administración</h1>} />
         
     </Route>
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
+      </Route>
     )
 );
