@@ -16,8 +16,8 @@ export const Navbar = () => {
 							<a className="nav-link active pt-3 px-3" aria-current="page" href="/">Mis recetas</a>
 						</li>
 						<form className="d-flex" role="search">
-							<input className="form-control me-2" type="search" placeholder="Search" aria-label="Search" />
-							<button  className="btn btn-outline-success" type="submit">Search</button>
+							<input className="form-control me-2 pt-0" type="search" placeholder="Search" aria-label="Search" />
+							<button  className="btn btn-outline-success py-0" type="submit">Search</button>
 						</form>
 						<li className="nav-item dropdown">
 							<a id="Settings" className="nav-link dropdown-toggle p-0" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
