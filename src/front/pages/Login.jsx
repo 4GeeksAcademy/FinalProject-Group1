@@ -40,11 +40,11 @@ export const Login = () => {
             if (response.ok) {
                 const { token, user_info } = data;
                 console.log ("Login exitoso, token recibido:", user_info);
-                localStorage.setItem('access_token', token); 
+                localStorage.setItem('access_token', token);
+                localStorage.setItem('user', JSON.stringify(user_info));
                 dispatch({ type: "SET_USER", payload: user_info })
                 dispatch({ type: "SET_TOKEN", payload: data.token })
 
-                localStorage.setItem("token", data.token)
                 navigate('/');
 
             } else {
