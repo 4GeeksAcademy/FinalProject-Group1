@@ -4,6 +4,10 @@ export const initialStore=()=>{
     message: null,
     todos: [
       {
+        token: null,
+        user: null
+      },
+      {
         id: 1,
         title: "Make the bed",
         background: null,
