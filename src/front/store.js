@@ -1,6 +1,8 @@
 export const initialStore=()=>{
   return{
-    currentUserId: 5,
+    token: null,
+    currentUserId: null,
+    user: null,
     message: null,
     todos: [
       {
@@ -27,6 +29,28 @@ export default function storeReducer(store, action = {}) {
       return {
         ...store,
         message: action.payload
+      };
+
+    case 'login_success':
+      return {
+        ...store,
+        token: action.payload.token,
+        currentUserId: action.payload.user_id,
+        user: action.payload.user
+      };
+
+    case 'logout':
+      return {
+        ...store,
+        token: null,
+        currentUserId: null,
+        user: null
+      };
+
+    case 'update_user':
+      return {
+        ...store,
+        user: action.payload
       };
       
     case 'add_task':

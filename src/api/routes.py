@@ -33,12 +33,12 @@ def getUser(user_id):
 
     
 
-@api.route("/users/<int:user_id>", methods=["PUT"])
-# @api.route("user/", methods=["PUT"])
-# @jwt_required
-def updateUser(user_id): #quitar el user_id y dejarlo vacio
-    # current_user_id = get_jwt_identity()
-    user = User.query.get(user_id) #reemplazar "user_id" por "current_user_id"
+
+@api.route("/user", methods=["PUT"])
+@jwt_required()
+def updateUser():
+    current_user_id = get_jwt_identity()
+    user = User.query.get(current_user_id) 
     if not user:
         return jsonify({"message": "User not found"}), 404
 
@@ -53,7 +53,26 @@ def updateUser(user_id): #quitar el user_id y dejarlo vacio
     fullname = data.get("fullname")
     username = data.get("username")
 
-    #validaciones de los campos
+    if email:
+        if not val_email(email):
+            return jsonify({"message": "Email is invalid"}), 400
+        
+        # Verificar si ya existe el email
+
+        existing_email_user = User.query.filter_by(email=email).first()
+        if existing_email_user and existing_email_user.id != current_user_id:
+            return jsonify({"message": "This email is already registered"}), 400
+
+        user.email = email
+
+    
+    if username:
+        # Verificar si ya existe el username
+        existing_username_user = User.query.filter_by(username=username).first()
+        if existing_username_user and existing_username_user.id != current_user_id:
+            return jsonify({"message": "This username is already in use"}), 400
+
+
     if email:
         if not val_email(email):
             return jsonify({"message": "Email is invalid,"}), 400
