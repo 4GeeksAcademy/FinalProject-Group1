@@ -213,6 +213,7 @@ def edit_category(id):
             "error": f"{error.args}"
         }), 500
 
+
 @api.route("/categories/<int:id>", methods=["DELETE"])
 def delete_category(id):
     
