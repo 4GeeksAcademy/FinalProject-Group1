@@ -1,10 +1,17 @@
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 // CORRECCIÓN: Se agrega explícitamente la extensión .jsx para resolver el problema de importación.
 import useGlobalReducer from "../hooks/useGlobalReducer.jsx";
 
 
 export const Navbar = () => {
-    const { store, actions } = useGlobalReducer();
+ const { store, dispatch } = useGlobalReducer()
+
+	const logout = () => {
+		dispatch({ type: "SET_TOKEN", payload: null })
+		dispatch({ type: "SET_USER", payload: null })
+		localStorage.removeItem("token")
+		localStorage.removeItem("user")
+	}
 
 	return (
 		<nav className="container navbar navbar-expand-lg bg-body-tertiary p-0">
@@ -22,6 +29,26 @@ export const Navbar = () => {
 							<input className="form-control me-2 pt-0" type="search" placeholder="Search" aria-label="Search" />
 							<button  className="btn btn-outline-success py-0" type="submit">Search</button>
 						</form>
+						<li>
+							{
+								store.token ? (
+									<div>
+										<button
+											className="btn btn-outline-secondary ms-3 text-black"
+											onClick={() => logout()}
+										>Cerrar sesión</button>
+									</div>
+								) : (
+									<div>
+										<NavLink
+											to={"/login"}
+											className={"btn btn-outline-light text-black"}>
+											Iniciar Sesión
+										</NavLink>
+									</div>
+								)
+							}
+						</li>
 						<li className="nav-item dropdown">
 							<a id="Settings" className="nav-link dropdown-toggle p-0" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
 								<span className="profile-photo-navbar bg-secondary rounded-circle">Photo</span>
