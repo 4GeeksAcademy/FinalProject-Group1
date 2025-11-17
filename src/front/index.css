@@ -1,0 +1,11 @@
+.profile-photo-navbar {
+    width: 3rem;
+    height: 3rem;
+    display: inline-block;
+    background-color: #6c757d;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 1rem;
+    color: white;
+    font-size: 0.5rem;
+}
