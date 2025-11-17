@@ -1,7 +1,10 @@
 import { Link } from "react-router-dom";
+// CORRECCIÓN: Se agrega explícitamente la extensión .jsx para resolver el problema de importación.
+import useGlobalReducer from "../hooks/useGlobalReducer.jsx";
 
 
 export const Navbar = () => {
+    const { store, actions } = useGlobalReducer();
 
 	return (
 		<nav className="container navbar navbar-expand-lg bg-body-tertiary p-0">
