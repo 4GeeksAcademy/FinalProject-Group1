@@ -13,6 +13,7 @@ from datetime import timedelta
 from functools import wraps
 import json
 from .cloudinary_service import cloudinary_service
+from sqlalchemy import select
 
 
 api = Blueprint('api', __name__)
@@ -281,30 +282,6 @@ def login_user():
     return jsonify({"msg": "Login successful", "token": token, "user_info": user.serialize()}), 200
 
 
-def admin_required():
-    def wrapper(fn):
-        @wraps(fn)
-        @jwt_required()
-        def decorator(*args, **kwargs):
-            claims = get_jwt()
-            if claims.get("is_administrator", False) is True:
-                return fn(*args, **kwargs)
-            else:
-                return jsonify({"msg": "Acceso denegado. Se requiere rol de administrador."}), 403
-        return decorator
-    return wrapper
-
-
-@api.route("/me", methods=["GET"])
-@jwt_required()
-def me():
-    user_id = get_jwt_identity()
-    user = User.query.get(user_id)
-    if user is None:
-        return jsonify({"message": "User not found or deleted."}), 404
-    return jsonify({"user": user.serialize()}), 200
-
-
 @api.route("/recipes", methods=["POST"])
 @jwt_required()
 def create_recipe():
@@ -332,11 +309,9 @@ def create_recipe():
         return jsonify({"message": "Ingredients must be a list of objects", "details": str(error)}), 400
 
     if is_admin:
-        # Si es Administrador, publica directamente.
         initial_state = stateRecipeEnum.PUBLISHED
         success_message = "Recipe created and successfully published."
     else:
-        # Si es un usuario normal, se envía a revisión.
         initial_state = stateRecipeEnum.PENDING
         success_message = "Recipe created and submitted for review."
 
@@ -404,176 +379,23 @@ def create_recipe():
         return jsonify({"message": "Error saving the recipe to the database.", "details": str(error)}), 400
 
 
-@api.route("/recipes/<int:recipe_id>", methods=["PUT"])
-@jwt_required()
-def edit_recipe(recipe_id):
-    """Permite al administrador editar una receta existente."""
-    user_id = get_jwt_identity()
-    claims = get_jwt()
-    is_admin = claims.get("is_administrator", False)
-
-    # 🛑 2. BUSCAR RECETA
-    recipe = db.session.get(Recipe, recipe_id)
-    if recipe is None:
-        return jsonify({"message": f"Recipe with ID {recipe_id} not found."}), 404
-
-    # Caso 1: Administrador puede editar CUALQUIERA, sin importar el estado.
-    if is_admin:
-        pass  # Permitir la ejecución del resto de la función.
-
-    else:
-        # A. Si la receta está PUBLICADA, el usuario NO puede editar.
-        if recipe.state_recipe == stateRecipeEnum.published:
-            return jsonify({"message": "Access denied. Only administrators can edit published recipes."}), 403
-
-        # B. Si la receta está PENDIENTE, verificar que sea SU receta.
-        if recipe.state_recipe == stateRecipeEnum.pending:
-            if recipe.user_id != user_id:
-                # No es su receta
-                return jsonify({"message": "Access denied. You can only edit your own pending recipes."}), 403
-            # Si es su receta PENDIENTE, permitir la ejecución del resto de la función.
-        # C. (Otras validaciones si agregas más estados, ej. RECHAZADA)
-        # Por ahora, si es un estado desconocido, por defecto se deniega.
-        else:
-            return jsonify({"message": "Access denied. You do not have permission to edit this recipe."}), 403
-
-    data_form = request.form
-    data_files = request.files
-
-    # El ingrediente JSON es obligatorio
-    ingredients_str = data_form.get("ingredients_json")
-    if not ingredients_str:
-        return jsonify({"message": "Ingredients data is missing."}), 400
-
+@api.route("/recipes", methods=["GET"])
+def get_published_recipes():
     try:
-        ingredients_list = json.loads(ingredients_str)
-        if not isinstance(ingredients_list, list):
-            raise ValueError("Ingredients must be a list of objects.")
-    except Exception as error:
-        return jsonify({"message": "Invalid ingredients format.", "details": str(error)}), 400
+        published_recipes = db.session.execute(
+            db.select(Recipe)
+            .filter(Recipe.state_recipe == stateRecipeEnum.PUBLISHED)
+            .order_by(Recipe.created_at.desc())
+        ).scalars().all()
+        response_body = [recipe.serialize() for recipe in published_recipes]
 
-    # 🛑 3. ACTUALIZAR CAMPOS BÁSICOS
-    try:
-        recipe.title = data_form.get("title", recipe.title)
-        recipe.steps = data_form.get("steps", recipe.steps)
-        recipe.preparation_time_min = int(data_form.get(
-            "prep_time_min", recipe.preparation_time_min))
-        recipe.portions = int(data_form.get("portions", recipe.portions))
-        recipe.category_id = int(data_form.get(
-            "category_id", recipe.category_id))
-
-        # Asumiendo que la dificultad se envía como string (ej. "FÁCIL")
-        new_difficulty_str = data_form.get("difficulty")
-        if new_difficulty_str:
-            recipe.difficulty = difficultyEnum(
-                new_difficulty_str.strip().lower())
-
-        # Opcional: Si el administrador edita, puede cambiar el estado de PENDING a PUBLISHED
-        # Si no se envía estado, se mantiene el actual.
-        # Esto podría manejarse con una ruta separada de moderación, pero lo dejamos aquí por ahora.
-        # new_state_str = data_form.get("state_recipe")
-        # if new_state_str:
-        #     recipe.state_recipe = stateRecipeEnum(new_state_str.strip().lower())
-
-    except ValueError as e:
-        db.session.rollback()
-        return jsonify({"message": "Invalid data type for one or more fields.", "details": str(e)}), 400
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({"message": "Error updating basic recipe fields.", "details": str(e)}), 400
-
-    # 🛑 4. MANEJO DE IMAGEN (Si se sube una nueva)
-    image_file = data_files.get("image")
-    if image_file:
-        try:
-            # Lógica 1: Opcional, pero recomendada: BORRAR la imagen antigua de Cloudinary.
-            # Aquí necesitarías la ID pública de la imagen antigua (si la guardaste).
-            # cloudinary_service.delete_image(recipe.image)
-
-            # Lógica 2: Subir la nueva imagen.
-            new_image_url = cloudinary_service.upload_image(
-                image_file, folder_name="recipe_images")
-
-            recipe.image = new_image_url
-
-        except Exception as error:
-            # Si la subida de la nueva imagen falla, se hace rollback y se retorna error.
-            return jsonify({"message": f"Image update failed. Details: {str(error)}"}), 500
-
-    # 🛑 5. ACTUALIZAR INGREDIENTES (El paso complejo)
-    try:
-        # A. Borrar todos los ingredientes actuales de la receta (relación N:M)
-        # Esto asegura que la lista de ingredientes sea exactamente la que viene en la petición.
-        recipe.recipe_ingredients_details = []
-
-        # B. Crear los nuevos objetos RecipeIngredient
-        recipe_ingredient_objects = []
-        for item in ingredients_list:
-            ingredient_name = item.get("name").strip().lower()
-            quantity = float(item.get("quantity"))
-            unit_enum_value = UnitEnum(
-                item.get("unit_measure").strip().lower())
-
-            # La lógica para buscar/crear en la tabla Ingredient es la misma que en POST
-            ingredient_catalog = Ingredient.query.filter_by(
-                name=ingredient_name).one_or_none()
-            if ingredient_catalog is None:
-                # Creación de nuevo ingrediente en el catálogo (si no existe)
-                ingredient_catalog = Ingredient(
-                    name=ingredient_name, calories_per_100=0.0, protein_per_100=0.0, carbs_per_100=0.0, fat_per_100=0.0)
-                db.session.add(ingredient_catalog)
-                db.session.flush()  # Importante: db.session.flush() para obtener el ID antes del commit
-
-            new_recipe_ingredient = RecipeIngredient(
-                quantity=quantity,
-                unit_measure=unit_enum_value,
-                recipe=recipe,  # En la relación RecipeIngredient, tu variable es 'recipe'
-                ingredient_catalog=ingredient_catalog
-            )
-            recipe_ingredient_objects.append(new_recipe_ingredient)
-
-        # C. Agregar las nuevas relaciones (N:M)
-        db.session.add_all(recipe_ingredient_objects)
-
-        db.session.commit()
-
-        return jsonify({"message": "Recipe updated successfully.", "recipe": recipe.serialize()}), 200
+        return jsonify({
+            "message": "List of successfully published recipes",
+            "recipes": response_body
+        }), 200
 
     except Exception as error:
-        db.session.rollback()
-        return jsonify({"message": "Error updating recipe details or ingredients.", "details": str(error)}), 400
-
-
-@api.route("/recipes/<int:recipe_id>", methods=["GET"])
-# El token es opcional, ya que los publicados son públicos
-@jwt_required(optional=True)
-def get_recipe_by_id(recipe_id):
-    """Devuelve los detalles de una receta, aplicando reglas de visibilidad."""
-
-    recipe = db.session.get(Recipe, recipe_id)
-    if recipe is None:
-        return jsonify({"message": f"Recipe with ID {recipe_id} not found."}), 404
-
-    # --- Lógica de Visibilidad ---
-
-    # 1. Si la receta está PUBLICADA, cualquier persona (autenticada o no) puede verla.
-    if recipe.state_recipe == stateRecipeEnum.published:
-        return jsonify(recipe.serialize()), 200
-
-    # 2. Si la receta NO está publicada (PENDING, REJECTED, etc.), necesitamos permisos.
-
-    # Obtener info del usuario logueado (si existe)
-    user_id = get_jwt_identity()
-    claims = get_jwt()
-    is_admin = claims.get("is_administrator", False) if claims else False
-
-    # A. El Administrador puede ver cualquier receta (publicada o no).
-    if is_admin:
-        return jsonify(recipe.serialize()), 200
-
-    # B. El usuario creador puede ver su propia receta (ej. si está PENDING).
-    if user_id is not None and recipe.user_id == user_id:
-        return jsonify(recipe.serialize()), 200
-
-    # 3. Si no cumple ninguna de las condiciones de visibilidad.
-    return jsonify({"message": "Recipe not found or access denied."}), 404
+        return jsonify({
+            "message": "Internal server error while processing the request.",
+            "error_detail": str(error)
+        }), 500

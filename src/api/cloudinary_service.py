@@ -18,10 +18,10 @@ class CloudinaryService:
                 folder=folder_name, 
                 resource_type="auto"
             )
-
             return upload_result['secure_url']
-        except Exception as e:
-            print(f"Cloudinary Upload Error: {e}")
-            raise Exception("Error al subir la imagen. Verifique las credenciales de Cloudinary.")
+        
+        except Exception as error:
+            print(f"Cloudinary Upload Error: {error}")
+            raise Exception("Error uploading image. Please verify your Cloudinary credentials.")
 
 cloudinary_service = CloudinaryService()

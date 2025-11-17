@@ -135,7 +135,7 @@ class Recipe(db.Model):
 
     def serialize(self):
         ingredients_list = [
-            ri.serialize() for ri in self.recipe_ingredients
+            item.serialize() for item in self.recipe_ingredients_details
         ]
         return {
             "id": self.id_recipe,
@@ -151,17 +151,19 @@ class Recipe(db.Model):
             "nutritional_data": self.nutritional_data,
             "creator_id": self.user_id,
             "category_id": self.category_id,
+            "category_name": self.category_recipe.name_category,
             "ingredients": ingredients_list,
             "created_at": self.created_at.isoformat(),
         }
 
 
-# CLASE INGREDIENT (Catálogo de Sustancias) los gramos y demás
+# Clase ingrediente (el catálogo)
 
 class Ingredient(db.Model):
     id_ingredient: Mapped[int] = mapped_column(primary_key=True)
-    # es para el nombre ÚNICO para que no haya dos entradas de "Harina de Trigo"
+    # es para el nombre, para que no haya dos ingredientes repetidos
     name: Mapped[str] = mapped_column(String(100), unique=True, nullable=False) 
+    # lo coloco por si nos da tiempo de hacer lo de las conversiones
     volume_to_mass_factor: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
     unit_to_mass_factor: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
     # Para valores nutricionales por 100g/ml 
@@ -190,7 +192,7 @@ class Ingredient(db.Model):
     
 
 
-# Para presentar el detalle de la Receta - Una clase intermedia
+# Para presentar el detalle de la Receta - Una clase intermedia, de enlace entre las dos tablas, ingredientes y recetas
 
 class RecipeIngredient(db.Model):
     id_recipe_ingredient: Mapped[int] = mapped_column(primary_key=True) 
@@ -215,36 +217,3 @@ class RecipeIngredient(db.Model):
             "quantity": self.quantity,
             "unit_measure": self.unit_measure.value,
         }
-
-# class Ingredient(db.Model):
-#     id_ingredient: Mapped[int] = mapped_column(primary_key=True)
-#     name: Mapped[str] = mapped_column(String(100), nullable=False)
-#     quantity: Mapped[float] = mapped_column(Float, nullable=False)
-#     unit_measure: Mapped[str] = mapped_column(Enum(UnitEnum), nullable=False)
-
-#     recipe_id: Mapped[int] = mapped_column(
-#         db.ForeignKey('recipe.id_recipe'), nullable=False)
-#     recipe_ingredient: Mapped["Recipe"] = relationship(
-#         back_populates="ingredient_recipe")
-
-#     density_id: Mapped[int] = mapped_column(
-#         db.ForeignKey('density.id'), nullable=False)
-#     density_ingredient: Mapped["Density"] = relationship(
-#         back_populates="ingredient_density")
-
-#     def __repr__(self):
-#         return f'<Ingredient {self.name} for Recipe ID: {self.recipe_id}>'
-
-#     def serialize(self):
-#         return {
-#             "id": self.id_ingredient,
-#             "name": self.name,
-#             "quantity": self.quantity,
-#             "unit_measure": self.unit_measure.value,
-#             "recipe_id": self.recipe_id,
-#             "density_id": self.density_id,
-#         }
-
-
-
-

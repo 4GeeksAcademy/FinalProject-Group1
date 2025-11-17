@@ -1,14 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Toaster, toast } from 'sonner';
-// Asumo que el CSS de register.css y Bootstrap están disponibles en el entorno de la aplicación.
 
-// --- ENUMS Y CONSTANTES ---
-
-// Los valores de dificultad deben coincidir con tu DifficultyEnum en el backend
 const DIFFICULTIES = ["FÁCIL", "MEDIO", "DIFÍCIL"];
 
-// Las unidades deben coincidir con tu UnitEnum en el backend (ej: GRAMS -> g)
 const UNITS = [
     { label: "Gramos (g)", value: "g" },
     { label: "Mililitros (ml)", value: "ml" },
@@ -16,8 +11,9 @@ const UNITS = [
     { label: "Cucharada", value: "tbsp" },
     { label: "Cucharadita", value: "tsp" },
 ];
+  
 
-// Simulamos categorías estáticas para el dropdown hasta que tengamos un endpoint para listarlas
+// OJO. Debo botrrar estas categorías, pues son simuladas para probar. 
 const MOCK_CATEGORIES = [
     { id: 1, name: "Postres" },
     { id: 2, name: "Platos Principales" },
@@ -27,24 +23,21 @@ const MOCK_CATEGORIES = [
 const initialRecipeState = {
     title: "",
     steps: "",
-    prep_time_min: 30, // Default 30 min
-    difficulty: DIFFICULTIES[0], // Default FÁCIL
-    portions: 4, // Default 4
-    category_id: MOCK_CATEGORIES[0].id, // Default Postres
+    prep_time_min: 0,
+    difficulty: DIFFICULTIES[0],
+    portions: 4,
+    category_id: MOCK_CATEGORIES[0].id,
 };
 
-// Estado inicial para un ingrediente
+
 const initialIngredient = {
     name: "",
     quantity: 0,
     unit_measure: UNITS[0].value,
 };
 
-// Obtención de la URL base
-// NOTA IMPORTANTE: Para evitar el warning de compilación, he reemplazado el uso de 'import.meta.env' 
-// con un valor placeholder. Por favor, asegúrate de reemplazar esta línea con tu variable de entorno real 
-// si tu configuración de compilación lo permite, o utiliza la URL directa de tu backend.
-// Ejemplo: const urlBase = import.meta.env.VITE_BACKEND_URL;
+
+
 const urlBase = import.meta.env.VITE_BACKEND_URL;
 
 
@@ -55,23 +48,15 @@ const CreateRecipe = () => {
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
-    // NOTA IMPORTANTE PARA EL USER
-    // En un entorno real, el token JWT del administrador se obtendría aquí
-    // a través de un Context o Hook de autenticación.
-    // Por ahora, lo simulamos para recordarlo.
     const getAuthToken = () => {
-        // Debes reemplazar esta lógica con la obtención real del token JWT
-        // de un usuario con rol de ADMINISTRADOR, por ejemplo, desde localStorage.
         const token = localStorage.getItem("token");
         if (!token) {
-            toast.error("Debes iniciar sesión como administrador para crear recetas.");
+            toast.error("Debes iniciar sesión para crear recetas.");
             return null;
         }
         return token;
     };
 
-
-    // --- MANEJO DE CAMBIOS DEL FORMULARIO PRINCIPAL ---
 
     const handleChange = ({ target }) => {
         const { name, value, type } = target;
@@ -90,7 +75,6 @@ const CreateRecipe = () => {
         }
     };
 
-    // --- MANEJO DINÁMICO DE INGREDIENTES ---
 
     const handleIngredientChange = (index, { target }) => {
         const { name, value, type } = target;
@@ -98,7 +82,6 @@ const CreateRecipe = () => {
             if (i === index) {
                 return {
                     ...item,
-                    // Si es cantidad, lo parseamos a float
                     [name]: type === 'number' ? parseFloat(value) : value,
                 };
             }
@@ -108,7 +91,6 @@ const CreateRecipe = () => {
     };
 
     const addIngredient = () => {
-        // Solo añadimos si el último ingrediente tiene nombre y cantidad
         const lastIngredient = ingredients[ingredients.length - 1];
         if (lastIngredient.name.trim() && lastIngredient.quantity > 0) {
             setIngredients([...ingredients, initialIngredient]);
@@ -125,7 +107,6 @@ const CreateRecipe = () => {
         }
     };
 
-    // --- MANEJO DEL ENVÍO DEL FORMULARIO ---
 
     const handleSubmit = async (event) => {
         event.preventDefault();
@@ -137,7 +118,7 @@ const CreateRecipe = () => {
             return;
         }
 
-        // 1. Validación Mínima y Estandarización
+
         if (!imageFile) {
             toast.error("Debes subir una imagen para la receta.");
             setLoading(false);
@@ -151,39 +132,30 @@ const CreateRecipe = () => {
             return;
         }
 
-        // Estandarizar y formatear ingredientes para el backend
+
         const formattedIngredients = validIngredients.map(item => ({
-            name: item.name.trim(), // El backend aplicará .lower()
+            name: item.name.trim(),
             quantity: item.quantity,
             unit_measure: item.unit_measure,
         }));
 
 
-        // 2. Creación del objeto FormData (requerido para enviar archivos)
+
         const formData = new FormData();
 
-        // A. Añadir campos de texto
         formData.append("title", recipeData.title);
         formData.append("steps", recipeData.steps);
         formData.append("prep_time_min", recipeData.prep_time_min.toString());
         formData.append("difficulty", recipeData.difficulty);
         formData.append("portions", recipeData.portions.toString());
         formData.append("category_id", recipeData.category_id.toString());
-
-        // B. Añadir el archivo de imagen
         formData.append("image", imageFile);
-
-        // C. Añadir el JSON de ingredientes como string
         formData.append("ingredients_json", JSON.stringify(formattedIngredients));
 
-
-        // 3. Envío al Backend
         try {
             const response = await fetch(`${urlBase}/recipes`, {
                 method: "POST",
                 headers: {
-                    // ¡OJO! No incluyas 'Content-Type': 'application/json' cuando envías FormData. 
-                    // El navegador lo gestiona automáticamente con el boundary correcto.
                     "Authorization": `Bearer ${token}`,
                 },
                 body: formData,
@@ -199,10 +171,9 @@ const CreateRecipe = () => {
                 setRecipeData(initialRecipeState);
                 setIngredients([initialIngredient]);
                 setImageFile(null);
-                // Opcional: navegar a la página de la nueva receta o al listado
-                setTimeout(() => navigate("/"), 2000); 
+
+                setTimeout(() => navigate("/"), 2000);
             } else {
-                // Manejo de errores específicos del backend
                 const message = data.message || "Error desconocido al guardar la receta.";
                 toast.error(`Error: ${message}`);
             }
@@ -215,7 +186,6 @@ const CreateRecipe = () => {
     };
 
 
-    // Comprobación de que todos los campos requeridos estén llenos
     const isFormComplete =
         recipeData.title &&
         recipeData.steps &&
@@ -226,34 +196,23 @@ const CreateRecipe = () => {
 
 
     return (
-        // Se añade la dependencia de Bootstrap CSS para que se visualice correctamente
         <>
-            <link
-                rel="stylesheet"
-                href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-                xintegrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
-                crossOrigin="anonymous"
-            />
-            <div className="container" style={{ paddingTop: '20px', paddingBottom: '20px' }}>
+            <div className="container pt-5">
                 <Toaster position="top-center" richColors />
                 <div className="row justify-content-center">
                     <div className="col-12 col-lg-10">
-                        <h1 className="text-center bg-warning-subtle mx-2 p-4 mb-5 rounded-lg shadow-md">Crear Nueva Receta</h1>
-
+                        <h1 className="text-center bg-warning-subtle mx-2 p-4 mb-5 shadow">Crear nueva receta</h1>
                         <form
-                            className="border border-secondary form-group p-5 bg-light rounded-lg shadow-lg"
+                            className="border border-secondary form-group p-5 bg-light shadow"
                             onSubmit={handleSubmit}
                         >
-                            {/* SECCIÓN 1: DATOS GENERALES DE LA RECETA */}
-                            <h4 className="mb-4 text-primary border-bottom pb-2">Información Básica</h4>
-
-                            {/* Título y Categoría */}
+                            <h4 className="mb-4 text-primary border-bottom pb-2">Completa todos los requerimientos</h4>
                             <div className="row mb-3">
                                 <div className="col-md-8 form-group">
                                     <label htmlFor="txtTitle" className="form-label"><b>Título de la Receta:</b></label>
                                     <input
                                         type="text"
-                                        placeholder="Brownie de Chocolate"
+                                        placeholder="Torta de limón"
                                         className="form-control"
                                         id="txtTitle"
                                         name="title"
@@ -263,10 +222,10 @@ const CreateRecipe = () => {
                                     />
                                 </div>
                                 <div className="col-md-4 form-group">
-                                    <label htmlFor="selectCategory" className="form-label"><b>Categoría:</b></label>
+                                    <label htmlFor="txtCategory" className="form-label"><b>Categoría:</b></label>
                                     <select
                                         className="form-select"
-                                        id="selectCategory"
+                                        id="txtCategory"
                                         name="category_id"
                                         onChange={handleChange}
                                         value={recipeData.category_id}
@@ -278,15 +237,13 @@ const CreateRecipe = () => {
                                     </select>
                                 </div>
                             </div>
-
-                            {/* Tiempo, Dificultad, Porciones */}
                             <div className="row mb-4">
                                 <div className="col-md-4 form-group">
                                     <label htmlFor="txtTime" className="form-label"><b>Tiempo de Prep. (min):</b></label>
                                     <input
                                         type="number"
                                         min="1"
-                                        placeholder="45"
+                                        placeholder="0"
                                         className="form-control"
                                         id="txtTime"
                                         name="prep_time_min"
@@ -296,10 +253,10 @@ const CreateRecipe = () => {
                                     />
                                 </div>
                                 <div className="col-md-4 form-group">
-                                    <label htmlFor="selectDifficulty" className="form-label"><b>Dificultad:</b></label>
+                                    <label htmlFor="txttDifficulty" className="form-label"><b>Dificultad:</b></label>
                                     <select
                                         className="form-select"
-                                        id="selectDifficulty"
+                                        id="txttDifficulty"
                                         name="difficulty"
                                         onChange={handleChange}
                                         value={recipeData.difficulty}
@@ -315,7 +272,7 @@ const CreateRecipe = () => {
                                     <input
                                         type="number"
                                         min="1"
-                                        placeholder="8"
+                                        placeholder="4"
                                         className="form-control"
                                         id="txtPortions"
                                         name="portions"
@@ -325,12 +282,11 @@ const CreateRecipe = () => {
                                     />
                                 </div>
                             </div>
-
-                            {/* Pasos / Instrucciones */}
                             <div className="form-group mb-4">
                                 <label htmlFor="txtSteps" className="form-label"><b>Pasos de Preparación:</b></label>
                                 <textarea
-                                    placeholder="1. Calentar el horno... 2. Mezclar los ingredientes..."
+                                    placeholder="1. Calentar el horno... 
+                                    2. Mezclar los ingredientes..."
                                     className="form-control"
                                     id="txtSteps"
                                     name="steps"
@@ -341,7 +297,6 @@ const CreateRecipe = () => {
                                 />
                             </div>
 
-                            {/* Carga de Imagen */}
                             <div className="form-group mb-5">
                                 <label htmlFor="fileImage" className="form-label"><b>Imagen de la Receta:</b></label>
                                 <input
@@ -358,12 +313,10 @@ const CreateRecipe = () => {
                                 )}
                             </div>
 
-
-                            {/* SECCIÓN 2: INGREDIENTES DINÁMICOS */}
                             <h4 className="mb-4 text-success border-bottom pb-2">Ingredientes</h4>
                             <p className="alert alert-info py-2 px-3 mb-4">
                                 <i className="fa-solid fa-circle-info me-2"></i>
-                                **RECUERDA:** Ingresa los ingredientes en **singular** (ej: "Huevo", no "Huevos") para mantener limpio el catálogo.
+                                Por favor ingresa los ingredientes en <b>**singular**</b> (ejemplo: "Huevo", no "Huevos").
                             </p>
 
 
@@ -373,7 +326,7 @@ const CreateRecipe = () => {
                                         <label className="form-label">Ingrediente #{index + 1}</label>
                                         <input
                                             type="text"
-                                            placeholder="ej: Huevo"
+                                            placeholder="ejemplo: Tomate"
                                             className="form-control"
                                             name="name"
                                             onChange={(e) => handleIngredientChange(index, e)}
@@ -387,7 +340,7 @@ const CreateRecipe = () => {
                                             type="number"
                                             min="0.1"
                                             step="0.1"
-                                            placeholder="ej: 250.5"
+                                            placeholder="ejemplo: 250.5"
                                             className="form-control"
                                             name="quantity"
                                             onChange={(e) => handleIngredientChange(index, e)}
@@ -423,7 +376,6 @@ const CreateRecipe = () => {
                                 </div>
                             ))}
 
-                            {/* Botón para añadir nuevo ingrediente */}
                             <div className="d-grid gap-2 mt-4">
                                 <button
                                     type="button"
@@ -433,9 +385,6 @@ const CreateRecipe = () => {
                                     <i className="fa-solid fa-circle-plus me-2"></i> Añadir otro ingrediente
                                 </button>
                             </div>
-
-
-                            {/* BOTÓN DE ENVÍO PRINCIPAL */}
                             <button
                                 className={`btn btn-primary w-100 mt-5 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 ${loading ? 'opacity-75' : ''}`}
                                 type="submit"
