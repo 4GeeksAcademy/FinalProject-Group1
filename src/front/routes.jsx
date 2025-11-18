@@ -10,6 +10,7 @@ import { Myprofile } from "./pages/Myprofile";
 import { Login } from "./pages/Login"; 
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
+import AdminCategories from "./pages/AdminCategories";
 
 export const router = createBrowserRouter(
     createRoutesFromElements(
@@ -22,7 +23,8 @@ export const router = createBrowserRouter(
         <Route path="/login" element={<Login />} /> 
         <Route path="/forgot-password" element={<h1>Recuperar Contraseña</h1>} />
         <Route path="/admin-panel" element={<h1>Panel de Administración</h1>} />
-        
+        <Route path="/admin/categories" element={<AdminCategories />} />
+
     </Route>
     )
 );
