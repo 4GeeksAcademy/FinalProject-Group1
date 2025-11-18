@@ -2,7 +2,6 @@ export const initialStore=()=>{
   return{
     token: localStorage.getItem("access_token") ?? null,
     user: JSON.parse(localStorage.getItem("user")) ?? null,
-    currentUserId: null,
     message: null,
     todos: [
       {
