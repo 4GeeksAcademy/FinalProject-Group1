@@ -40,3 +40,25 @@ class User(db.Model):
             "is_Active": self.is_active,
             "image": self.profile
         }
+
+
+# Empieza código de categoría
+
+class Category(db.Model):
+    __tablename__ = "categories"
+
+    id_category: Mapped[int] = mapped_column(primary_key=True)
+    name_category: Mapped[str] = mapped_column(String(55), unique=True, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(
+        timezone=True), default=lambda: datetime.now(timezone.utc), nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(
+        timezone.utc), onupdate=lambda: datetime.now(timezone.utc), nullable=False)
+
+    def __repr__(self):
+        return f'<Category {self.name_category}>'
+
+    def serialize(self):
+        return {
+            "id": self.id_category,
+            "name_category": self.name_category,
+        }
