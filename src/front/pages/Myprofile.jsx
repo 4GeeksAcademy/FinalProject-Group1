@@ -50,7 +50,7 @@ export const Myprofile = () => {
         const loadUser = async () => {
             try {
                 const backendUrl = import.meta.env.VITE_BACKEND_URL;
-                const response = await fetch(`${backendUrl}/users/${store.currentUserId}`);
+                const response = await fetch(`${backendUrl}/users/`);
 
                 if (!response.ok) throw new Error("Error loading user");
 

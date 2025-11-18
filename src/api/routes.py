@@ -37,12 +37,12 @@ def getUser(user_id):
 @api.route("/user", methods=["PUT"])
 @jwt_required()
 def updateUser():
-    current_user_id = get_jwt_identity()
-    user = User.query.get(current_user_id) 
+    user = get_jwt_identity()
+    user = User.query.get(user) 
     if not user:
         return jsonify({"message": "User not found"}), 404
 
-    data = request.get_json() #or {}
+    data = request.get_json()
     if data is None:
         return jsonify({"message": "Invalid JSON or no data provided"}), 400
     
