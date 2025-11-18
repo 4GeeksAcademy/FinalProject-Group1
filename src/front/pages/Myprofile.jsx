@@ -49,11 +49,14 @@ export const Myprofile = () => {
     useEffect(() => {
         const loadUser = async () => {
             try {
-                const backendUrl = import.meta.env.VITE_BACKEND_URL;
-                const response = await fetch(`${backendUrl}/users/`);
+                const response = await fetch(`${urlBase}/user/${store.user.id}`, {
+                    method: 'GET',
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": "Bearer " + store.token
 
-                if (!response.ok) throw new Error("Error loading user");
-
+                    },
+                })
                 const data = await response.json();
                 setUser(data);
             } catch (error) {
@@ -64,6 +67,32 @@ export const Myprofile = () => {
         loadUser();
     }, []);
 
+    const updateUser = async () => {
+        try {
+            const response = await fetch(`${urlBase}/user/${store.user.id}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer " + store.token
+                },
+                body: JSON.stringify({
+                    fullname: user.fullname,
+                    username: user.username,
+                    email: user.email,
+                    image: user.image
+                })
+            });
+
+            const data = await response.json();
+            console.log("Usuario actualizado:", data);
+
+            setUser(data);
+
+        } catch (error) {
+            console.error("Error actualizando usuario:", error);
+        }
+    };
+
 
     return (
         <div className="container">
@@ -72,14 +101,14 @@ export const Myprofile = () => {
                     <div className="row align-columns mt-5">
                         <div className="div col-4 border">
                             <div>
-                                <h2>My Profile</h2>
+                                <h2>Mi perfil</h2>
                             </div>
-                            <button className="btn btn-sm btn-warning w-100 my-2">Profile Details</button>
+                            <button className="btn btn-sm btn-warning w-100 my-2">Detalles</button>
                         </div>
 
                         <div className="div col-8 border">
                             <div>
-                                <h2>Profile Details</h2>
+                                <h2>Detalles de mi perfil</h2>
                             </div>
 
 
@@ -94,7 +123,7 @@ export const Myprofile = () => {
 
 
                             <div className="form-control">
-                                <label>Full Name</label>
+                                <label>Nombre Completo</label>
                                 {editing.fullname ? (
                                     <div className="d-flex align-items-center">
                                         <input
@@ -110,26 +139,26 @@ export const Myprofile = () => {
                                                     setEditing({ ...editing, fullname: false });
                                                 }
                                             }}
-                                            placeholder="Full Name"
+                                            placeholder="Nombre Completo"
                                             autoFocus
                                         />
                                         <button
                                             className="btn btn-success btn-sm"
                                             onClick={() => setEditing({ ...editing, fullname: false })}
                                         >
-                                            Save
+                                            Guardar
                                         </button>
                                     </div>
                                 ) : (
                                     <div className="d-flex align-items-center">
                                         <div className="form-control mx-2 mb-0" type="text">
-                                            {user.fullname || <div>Full Name</div>}
+                                            {user.fullname || <div>Nombre Completo</div>}
                                         </div>
                                         <button
                                             className="btn btn-secondary btn-sm"
                                             onClick={() => setEditing({ ...editing, fullname: true })}
                                         >
-                                            Edit
+                                            Editar
                                         </button>
                                     </div>
                                 )}
@@ -137,7 +166,7 @@ export const Myprofile = () => {
 
 
                             <div className="form-control">
-                                <label>User Name</label>
+                                <label>Nombre de Usuario</label>
                                 {editing.username ? (
                                     <div className="d-flex align-items-center">
                                         <input
@@ -153,14 +182,14 @@ export const Myprofile = () => {
                                                     setEditing({ ...editing, username: false });
                                                 }
                                             }}
-                                            placeholder="User Name"
+                                            placeholder="Nombre de Usuario"
                                             autoFocus
                                         />
                                         <button
                                             className="btn btn-success btn-sm"
                                             onClick={() => setEditing({ ...editing, username: false })}
                                         >
-                                            Save
+                                            Guardar
                                         </button>
                                     </div>
                                 ) : (
@@ -172,14 +201,14 @@ export const Myprofile = () => {
                                             className="btn btn-secondary btn-sm"
                                             onClick={() => setEditing({ ...editing, username: true })}
                                         >
-                                            Edit
+                                            Editar
                                         </button>
                                     </div>
                                 )}
                             </div>
 
                             <div className="form-control">
-                                <label>Email</label>
+                                <label>Correo</label>
                                 {editing.email ? (
                                     <div className="d-flex align-items-center">
                                         <input
@@ -193,7 +222,7 @@ export const Myprofile = () => {
                                                     setEditing({ ...editing, email: false });
                                                 }
                                             }}
-                                            placeholder="Email"
+                                            placeholder="Correo"
                                             autoFocus
                                         />
                                         <button
@@ -202,7 +231,7 @@ export const Myprofile = () => {
                                                 setEditing({ ...editing, email: false });
                                             }}
                                         >
-                                            Save
+                                            Guardar
                                         </button>
                                     </div>
                                 ) : (
@@ -217,20 +246,20 @@ export const Myprofile = () => {
                                             className="btn btn-secondary btn-sm mb-0"
                                             onClick={() => setEditing({ ...editing, email: true })}
                                         >
-                                            Edit
+                                            Editar
                                         </button>
                                     </div>
                                 )}
                             </div>
 
                             <div className="form-control">
-                                <label>Password</label>
-                                <input className="mx-2" type="password" placeholder="Password" disabled />
+                                <label>Contraseña</label>
+                                <input className="mx-2" type="password" placeholder="Contraseña" disabled />
                                 <button
                                     className="btn btn-sm btn-secondary mx-2"
                                     onClick={() => setShowPasswordModal(true)}
                                 >
-                                    Edit
+                                    Editar
                                 </button>
                             </div>
                         </div>
@@ -244,7 +273,7 @@ export const Myprofile = () => {
                     <div className="modal-dialog" role="document">
                         <div className="modal-content">
                             <div className="modal-header">
-                                <h5 className="modal-title">Change Password</h5>
+                                <h5 className="modal-title">Cambiar Contraseña</h5>
                                 <button
                                     type="button"
                                     className="btn-close"
@@ -253,7 +282,7 @@ export const Myprofile = () => {
                             </div>
                             <div className="modal-body">
                                 <div className="mb-3">
-                                    <label>Current Password</label>
+                                    <label>Contraseña Actual</label>
                                     <input
                                         type="password"
                                         className="form-control"
@@ -265,7 +294,7 @@ export const Myprofile = () => {
                                 </div>
 
                                 <div className="mb-3">
-                                    <label>New Password</label>
+                                    <label>Nueva Contraseña</label>
                                     <input
                                         type="password"
                                         className="form-control"
@@ -276,7 +305,7 @@ export const Myprofile = () => {
                                     />
                                 </div>
                                 <div className="mb-3">
-                                    <label>Repeat New Password</label>
+                                    <label>Repetir Nueva Contraseña</label>
                                     <input
                                         type="password"
                                         className="form-control"
@@ -293,10 +322,10 @@ export const Myprofile = () => {
                                     className="btn btn-secondary"
                                     onClick={() => setShowPasswordModal(false)}
                                 >
-                                    Cancel
+                                    Cancelar
                                 </button>
                                 <button className="btn btn-primary" onClick={handleSavePassword}>
-                                    Save
+                                    Guardar
                                 </button>
                             </div>
                         </div>

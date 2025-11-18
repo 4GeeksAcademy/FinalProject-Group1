@@ -23,7 +23,8 @@ CORS(api)
 def health_check():
     return jsonify({"status": "OK"}), 200
 
-@api.route("/users/<int:user_id>", methods=["GET"])
+@api.route("/user/<int:user_id>", methods=["GET"])
+@jwt_required()
 def getUser(user_id):
     user = User.query.get(user_id)
     if not user:
@@ -34,15 +35,15 @@ def getUser(user_id):
     
 
 
-@api.route("/user", methods=["PUT"])
+@api.route("/user/<int:user_id>", methods=["PUT"])
 @jwt_required()
-def updateUser():
+def updateUser(user_id):
     user = get_jwt_identity()
-    user = User.query.get(user) 
+    user = User.query.get(user_id) 
     if not user:
         return jsonify({"message": "User not found"}), 404
 
-    data = request.get_json()
+    data = request.get_json() 
     if data is None:
         return jsonify({"message": "Invalid JSON or no data provided"}), 400
     
@@ -60,7 +61,7 @@ def updateUser():
         # Verificar si ya existe el email
 
         existing_email_user = User.query.filter_by(email=email).first()
-        if existing_email_user and existing_email_user.id != current_user_id:
+        if existing_email_user and existing_email_user.id != user.id:
             return jsonify({"message": "This email is already registered"}), 400
 
         user.email = email
@@ -69,7 +70,7 @@ def updateUser():
     if username:
         # Verificar si ya existe el username
         existing_username_user = User.query.filter_by(username=username).first()
-        if existing_username_user and existing_username_user.id != current_user_id:
+        if existing_username_user and existing_username_user.id != user.id:
             return jsonify({"message": "This username is already in use"}), 400
 
 
