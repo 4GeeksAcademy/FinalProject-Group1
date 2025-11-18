@@ -16,11 +16,11 @@ flask-admin = "==2.0.0"
 typing-extensions = "*"
 wtforms = "==3.1.2"
 sqlalchemy = "*"
-sendgrid = "*"
 flask-cors = "*"
 flask = "*"
 flask-jwt-extended = "*"
 cloudinary = "*"
+sendgrid = "*"
 
 [requires]
 python_version = "3.13"

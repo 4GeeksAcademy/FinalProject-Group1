@@ -37,13 +37,12 @@ def getUser(user_id):
     return jsonify(user.serialize()), 200
 
 
-@api.route("/users/<int:user_id>", methods=["PUT"])
-# @api.route("user/", methods=["PUT"])
-# @jwt_required
-def updateUser(user_id):  # quitar el user_id y dejarlo vacio
-    # current_user_id = get_jwt_identity()
-    # reemplazar "user_id" por "current_user_id"
-    user = User.query.get(user_id)
+
+@api.route("/user", methods=["PUT"])
+@jwt_required()
+def updateUser():
+    current_user_id = get_jwt_identity()
+    user = User.query.get(current_user_id) 
     if not user:
         return jsonify({"message": "User not found"}), 404
 
@@ -57,7 +56,26 @@ def updateUser(user_id):  # quitar el user_id y dejarlo vacio
     fullname = data.get("fullname")
     username = data.get("username")
 
-    # validaciones de los campos
+    if email:
+        if not val_email(email):
+            return jsonify({"message": "Email is invalid"}), 400
+        
+        # Verificar si ya existe el email
+
+        existing_email_user = User.query.filter_by(email=email).first()
+        if existing_email_user and existing_email_user.id != current_user_id:
+            return jsonify({"message": "This email is already registered"}), 400
+
+        user.email = email
+
+    
+    if username:
+        # Verificar si ya existe el username
+        existing_username_user = User.query.filter_by(username=username).first()
+        if existing_username_user and existing_username_user.id != current_user_id:
+            return jsonify({"message": "This username is already in use"}), 400
+
+
     if email:
         if not val_email(email):
             return jsonify({"message": "Email is invalid,"}), 400
@@ -183,42 +201,64 @@ def create_category():
 
 
 @api.route("/categories/<int:id>", methods=["PUT"])
-def edit_category():
+def edit_category(id):
     data = request.get_json(silent=True)
 
     if data is None:
         return jsonify({"message": "Data not provided"}), 400
 
-    category = Category.query.get(id)
+    new_name = data.get("name_category")
 
-    new_name = data.get.id("name_category")
-
-    if new_name is not None:
-        new_name = new_name.strip()
-        if new_name == "":
+    if not new_name or not new_name.strip():
             return jsonify({"message": "Category name cannot be empty"}), 400
 
-    if new_name and new_name != category.name_category:
-        existing = Category.query.filter_by(name_category=new_name).first()
-        if existing:
-            return jsonify({"message": "Category name already exists"}), 400
-
-    if new_name:
-        category.name_category.id = new_name
-
-
-@api.route("/categories", methods=["DELETE"])
-def delete_category():
+    new_name = new_name.strip()
 
     category = Category.query.get(id)
 
-    data = ""
+    if category is None:
+        return jsonify({"message": "Category not found"}), 404
+    
+    if new_name != category.name_category:
+        existing = Category.query.filter_by(name_category=new_name).first()
+        if existing:
+            return jsonify({"message": "Category name already exists"}), 409
 
-    delete_category = data.get("name_category")
+    category.name_category = new_name
 
-    if delete_category:
-        pass
+    try:
+        db.session.commit()
+        return jsonify({
+            "message": "Category updated successfully",
+            "category": category.serialize()
+        }), 200
+    except Exception as error:
+        db.session.rollback()
+        return jsonify({
+            "message": "Error updating category",
+            "error": f"{error.args}"
+        }), 500
 
+
+@api.route("/categories/<int:id>", methods=["DELETE"])
+def delete_category(id):
+    
+    category = Category.query.get(id)
+    if category is None:
+        return jsonify({"message": "Category not found"}), 404
+    
+    try:
+        db.session.delete(category)
+        db.session.commit()
+        return jsonify({
+            "message": "Category deleted successfully",
+        }), 200
+    except Exception as error:
+        db.session.rollback()
+        return jsonify({
+            "message": "Error deleting category",
+            "error": f"{error.args}"
+        }), 500
 
 @api.route("/change-password", methods=["PUT"])
 @jwt_required()

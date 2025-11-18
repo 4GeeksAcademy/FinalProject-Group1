@@ -1,16 +1,13 @@
 // Import necessary components and functions from react-router-dom.
 
-import {
-  createBrowserRouter,
-  createRoutesFromElements,
-  Route,
-} from "react-router-dom";
+import { createBrowserRouter, createRoutesFromElements, Route, } from "react-router-dom";
 import { Layout } from "./pages/Layout";
 import { Home } from "./pages/Home";
 import { Single } from "./pages/Single";
 import { Demo } from "./pages/Demo";
 import Register from "./pages/Register";
 import { Myprofile } from "./pages/Myprofile";
+import { Login } from "./pages/Login"; 
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import CreateRecipe from "./pages/CreateRecipe";
@@ -42,7 +39,9 @@ export const router = createBrowserRouter(
       <Route path="/create-recipe" element={<CreateRecipe />} />
       <Route path="/recipes-list" element={<RecipeList />} />
       <Route path="/categories-list" element={<Categorias />} />
+      <Route path="/login" element={<Login />} /> 
 
     </Route>
   )
+
 );
