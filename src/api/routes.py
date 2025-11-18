@@ -439,3 +439,119 @@ def get_published_recipes():
             "message": "Internal server error while processing the request.",
             "error_detail": str(error)
         }), 500
+
+
+
+@api.route("/recipes/<int:recipe_id>", methods=["PUT"])
+@jwt_required()
+def edit_recipe(recipe_id):
+
+    user_id = get_jwt_identity()
+    claims = get_jwt()
+    is_admin = claims.get("is_administrator", False)
+
+    recipe = db.session.get(Recipe, recipe_id)
+    if recipe is None:
+        return jsonify({"message": f"Recipe with ID {recipe_id} not found."}), 404
+
+    if is_admin:
+        pass
+
+    else:
+        if recipe.state_recipe == stateRecipeEnum.published:
+            return jsonify({"message": "Access denied. Only administrators can edit published recipes."}), 403
+
+        if recipe.state_recipe == stateRecipeEnum.pending:
+            if recipe.user_id != user_id:
+                return jsonify({"message": "Access denied. You can only edit your own pending recipes."}), 403
+        else:
+            return jsonify({"message": "Access denied. You do not have permission to edit this recipe."}), 403
+
+    data_form = request.form
+    data_files = request.files
+
+    ingredients_str = data_form.get("ingredients_json")
+    if not ingredients_str:
+        return jsonify({"message": "Ingredients data is missing."}), 400
+
+    try:
+        ingredients_list = json.loads(ingredients_str)
+        if not isinstance(ingredients_list, list):
+            raise ValueError("Ingredients must be a list of objects.")
+    except Exception as error:
+        return jsonify({"message": "Invalid ingredients format.", "details": str(error)}), 400
+
+    try:
+        recipe.title = data_form.get("title", recipe.title)
+        recipe.steps = data_form.get("steps", recipe.steps)
+        recipe.preparation_time_min = int(data_form.get(
+            "prep_time_min", recipe.preparation_time_min))
+        recipe.portions = int(data_form.get("portions", recipe.portions))
+        recipe.category_id = int(data_form.get(
+            "category_id", recipe.category_id))
+        new_difficulty_str = data_form.get("difficulty")
+        if new_difficulty_str:
+            recipe.difficulty = difficultyEnum(
+                new_difficulty_str.strip().lower())
+
+    except ValueError as error:
+        db.session.rollback()
+        return jsonify({"message": "Invalid data type for one or more fields.", "details": str(error)}), 400
+    except Exception as error:
+        db.session.rollback()
+        return jsonify({"message": "Error updating basic recipe fields.", "details": str(error)}), 400
+
+    image_file = data_files.get("image")
+    if image_file:
+        try:
+            new_image_url = cloudinary_service.upload_image(
+                image_file, folder_name="recipe_images")
+            recipe.image = new_image_url
+
+        except Exception as error:
+            return jsonify({"message": f"Image update failed. Details: {str(error)}"}), 500
+    try:
+        recipe.recipe_ingredients_details = []
+        recipe_ingredient_objects = []
+        for item in ingredients_list:
+            ingredient_name = item.get("name").strip().lower()
+            quantity = float(item.get("quantity"))
+            unit_enum_value = UnitEnum(
+                item.get("unit_measure").strip().lower())
+
+            ingredient_catalog = Ingredient.query.filter_by(
+                name=ingredient_name).one_or_none()
+            if ingredient_catalog is None:
+                ingredient_catalog = Ingredient(
+                    name=ingredient_name, calories_per_100=0.0, protein_per_100=0.0, carbs_per_100=0.0, fat_per_100=0.0)
+                db.session.add(ingredient_catalog)
+                db.session.flush()
+
+            new_recipe_ingredient = RecipeIngredient(
+                quantity=quantity,
+                unit_measure=unit_enum_value,
+                recipe=recipe,
+                ingredient_catalog=ingredient_catalog
+            )
+            recipe_ingredient_objects.append(new_recipe_ingredient)
+
+        db.session.add_all(recipe_ingredient_objects)
+        db.session.commit()
+
+        return jsonify({"message": "Recipe updated successfully.", "recipe": recipe.serialize()}), 200
+
+    except Exception as error:
+        db.session.rollback()
+        return jsonify({"message": "Error updating recipe details or ingredients.", "details": str(error)}), 400
+    
+
+@api.route("/recipes/<int:recipe_id>", methods=["GET"])
+# @jwt_required() 
+def get_single_recipe(recipe_id):
+    recipe = db.session.get(Recipe, recipe_id)
+    if recipe is None:
+        return jsonify({"message": f"Recipe with ID {recipe_id} not found."}), 404
+    return jsonify({
+        "message": "Recipe found successfully",
+        "recipe": recipe.serialize() 
+    }), 200

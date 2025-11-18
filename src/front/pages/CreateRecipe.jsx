@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Toaster, toast } from 'sonner';
 
 const DIFFICULTIES = ["FÁCIL", "MEDIO", "DIFÍCIL"];
-
 const UNITS = [
     { label: "Gramos (g)", value: "g" },
     { label: "Mililitros (ml)", value: "ml" },
@@ -11,24 +10,11 @@ const UNITS = [
     { label: "Cucharada", value: "tbsp" },
     { label: "Cucharadita", value: "tsp" },
 ];
-  
-
-// OJO. Debo botrrar estas categorías, pues son simuladas para probar. 
 const MOCK_CATEGORIES = [
     { id: 1, name: "Postres" },
     { id: 2, name: "Platos Principales" },
     { id: 3, name: "Entradas" },
 ];
-
-const initialRecipeState = {
-    title: "",
-    steps: "",
-    prep_time_min: 0,
-    difficulty: DIFFICULTIES[0],
-    portions: 4,
-    category_id: MOCK_CATEGORIES[0].id,
-};
-
 
 const initialIngredient = {
     name: "",
@@ -36,12 +22,24 @@ const initialIngredient = {
     unit_measure: UNITS[0].value,
 };
 
-
+const initialRecipeState = {
+    title: "",
+    steps: "",
+    prep_time_min: 30,
+    difficulty: DIFFICULTIES[0],
+    portions: 4,
+    category_id: MOCK_CATEGORIES[0].id,
+    image_url_existing: null,
+};
 
 const urlBase = import.meta.env.VITE_BACKEND_URL;
 
 
 const CreateRecipe = () => {
+
+    const { recipe_id } = useParams();
+    const isEditMode = !!recipe_id;
+
     const [recipeData, setRecipeData] = useState(initialRecipeState);
     const [ingredients, setIngredients] = useState([initialIngredient]);
     const [imageFile, setImageFile] = useState(null);
@@ -49,20 +47,83 @@ const CreateRecipe = () => {
     const navigate = useNavigate();
 
     const getAuthToken = () => {
-        const token = localStorage.getItem("token");
+        const token = localStorage.getItem("access_token");
         if (!token) {
-            toast.error("Debes iniciar sesión para crear recetas.");
+            toast.error("Debes iniciar sesión para crear/editar recetas.");
             return null;
         }
         return token;
     };
 
 
+    useEffect(() => {
+        if (isEditMode) {
+            loadRecipeData();
+        }
+    }, [isEditMode, recipe_id]);
+
+
+    const loadRecipeData = async () => {
+        setLoading(true);
+        const token = getAuthToken();
+        if (!token) {
+            setLoading(false);
+            return;
+        }
+
+        try {
+            const response = await fetch(`${urlBase}/recipes/${recipe_id}`, {
+                method: "GET",
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                },
+            });
+            const data = await response.json();
+
+            if (response.ok) {
+                const loadedRecipe = {
+                    title: data.recipe.title,
+                    steps: data.recipe.steps,
+                    prep_time_min: data.recipe.prep_time_min,
+                    difficulty: data.recipe.difficulty.toUpperCase(),
+                    portions: data.recipe.portions,
+                    category_id: data.recipe.category_id,
+                    image_url_existing: data.recipe.image,
+                };
+
+                const loadedIngredients = (data.recipe.ingredients || []).map(item => ({
+                    name: item.name,
+                    quantity: item.quantity,
+                    unit_measure: item.unit_measure,
+                }));
+
+
+                setRecipeData(loadedRecipe);
+                setIngredients(loadedIngredients.length > 0 ? loadedIngredients : [initialIngredient]);
+
+            } else {
+                toast.error(data.message || "Error al cargar los datos de la receta.");
+                navigate("/");
+            }
+        } catch (error) {
+            toast.error("Error de conexión al cargar la receta.");
+            console.error("Fetch error:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+
     const handleChange = ({ target }) => {
         const { name, value, type } = target;
+        let newValue = value;
+
+        if (type === 'number') {
+            newValue = value === "" ? "" : parseFloat(value);
+        }
         setRecipeData(prev => ({
             ...prev,
-            [name]: type === 'number' ? parseFloat(value) : value,
+            [name]: newValue,
         }));
     };
 
@@ -75,14 +136,19 @@ const CreateRecipe = () => {
         }
     };
 
-
     const handleIngredientChange = (index, { target }) => {
         const { name, value, type } = target;
         const newIngredients = ingredients.map((item, i) => {
             if (i === index) {
+
+                let newValue = value;
+                if (type === 'number') {
+                    newValue = value === "" ? "" : parseFloat(value);
+                }
+
                 return {
                     ...item,
-                    [name]: type === 'number' ? parseFloat(value) : value,
+                    [name]: newValue,
                 };
             }
             return item;
@@ -119,26 +185,24 @@ const CreateRecipe = () => {
         }
 
 
-        if (!imageFile) {
+        if (!isEditMode && !imageFile) {
             toast.error("Debes subir una imagen para la receta.");
             setLoading(false);
             return;
         }
 
-        const validIngredients = ingredients.filter(ing => ing.name.trim() && ing.quantity > 0);
+        const validIngredients = ingredients.filter(item => item.name.trim() && item.quantity > 0);
         if (validIngredients.length === 0) {
             toast.error("La receta debe tener al menos un ingrediente válido con nombre y cantidad.");
             setLoading(false);
             return;
         }
 
-
         const formattedIngredients = validIngredients.map(item => ({
             name: item.name.trim(),
             quantity: item.quantity,
             unit_measure: item.unit_measure,
         }));
-
 
 
         const formData = new FormData();
@@ -149,12 +213,20 @@ const CreateRecipe = () => {
         formData.append("difficulty", recipeData.difficulty);
         formData.append("portions", recipeData.portions.toString());
         formData.append("category_id", recipeData.category_id.toString());
-        formData.append("image", imageFile);
         formData.append("ingredients_json", JSON.stringify(formattedIngredients));
+        if (imageFile) {
+            formData.append("image", imageFile);
+        }
+
+
+        const url = isEditMode
+            ? `${urlBase}/recipes/${recipe_id}`
+            : `${urlBase}/recipes`;
+        const method = isEditMode ? "PUT" : "POST";
 
         try {
-            const response = await fetch(`${urlBase}/recipes`, {
-                method: "POST",
+            const response = await fetch(url, {
+                method: method,
                 headers: {
                     "Authorization": `Bearer ${token}`,
                 },
@@ -164,17 +236,20 @@ const CreateRecipe = () => {
             const data = await response.json();
 
             if (response.ok) {
-                const successMessage = data.status === 'published'
-                    ? "¡Receta creada y publicada con éxito!"
-                    : "¡Receta creada! Pendiente de revisión por el administrador.";
-                toast.success(successMessage);
-                setRecipeData(initialRecipeState);
-                setIngredients([initialIngredient]);
-                setImageFile(null);
+                const action = isEditMode ? "editada" : "creada";
+                toast.success(`¡Receta ${action} con éxito!`);
 
-                setTimeout(() => navigate("/"), 2000);
+                if (isEditMode) {
+                    setTimeout(() => navigate("/"), 1000);
+
+                } else {
+                    setRecipeData(initialRecipeState);
+                    setIngredients([initialIngredient]);
+                    setImageFile(null);
+                    setTimeout(() => navigate("/"), 2000);
+                }
             } else {
-                const message = data.message || "Error desconocido al guardar la receta.";
+                const message = data.message || `Error desconocido al ${isEditMode ? 'editar' : 'guardar'} la receta.`;
                 toast.error(`Error: ${message}`);
             }
         } catch (error) {
@@ -191,28 +266,43 @@ const CreateRecipe = () => {
         recipeData.steps &&
         recipeData.prep_time_min > 0 &&
         recipeData.portions > 0 &&
-        imageFile &&
-        ingredients.every(ing => ing.name.trim() && ing.quantity > 0);
+        (imageFile || recipeData.image_url_existing) &&
+        ingredients.some(ing => ing.name.trim() && ing.quantity > 0);
+
+
+    if (isEditMode && loading) {
+        return (
+            <div className="container text-center py-5">
+                <div className="spinner-border text-primary" role="status">
+                    <span className="visually-hidden">Cargando...</span>
+                </div>
+                <p className="mt-3">Cargando receta para edición...</p>
+            </div>
+        );
+    }
 
 
     return (
         <>
-            <div className="container pt-5">
+            <div className="container" style={{ paddingTop: '20px', paddingBottom: '20px' }}>
                 <Toaster position="top-center" richColors />
                 <div className="row justify-content-center">
                     <div className="col-12 col-lg-10">
-                        <h1 className="text-center bg-warning-subtle mx-2 p-4 mb-5 shadow">Crear nueva receta</h1>
+                        <h1 className="text-center bg-warning-subtle mx-2 p-4 mb-5 rounded-lg shadow-md">
+                            {isEditMode ? `Editar Receta #${recipe_id}` : "Crear Nueva Receta"}
+                        </h1>
+
                         <form
-                            className="border border-secondary form-group p-5 bg-light shadow"
+                            className="border border-secondary form-group p-5 bg-light rounded-lg shadow-lg"
                             onSubmit={handleSubmit}
                         >
-                            <h4 className="mb-4 text-primary border-bottom pb-2">Completa todos los requerimientos</h4>
+                            <h4 className="mb-4 text-primary border-bottom pb-2">Información Básica</h4>
                             <div className="row mb-3">
                                 <div className="col-md-8 form-group">
                                     <label htmlFor="txtTitle" className="form-label"><b>Título de la Receta:</b></label>
                                     <input
                                         type="text"
-                                        placeholder="Torta de limón"
+                                        placeholder="Brownie de Chocolate"
                                         className="form-control"
                                         id="txtTitle"
                                         name="title"
@@ -222,10 +312,10 @@ const CreateRecipe = () => {
                                     />
                                 </div>
                                 <div className="col-md-4 form-group">
-                                    <label htmlFor="txtCategory" className="form-label"><b>Categoría:</b></label>
+                                    <label htmlFor="selectCategory" className="form-label"><b>Categoría:</b></label>
                                     <select
                                         className="form-select"
-                                        id="txtCategory"
+                                        id="selectCategory"
                                         name="category_id"
                                         onChange={handleChange}
                                         value={recipeData.category_id}
@@ -243,7 +333,7 @@ const CreateRecipe = () => {
                                     <input
                                         type="number"
                                         min="1"
-                                        placeholder="0"
+                                        placeholder="45"
                                         className="form-control"
                                         id="txtTime"
                                         name="prep_time_min"
@@ -253,10 +343,10 @@ const CreateRecipe = () => {
                                     />
                                 </div>
                                 <div className="col-md-4 form-group">
-                                    <label htmlFor="txttDifficulty" className="form-label"><b>Dificultad:</b></label>
+                                    <label htmlFor="selectDifficulty" className="form-label"><b>Dificultad:</b></label>
                                     <select
                                         className="form-select"
-                                        id="txttDifficulty"
+                                        id="selectDifficulty"
                                         name="difficulty"
                                         onChange={handleChange}
                                         value={recipeData.difficulty}
@@ -272,7 +362,7 @@ const CreateRecipe = () => {
                                     <input
                                         type="number"
                                         min="1"
-                                        placeholder="4"
+                                        placeholder="8"
                                         className="form-control"
                                         id="txtPortions"
                                         name="portions"
@@ -285,8 +375,10 @@ const CreateRecipe = () => {
                             <div className="form-group mb-4">
                                 <label htmlFor="txtSteps" className="form-label"><b>Pasos de Preparación:</b></label>
                                 <textarea
-                                    placeholder="1. Calentar el horno... 
-                                    2. Mezclar los ingredientes..."
+                                    placeholder={`1. Calentar el horno..
+2. Mezclar los ingredientes...
+3. Agregar condimentos...
+4. Poner a cocinar...`}
                                     className="form-control"
                                     id="txtSteps"
                                     name="steps"
@@ -296,7 +388,6 @@ const CreateRecipe = () => {
                                     required
                                 />
                             </div>
-
                             <div className="form-group mb-5">
                                 <label htmlFor="fileImage" className="form-label"><b>Imagen de la Receta:</b></label>
                                 <input
@@ -306,17 +397,23 @@ const CreateRecipe = () => {
                                     name="image"
                                     accept="image/*"
                                     onChange={handleImageChange}
-                                    required
+                                    required={!isEditMode || !recipeData.image_url_existing}
                                 />
+                                {recipeData.image_url_existing && !imageFile && (
+                                    <div className="mt-3">
+                                        <small className="text-muted d-block mb-1">Imagen actual (Cámbiala subiendo un nuevo archivo):</small>
+                                        <img src={recipeData.image_url_existing} alt="Receta actual" style={{ maxWidth: '150px', maxHeight: '150px', objectFit: 'cover' }} className="rounded shadow" />
+                                    </div>
+                                )}
                                 {imageFile && (
-                                    <small className="text-success mt-2 d-block">Archivo seleccionado: {imageFile.name}</small>
+                                    <small className="text-success mt-2 d-block">Archivo seleccionado para subir: {imageFile.name}</small>
                                 )}
                             </div>
 
                             <h4 className="mb-4 text-success border-bottom pb-2">Ingredientes</h4>
                             <p className="alert alert-info py-2 px-3 mb-4">
                                 <i className="fa-solid fa-circle-info me-2"></i>
-                                Por favor ingresa los ingredientes en <b>**singular**</b> (ejemplo: "Huevo", no "Huevos").
+                                **RECUERDA:** Ingresa los ingredientes en **singular** (ej: "Huevo", no "Huevos") para mantener limpio el catálogo.
                             </p>
 
 
@@ -326,7 +423,7 @@ const CreateRecipe = () => {
                                         <label className="form-label">Ingrediente #{index + 1}</label>
                                         <input
                                             type="text"
-                                            placeholder="ejemplo: Tomate"
+                                            placeholder="ej: Huevo"
                                             className="form-control"
                                             name="name"
                                             onChange={(e) => handleIngredientChange(index, e)}
@@ -340,7 +437,7 @@ const CreateRecipe = () => {
                                             type="number"
                                             min="0.1"
                                             step="0.1"
-                                            placeholder="ejemplo: 250.5"
+                                            placeholder="ej: 250.5"
                                             className="form-control"
                                             name="quantity"
                                             onChange={(e) => handleIngredientChange(index, e)}
@@ -385,6 +482,7 @@ const CreateRecipe = () => {
                                     <i className="fa-solid fa-circle-plus me-2"></i> Añadir otro ingrediente
                                 </button>
                             </div>
+
                             <button
                                 className={`btn btn-primary w-100 mt-5 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 ${loading ? 'opacity-75' : ''}`}
                                 type="submit"
@@ -393,10 +491,10 @@ const CreateRecipe = () => {
                                 {loading ? (
                                     <>
                                         <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                                        Guardando Receta...
+                                        {isEditMode ? "Guardando Cambios..." : "Guardando Receta..."}
                                     </>
                                 ) : (
-                                    "Guardar y Publicar Receta"
+                                    isEditMode ? "Actualizar Receta" : "Guardar y Publicar Receta"
                                 )}
                             </button>
                         </form>

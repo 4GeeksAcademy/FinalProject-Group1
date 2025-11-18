@@ -8,6 +8,7 @@ import enum
 
 db = SQLAlchemy()
 
+
 class User(db.Model):
     id_user: Mapped[int] = mapped_column(primary_key=True)
     username: Mapped[str] = mapped_column(
@@ -30,7 +31,6 @@ class User(db.Model):
     recipe_user: Mapped[List["Recipe"]] = relationship(
         back_populates="user_recipe")
 
-
     def __repr__(self):
         return f'<User {self.username}>'
 
@@ -52,12 +52,13 @@ class Category(db.Model):
     __tablename__ = "categories"
 
     id_category: Mapped[int] = mapped_column(primary_key=True)
-    name_category: Mapped[str] = mapped_column(String(55), unique=True, nullable=False)
+    name_category: Mapped[str] = mapped_column(
+        String(55), unique=True, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(
         timezone=True), default=lambda: datetime.now(timezone.utc), nullable=False)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(
         timezone.utc), onupdate=lambda: datetime.now(timezone.utc), nullable=False)
-    
+
     recipe_category: Mapped[List["Recipe"]] = relationship(
         back_populates="category_recipe")
 
@@ -104,7 +105,7 @@ class Recipe(db.Model):
     steps: Mapped[str] = mapped_column(Text, nullable=False)
     image: Mapped[str] = mapped_column(String(255), nullable=False)
     difficulty: Mapped[str] = mapped_column(
-        Enum(difficultyEnum), nullable=False) 
+        Enum(difficultyEnum), nullable=False)
     preparation_time_min: Mapped[int] = mapped_column(Integer, nullable=False)
     portions: Mapped[int] = mapped_column(Integer, nullable=False)
     nutritional_data: Mapped[Optional[str]
@@ -121,7 +122,7 @@ class Recipe(db.Model):
     user_id: Mapped[int] = mapped_column(
         db.ForeignKey('user.id_user'), nullable=False)
     user_recipe: Mapped["User"] = relationship(back_populates="recipe_user")
-    
+
     recipe_ingredients_details: Mapped[List["RecipeIngredient"]] = relationship(
         back_populates="recipe", cascade="all, delete-orphan")
 
@@ -162,15 +163,21 @@ class Recipe(db.Model):
 class Ingredient(db.Model):
     id_ingredient: Mapped[int] = mapped_column(primary_key=True)
     # es para el nombre, para que no haya dos ingredientes repetidos
-    name: Mapped[str] = mapped_column(String(100), unique=True, nullable=False) 
+    name: Mapped[str] = mapped_column(String(100), unique=True, nullable=False)
     # lo coloco por si nos da tiempo de hacer lo de las conversiones
-    volume_to_mass_factor: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
-    unit_to_mass_factor: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
-    # Para valores nutricionales por 100g/ml 
-    calories_per_100: Mapped[float] = mapped_column(Float, nullable=False, default=0)
-    protein_per_100: Mapped[float] = mapped_column(Float, nullable=False, default=0)
-    carbs_per_100: Mapped[float] = mapped_column(Float, nullable=False, default=0)
-    fat_per_100: Mapped[float] = mapped_column(Float, nullable=False, default=0)
+    volume_to_mass_factor: Mapped[Optional[float]
+                                  ] = mapped_column(Float, nullable=True)
+    unit_to_mass_factor: Mapped[Optional[float]
+                                ] = mapped_column(Float, nullable=True)
+    # Para valores nutricionales por 100g/ml
+    calories_per_100: Mapped[float] = mapped_column(
+        Float, nullable=False, default=0)
+    protein_per_100: Mapped[float] = mapped_column(
+        Float, nullable=False, default=0)
+    carbs_per_100: Mapped[float] = mapped_column(
+        Float, nullable=False, default=0)
+    fat_per_100: Mapped[float] = mapped_column(
+        Float, nullable=False, default=0)
 
     recipe_ingredients_details: Mapped[List["RecipeIngredient"]] = relationship(
         back_populates="ingredient_catalog", cascade="all, delete-orphan")
@@ -189,13 +196,12 @@ class Ingredient(db.Model):
             "carbs_per_100": self.carbs_per_100,
             "fat_per_100": self.fat_per_100,
         }
-    
 
 
 # Para presentar el detalle de la Receta - Una clase intermedia, de enlace entre las dos tablas, ingredientes y recetas
 
 class RecipeIngredient(db.Model):
-    id_recipe_ingredient: Mapped[int] = mapped_column(primary_key=True) 
+    id_recipe_ingredient: Mapped[int] = mapped_column(primary_key=True)
     quantity: Mapped[float] = mapped_column(Float, nullable=False)
     unit_measure: Mapped[str] = mapped_column(Enum(UnitEnum), nullable=False)
 
@@ -208,7 +214,7 @@ class RecipeIngredient(db.Model):
         db.ForeignKey("ingredient.id_ingredient"), nullable=False)
     ingredient_catalog: Mapped["Ingredient"] = relationship(
         back_populates="recipe_ingredients_details")
-        
+
     def serialize(self):
         return {
             "id": self.id_recipe_ingredient,
