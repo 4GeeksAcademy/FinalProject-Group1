@@ -32,19 +32,52 @@ export const Myprofile = () => {
     });
     const [error, setError] = useState("");
 
-    const handleSavePassword = () => {
-        if (passwordData.newPass !== passwordData.repeatNew) {
-            setError("Las contraseñas no coinciden");
+    const handleSavePassword = async () => {
+
+        if (!passwordData.current || !passwordData.newPass || !passwordData.repeatNew) {
+            setError("Todos los campos son obligatorios.");
             return;
         }
 
+        if (passwordData.newPass !== passwordData.repeatNew) {
+            setError("Las contraseñas nuevas no coinciden.");
+            return;
+        }
 
-        console.log("Guardando contraseña:", passwordData);
+        if (passwordData.current === passwordData.newPass) {
+            setError("La nueva contraseña debe ser distinta a la actual.");
+            return;
+        }
 
-        setError("");
-        setPasswordData({ current: "", newPass: "", repeatNew: "" });
+        const response = await fetch(`${urlBase}/change-password`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + store.token
+            },
+            body: JSON.stringify({
+                current_password: passwordData.current,
+                new_password: passwordData.newPass
+            })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            setError(data.msg || "Error al cambiar contraseña");
+            return;
+        }
+
+        dispatch({ type: "SET_TOKEN", payload: data.token });
+        dispatch({ type: "SET_USER", payload: data.user });
+
+        localStorage.setItem("access_token", data.token);
+        localStorage.setItem("user", JSON.stringify(data.user));
+
         setShowPasswordModal(false);
+        setPasswordData({ current: "", newPass: "", repeatNew: "" });
     };
+
 
     useEffect(() => {
         const loadUser = async () => {
@@ -52,7 +85,6 @@ export const Myprofile = () => {
                 const response = await fetch(`${urlBase}/user/${store.user.id}`, {
                     method: 'GET',
                     headers: {
-                        "Content-Type": "application/json",
                         "Authorization": "Bearer " + store.token
 
                     },
@@ -86,7 +118,13 @@ export const Myprofile = () => {
             const data = await response.json();
             console.log("Usuario actualizado:", data);
 
-            setUser(data);
+            if (response.ok) {
+                setUser(data);
+                dispatch({ type: "SET_USER", payload: data.user });
+                localStorage.setItem("user", JSON.stringify(data.user));
+                return data.user;
+            }
+
 
         } catch (error) {
             console.error("Error actualizando usuario:", error);
@@ -133,7 +171,7 @@ export const Myprofile = () => {
                                             onChange={(event) => {
                                                 setUser({ ...user, fullname: event.target.value });
                                             }}
-                                            onKeyDown={(event) => {
+                                            onKeyDown={async (event) => {
                                                 if (event.key === "Enter") {
                                                     event.preventDefault();
                                                     setEditing({ ...editing, fullname: false });
@@ -144,7 +182,13 @@ export const Myprofile = () => {
                                         />
                                         <button
                                             className="btn btn-success btn-sm"
-                                            onClick={() => setEditing({ ...editing, fullname: false })}
+                                            onClick={async () => {
+                                                const updated = await updateUser();
+                                                if (updated) {
+                                                    setUser(updated);
+                                                }
+                                                setEditing({ ...editing, fullname: false });
+                                            }}
                                         >
                                             Guardar
                                         </button>
@@ -187,7 +231,14 @@ export const Myprofile = () => {
                                         />
                                         <button
                                             className="btn btn-success btn-sm"
-                                            onClick={() => setEditing({ ...editing, username: false })}
+                                            onClick={async () => {
+                                                const updated = await updateUser();
+                                                if (updated) {
+                                                    setUser(updated);
+                                                }
+                                                setEditing({ ...editing, username: false })
+
+                                            }}
                                         >
                                             Guardar
                                         </button>
@@ -228,7 +279,12 @@ export const Myprofile = () => {
                                         <button
                                             className="btn btn-success btn-sm mb-2"
                                             onClick={async () => {
-                                                setEditing({ ...editing, email: false });
+                                                const updated = await updateUser();
+                                                if (updated) {
+                                                    setUser(updated);
+                                                }
+                                                setEditing({ ...editing, email: false })
+
                                             }}
                                         >
                                             Guardar
@@ -254,7 +310,7 @@ export const Myprofile = () => {
 
                             <div className="form-control">
                                 <label>Contraseña</label>
-                                <input className="mx-2" type="password" placeholder="Contraseña" disabled />
+                                <input className="mx-2" type="password" placeholder="*********" disabled />
                                 <button
                                     className="btn btn-sm btn-secondary mx-2"
                                     onClick={() => setShowPasswordModal(true)}

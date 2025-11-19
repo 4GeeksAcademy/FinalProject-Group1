@@ -23,32 +23,41 @@ CORS(api)
 def health_check():
     return jsonify({"status": "OK"}), 200
 
+
 @api.route("/user/<int:user_id>", methods=["GET"])
 @jwt_required()
 def getUser(user_id):
+    current_user_id = int(get_jwt_identity())
+    if current_user_id != user_id:
+        return jsonify({"msg": "Unauthorized"}), 401  
+
     user = User.query.get(user_id)
     if not user:
         return jsonify({"message": "User not found"}), 404
 
     return jsonify(user.serialize()), 200
 
-    
-
 
 @api.route("/user/<int:user_id>", methods=["PUT"])
 @jwt_required()
 def updateUser(user_id):
-    user = get_jwt_identity()
-    user = User.query.get(user_id) 
+    current_user_id = int(get_jwt_identity())
+
+
+    if current_user_id != user_id:
+        return jsonify({"msg": "Unauthorized"}), 401
+
+    data = request.get_json()
+    user = User.query.get(user_id)
+    
     if not user:
         return jsonify({"message": "User not found"}), 404
 
-    data = request.get_json() 
+    data = request.get_json()
     if data is None:
         return jsonify({"message": "Invalid JSON or no data provided"}), 400
-    
-    
-    #Nos traemos los campos a actualizar
+
+    # Nos traemos los campos a actualizar
 
     email = data.get("email")
     fullname = data.get("fullname")
@@ -57,27 +66,22 @@ def updateUser(user_id):
     if email:
         if not val_email(email):
             return jsonify({"message": "Email is invalid"}), 400
-        
+
         # Verificar si ya existe el email
 
         existing_email_user = User.query.filter_by(email=email).first()
-        if existing_email_user and existing_email_user.id != user.id:
+        if existing_email_user and existing_email_user.id_user != user.id_user:
             return jsonify({"message": "This email is already registered"}), 400
 
         user.email = email
 
-    
     if username:
         # Verificar si ya existe el username
-        existing_username_user = User.query.filter_by(username=username).first()
-        if existing_username_user and existing_username_user.id != user.id:
+        existing_username_user = User.query.filter_by(
+            username=username).first()
+        if existing_username_user and existing_username_user.id_user != user.id_user:
             return jsonify({"message": "This username is already in use"}), 400
 
-
-    if email:
-        if not val_email(email):
-            return jsonify({"message": "Email is invalid,"}), 400
-        user.email = email
     if fullname:
         user.fullname = fullname
     if username:
@@ -92,7 +96,6 @@ def updateUser(user_id):
     except Exception as error:
         db.session.rollback()
         return jsonify({"message": "Error updating user", "Error": f"{error.args}"}), 500
-
 
 
 @api.route("/register", methods=["POST"])
@@ -121,7 +124,7 @@ def register_user():
 
     salt = b64encode(os.urandom(16)).decode("utf-8")
     hashed_password = generate_password_hash(f"{data['password']}{salt}")
- 
+
     new_user = User(
         email=email,
         password=hashed_password,
@@ -212,7 +215,7 @@ def edit_category(id):
     new_name = data.get("name_category")
 
     if not new_name or not new_name.strip():
-            return jsonify({"message": "Category name cannot be empty"}), 400
+        return jsonify({"message": "Category name cannot be empty"}), 400
 
     new_name = new_name.strip()
 
@@ -220,7 +223,7 @@ def edit_category(id):
 
     if category is None:
         return jsonify({"message": "Category not found"}), 404
-    
+
     if new_name != category.name_category:
         existing = Category.query.filter_by(name_category=new_name).first()
         if existing:
@@ -248,11 +251,11 @@ def delete_category(id):
     claims = get_jwt()
     if not claims.get("is_administrator"):
         return jsonify({"message": "Admin role required"}), 403
-    
+
     category = Category.query.get(id)
     if category is None:
         return jsonify({"message": "Category not found"}), 404
-    
+
     try:
         db.session.delete(category)
         db.session.commit()
@@ -266,10 +269,10 @@ def delete_category(id):
             "error": f"{error.args}"
         }), 500
 
+
 @api.route("/change-password", methods=["PUT"])
 @jwt_required()
 def change_password():
-    # Obtener el ID del usuario actual usando el token JWT
     current_user_id = get_jwt_identity()
     user = User.query.get(current_user_id)
 
@@ -278,49 +281,64 @@ def change_password():
 
     data = request.get_json(silent=True)
     if data is None:
-        return jsonify({"message": "Invalid JSON or no data provided"}), 400
+        return jsonify({"message": "Invalid JSON"}), 400
 
     current_password = data.get("current_password")
     new_password = data.get("new_password")
 
-    # Validación de campos de la password
     if not current_password or not new_password:
         return jsonify({"message": "Current and new password are required"}), 400
 
-    # Verificar que la contraseña actual sea correcta
-    is_valid = check_password_hash(user.password, f"{current_password}{user.salt}")
-    if not is_valid:
+    # verificar contraseña actual
+    if not check_password_hash(user.password, f"{current_password}{user.salt}"):
         return jsonify({"message": "Current password is incorrect"}), 401
 
-    # Validar la nueva contraseña con los parametros que definimoss
+    # validar nueva contraseña
     from api.utils import val_password
     if not val_password(new_password):
-        return jsonify({"message": "New password is invalid. It must have 8+ chars, uppercase, lowercase, number, and special char."}), 400
+        return jsonify({"message": "New password does not meet requirements"}), 400
 
-    # Generar y guardar la nueva contraseña hasheada
-    new_hashed_password = generate_password_hash(f"{new_password}{user.salt}")
+    # generar nuevo salt
+    import secrets
+    new_salt = secrets.token_hex(16)
+
+    # hashear con nuevo salt
+    new_hashed_password = generate_password_hash(f"{new_password}{new_salt}")
+
     user.password = new_hashed_password
+    user.salt = new_salt
     db.session.commit()
 
-    return jsonify({"message": "Password updated successfully"}), 200
+    # generar nuevo token
+    from flask_jwt_extended import create_access_token
+    additional_claims = {"rol": user.rol}
+    new_token = create_access_token(identity=str(user.id_user), additional_claims=additional_claims)
+
+    return jsonify({
+        "message": "Password updated successfully",
+        "token": new_token,
+        "user": user.serialize()
+    }), 200
+
+
 
 @api.route("/login", methods=["POST"])
 def login_user():
     data = request.get_json()
     username = data.get("username").strip()
-    password = data.get("password").strip() 
- 
+    password = data.get("password").strip()
+
     if not username or not password:
         return jsonify({"message": "Username and password are required"}), 400
-    user = User.query.filter_by(username=username).one_or_none() 
-    if user is None:  
-        return jsonify({"message": "Invalid username"}), 401 
-    if not check_password_hash(user.password, f"{password}{user.salt}"): 
+    user = User.query.filter_by(username=username).one_or_none()
+    if user is None:
+        return jsonify({"message": "Invalid username"}), 401
+    if not check_password_hash(user.password, f"{password}{user.salt}"):
         return jsonify({"message": "Invalid credentials"}), 401
-   
+
     is_admin = user.rol == "administrador"
     additional_claims = {"is_administrator": is_admin, "rol": user.rol}
     token = create_access_token(identity=str(user.id_user), expires_delta=timedelta(
         days=1), additional_claims=additional_claims)
- 
+
     return jsonify({"msg": "Login successful", "token": token, "user_info": user.serialize()}), 200
