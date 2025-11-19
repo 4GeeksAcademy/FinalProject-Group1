@@ -21,7 +21,7 @@ export const router = createBrowserRouter(
         <Route path="/demo" element={<Demo />} />
         <Route path="/myprofile" element={<Myprofile />} />
         <Route path="/login" element={<Login />} /> 
-        <Route path="/forgot-password" element={<h1>Recuperar Contraseña</h1>} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/admin-panel" element={<h1>Panel de Administración</h1>} />
         <Route path="/admin/categories" element={<AdminCategories />} />
 

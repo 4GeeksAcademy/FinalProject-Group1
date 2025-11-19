@@ -62,3 +62,5 @@ class Category(db.Model):
             "id": self.id_category,
             "name_category": self.name_category,
         }
+
+
