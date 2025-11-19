@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Toaster, toast } from 'sonner';
+import "../styles/create_recipe.css"
 
 const DIFFICULTIES = ["FÁCIL", "MEDIO", "DIFÍCIL"];
 const UNITS = [
@@ -49,10 +50,25 @@ const CreateRecipe = () => {
     const getAuthToken = () => {
         const token = localStorage.getItem("access_token");
         if (!token) {
+            navigate("/login");
             toast.error("Debes iniciar sesión para crear/editar recetas.");
             return null;
         }
         return token;
+    };
+
+    const getUserRole = () => {
+        const userString = localStorage.getItem("user");
+        if (userString) {
+            try {
+                const user = JSON.parse(userString);
+                return user.rol;
+            } catch (error) {
+                console.error("Error parsing user data:", error);
+                return "guest";
+            }
+        }
+        return "guest";
     };
 
 
@@ -71,6 +87,8 @@ const CreateRecipe = () => {
             return;
         }
 
+        const userRole = getUserRole();
+
         try {
             const response = await fetch(`${urlBase}/recipes/${recipe_id}`, {
                 method: "GET",
@@ -81,6 +99,16 @@ const CreateRecipe = () => {
             const data = await response.json();
 
             if (response.ok) {
+                const recipeStatus = data.recipe.status;
+
+                const canAccess = userRole === "admin" || recipeStatus === "pending";
+
+                if (!canAccess) {
+                    toast.error("Acceso denegado. Solo los administradores pueden editar recetas publicadas.");
+                    navigate("/");
+                    return;
+                }
+
                 const loadedRecipe = {
                     title: data.recipe.title,
                     steps: data.recipe.steps,
@@ -284,25 +312,25 @@ const CreateRecipe = () => {
 
     return (
         <>
-            <div className="container" style={{ paddingTop: '20px', paddingBottom: '20px' }}>
+            <div className="container py-4 bg-fondo">
                 <Toaster position="top-center" richColors />
                 <div className="row justify-content-center">
                     <div className="col-12 col-lg-10">
-                        <h1 className="text-center bg-warning-subtle mx-2 p-4 mb-5 rounded-lg shadow-md">
+                        <h1 className="text-center d-flex justify-content-center bg-titulo mx-2 p-4 mb-5 rounded-lg shadow-md">
                             {isEditMode ? `Editar Receta #${recipe_id}` : "Crear Nueva Receta"}
                         </h1>
 
                         <form
-                            className="border border-secondary form-group p-5 bg-light rounded-lg shadow-lg"
+                            className="border border-secondary form-group p-5 bg-formulario rounded-lg shadow-lg"
                             onSubmit={handleSubmit}
                         >
-                            <h4 className="mb-4 text-primary border-bottom pb-2">Información Básica</h4>
+                            <h4 className="mb-4 text-success border-bottom pb-2">Información Básica</h4>
                             <div className="row mb-3">
                                 <div className="col-md-8 form-group">
                                     <label htmlFor="txtTitle" className="form-label"><b>Título de la Receta:</b></label>
                                     <input
                                         type="text"
-                                        placeholder="Brownie de Chocolate"
+                                        placeholder="Papas fritas"
                                         className="form-control"
                                         id="txtTitle"
                                         name="title"
@@ -321,8 +349,8 @@ const CreateRecipe = () => {
                                         value={recipeData.category_id}
                                         required
                                     >
-                                        {MOCK_CATEGORIES.map(cat => (
-                                            <option key={cat.id} value={cat.id}>{cat.name}</option>
+                                        {MOCK_CATEGORIES.map(item => (
+                                            <option key={item.id} value={item.id}>{item.name}</option>
                                         ))}
                                     </select>
                                 </div>
@@ -352,8 +380,8 @@ const CreateRecipe = () => {
                                         value={recipeData.difficulty}
                                         required
                                     >
-                                        {DIFFICULTIES.map(d => (
-                                            <option key={d} value={d}>{d}</option>
+                                        {DIFFICULTIES.map(item => (
+                                            <option key={item} value={item}>{item}</option>
                                         ))}
                                     </select>
                                 </div>
@@ -402,7 +430,7 @@ const CreateRecipe = () => {
                                 {recipeData.image_url_existing && !imageFile && (
                                     <div className="mt-3">
                                         <small className="text-muted d-block mb-1">Imagen actual (Cámbiala subiendo un nuevo archivo):</small>
-                                        <img src={recipeData.image_url_existing} alt="Receta actual" style={{ maxWidth: '150px', maxHeight: '150px', objectFit: 'cover' }} className="rounded shadow" />
+                                        <img src={recipeData.image_url_existing} alt="Receta actual" className="prevew-image rounded shadow" />
                                     </div>
                                 )}
                                 {imageFile && (
@@ -411,9 +439,9 @@ const CreateRecipe = () => {
                             </div>
 
                             <h4 className="mb-4 text-success border-bottom pb-2">Ingredientes</h4>
-                            <p className="alert alert-info py-2 px-3 mb-4">
+                            <p className="alert alert-primary py-2 px-3 mb-4">
                                 <i className="fa-solid fa-circle-info me-2"></i>
-                                **RECUERDA:** Ingresa los ingredientes en **singular** (ej: "Huevo", no "Huevos") para mantener limpio el catálogo.
+                                **OBSERVACIÓN:** Ingresa los ingredientes en **singular** (ej: "Huevo", no "Huevos").
                             </p>
 
 
@@ -490,7 +518,7 @@ const CreateRecipe = () => {
                             >
                                 {loading ? (
                                     <>
-                                        <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                        <span className="spinner-border spinner-border-sm me-2"></span>
                                         {isEditMode ? "Guardando Cambios..." : "Guardando Receta..."}
                                     </>
                                 ) : (

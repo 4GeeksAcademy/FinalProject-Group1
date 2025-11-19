@@ -37,12 +37,11 @@ def getUser(user_id):
     return jsonify(user.serialize()), 200
 
 
-
 @api.route("/user", methods=["PUT"])
 @jwt_required()
 def updateUser():
     current_user_id = get_jwt_identity()
-    user = User.query.get(current_user_id) 
+    user = User.query.get(current_user_id)
     if not user:
         return jsonify({"message": "User not found"}), 404
 
@@ -59,7 +58,7 @@ def updateUser():
     if email:
         if not val_email(email):
             return jsonify({"message": "Email is invalid"}), 400
-        
+
         # Verificar si ya existe el email
 
         existing_email_user = User.query.filter_by(email=email).first()
@@ -68,13 +67,12 @@ def updateUser():
 
         user.email = email
 
-    
     if username:
         # Verificar si ya existe el username
-        existing_username_user = User.query.filter_by(username=username).first()
+        existing_username_user = User.query.filter_by(
+            username=username).first()
         if existing_username_user and existing_username_user.id != current_user_id:
             return jsonify({"message": "This username is already in use"}), 400
-
 
     if email:
         if not val_email(email):
@@ -120,9 +118,6 @@ def register_user():
     if User.query.filter_by(username=username).first():
         return jsonify({"message": "The username is already registered"}), 409
 
-# 1. Eliminar solo es para cablear un admin
-    rol_temporal = data.get("rol")
-
     salt = b64encode(os.urandom(16)).decode("utf-8")
     hashed_password = generate_password_hash(f"{data['password']}{salt}")
 
@@ -132,8 +127,6 @@ def register_user():
         fullname=fullname,
         username=username,
         salt=salt,
-        # elominar solo cableado de admin
-        rol=rol_temporal,
     )
 
     db.session.add(new_user)
@@ -210,7 +203,7 @@ def edit_category(id):
     new_name = data.get("name_category")
 
     if not new_name or not new_name.strip():
-            return jsonify({"message": "Category name cannot be empty"}), 400
+        return jsonify({"message": "Category name cannot be empty"}), 400
 
     new_name = new_name.strip()
 
@@ -218,7 +211,7 @@ def edit_category(id):
 
     if category is None:
         return jsonify({"message": "Category not found"}), 404
-    
+
     if new_name != category.name_category:
         existing = Category.query.filter_by(name_category=new_name).first()
         if existing:
@@ -242,11 +235,11 @@ def edit_category(id):
 
 @api.route("/categories/<int:id>", methods=["DELETE"])
 def delete_category(id):
-    
+
     category = Category.query.get(id)
     if category is None:
         return jsonify({"message": "Category not found"}), 404
-    
+
     try:
         db.session.delete(category)
         db.session.commit()
@@ -259,6 +252,7 @@ def delete_category(id):
             "message": "Error deleting category",
             "error": f"{error.args}"
         }), 500
+
 
 @api.route("/change-password", methods=["PUT"])
 @jwt_required()
@@ -328,7 +322,7 @@ def create_recipe():
 
     user_id = get_jwt_identity()
     claims = get_jwt()
-    is_admin = claims.get("is_administrator", False)
+    is_admin = claims.get("rol") == "admin"
 
     data_form = request.form
     data_files = request.files
@@ -420,35 +414,44 @@ def create_recipe():
 
 
 @api.route("/recipes", methods=["GET"])
-def get_published_recipes():
+def get_recipes():
     try:
-        published_recipes = db.session.execute(
+        status_param = request.args.get('status')
+        if status_param == "pending":
+            status_filter = stateRecipeEnum.PENDING
+        elif status_param == "rejected":
+            status_filter = stateRecipeEnum.REJECTED
+        else:
+            status_filter = stateRecipeEnum.PUBLISHED
+
+        query = (
             db.select(Recipe)
-            .filter(Recipe.state_recipe == stateRecipeEnum.PUBLISHED)
+            .filter(Recipe.state_recipe == status_filter)
             .order_by(Recipe.created_at.desc())
-        ).scalars().all()
-        response_body = [recipe.serialize() for recipe in published_recipes]
+        )
+
+        recipes = db.session.execute(query).scalars().all()
+        response_body = [recipe.serialize() for recipe in recipes]
 
         return jsonify({
-            "message": "List of successfully published recipes",
+            "message": f"List of successfully {status_param} recipes",
             "recipes": response_body
         }), 200
 
     except Exception as error:
+        print(f"Error al obtener recetas: {error}")
         return jsonify({
-            "message": "Internal server error while processing the request.",
-            "error_detail": str(error)
+            "message": "Internal server error while processing the request.", "Details": str(error)
         }), 500
-
 
 
 @api.route("/recipes/<int:recipe_id>", methods=["PUT"])
 @jwt_required()
 def edit_recipe(recipe_id):
 
-    user_id = get_jwt_identity()
+    user_id = int(get_jwt_identity())
     claims = get_jwt()
-    is_admin = claims.get("is_administrator", False)
+    is_admin = claims.get("rol") == "admin"
 
     recipe = db.session.get(Recipe, recipe_id)
     if recipe is None:
@@ -458,10 +461,10 @@ def edit_recipe(recipe_id):
         pass
 
     else:
-        if recipe.state_recipe == stateRecipeEnum.published:
+        if recipe.state_recipe == stateRecipeEnum.PUBLISHED:
             return jsonify({"message": "Access denied. Only administrators can edit published recipes."}), 403
 
-        if recipe.state_recipe == stateRecipeEnum.pending:
+        if recipe.state_recipe == stateRecipeEnum.PENDING:
             if recipe.user_id != user_id:
                 return jsonify({"message": "Access denied. You can only edit your own pending recipes."}), 403
         else:
@@ -543,15 +546,15 @@ def edit_recipe(recipe_id):
     except Exception as error:
         db.session.rollback()
         return jsonify({"message": "Error updating recipe details or ingredients.", "details": str(error)}), 400
-    
+
 
 @api.route("/recipes/<int:recipe_id>", methods=["GET"])
-# @jwt_required() 
-def get_single_recipe(recipe_id):
+# @jwt_required()
+def get_one_recipe(recipe_id):
     recipe = db.session.get(Recipe, recipe_id)
     if recipe is None:
         return jsonify({"message": f"Recipe with ID {recipe_id} not found."}), 404
     return jsonify({
         "message": "Recipe found successfully",
-        "recipe": recipe.serialize() 
+        "recipe": recipe.serialize()
     }), 200

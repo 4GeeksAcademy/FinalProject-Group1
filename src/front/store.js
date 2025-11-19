@@ -2,6 +2,7 @@ export const initialStore=()=>{
   return{
     token: localStorage.getItem("access_token") ?? null,
     user: JSON.parse(localStorage.getItem("user")) ?? null,
+    recipe_published: JSON.parse(localStorage.getItem("recipes")) || [],
     currentUserId: null,
     message: null,
     todos: [
@@ -53,7 +54,11 @@ export default function storeReducer(store, action = {}) {
         user: action.payload
       };
       
-    case 'add_task':
+    case "SET_RECIPES":
+      return {
+        ...store,
+        recipe_published: action.payload
+      }
 
     case "add_task":
       const { id, color } = action.payload;

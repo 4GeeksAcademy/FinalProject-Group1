@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Toaster, toast } from 'sonner';
+import { Link } from 'react-router-dom';
+import "../styles/recipe_list.css"
 
 const urlBase = import.meta.env.VITE_BACKEND_URL;
 
 const RecipeList = () => {
     const [recipes, setRecipes] = useState([]);
-    const [loading, setLoading] = useState(true);
-
-    const fetchRecipes = async () => {
-        setLoading(true);
+ 
+    const getAllRecipes = async () => {
         try {
             const response = await fetch(`${urlBase}/recipes`, {
                 method: "GET",
@@ -35,53 +35,46 @@ const RecipeList = () => {
             console.error("Error al obtener recetas:", error);
             toast.error(`Error de carga. Verifica API/Network: ${error.message}`);
             setRecipes([]);
-        } finally {
-            setLoading(false);
         }
     };
-
+ 
 
     useEffect(() => {
-        fetchRecipes();
+        getAllRecipes();
     }, []);
-
-
+ 
+ 
     return (
-        <div className="container pt-5">
-            <Toaster position="top-center" richColors />
-            <div className="row justify-content-center">
-                <div className="col-12 col-lg-8">
-                    <h1 className="text-center bg-info-subtle p-3 mb-4 rounded-lg shadow-sm">
-                        Recetas Publicadas
-                    </h1>
-                    {loading && (
-                        <div className="text-center my-5">
-                            <span className="spinner-border spinner-border-lg text-primary" role="status"></span>
-                            <p className="mt-2 text-primary">Cargando recetas...</p>
-                        </div>
-                    )}
-                    {!loading && recipes.length > 0 && (
-                        <ul className="list-group shadow-lg">
-                            {recipes.map((recipe) => (
-                                <li
-                                    key={recipe.id}
-                                    className="list-group-item list-group-item-action fw-bold"
-                                >
-                                    {recipe.title}
-                                </li>
-                            ))}
-                        </ul>
-                    )}
-
-                    {!loading && recipes.length === 0 && (
-                        <div className="alert alert-warning text-center">
-                            ¡Parece que no hay recetas con estado "published" aún!
-                        </div>
-                    )}
+        <div className="container published p-5">
+            <div className="row">
+                <div className="col-12 d-flex justify-content-center text-center my-3 shadow title-rl">
+                    <h1>Recetas publicadas</h1>
                 </div>
+                {
+                    recipes.map((item) => {
+                        return (
+                            <div key={item.id} className="col-12 col-md-6 col-lg-4 my-5 px-5">
+                                <div className="card bg-pink shadow p-3 border border-0">
+                                    <img src={item.image} className="card-img-top format-image" alt="receta" />
+                                    <div className="card-body">
+                                        <h5 className="card-title">{item.title}</h5>
+                                        <p className="card-text">{item.difficulty}</p>
+
+                                        <span className='d-flex justify-content-end'>
+                                            <i className="fa-solid fa-book fa-lg mx-3"></i>
+                                            <i className="fa-solid fa-pencil fa-lg mx-3"></i>
+                                            <i className="fa-solid fa-trash-can fa-lg ms-3"></i>
+                                        </span>
+                                        {/* <Link to={"/"} className="btn btn-outline-success">Elimina</Link> */}
+                                    </div>
+                                </div>
+                            </div>
+                        )
+                    })
+                }
             </div>
         </div>
     );
-};
+}
 
 export default RecipeList;

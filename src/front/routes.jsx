@@ -7,13 +7,10 @@ import { Single } from "./pages/Single";
 import { Demo } from "./pages/Demo";
 import Register from "./pages/Register";
 import { Myprofile } from "./pages/Myprofile";
-import { Login } from "./pages/Login"; 
+import { Login } from "./pages/Login";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import CreateRecipe from "./pages/CreateRecipe";
-import RecipeList from "./pages/RecipeList";
-import Categorias from "./pages/Categorias";
-
 
 
 export const router = createBrowserRouter(
@@ -35,12 +32,9 @@ export const router = createBrowserRouter(
       <Route path="/myprofile" element={<Myprofile />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password" element={<ResetPassword />} />
-      {/* <Route path="/create-recipe" element={<CreateRecipe />} /> */}
-      <Route path="/recipes-list" element={<RecipeList />} />
-      <Route path="/categories-list" element={<Categorias />} />
-      <Route path="/login" element={<Login />} /> 
-      <Route path="/recipes/create" element={<CreateRecipe />} />      {/* Modo Creación */}
-      <Route path="/recipes/edit/:recipe_id" element={<CreateRecipe />} /> {/* Modo Edición */}
+      <Route path="/login" element={<Login />} />
+      <Route path="/recipes/create" element={<CreateRecipe />} />
+      <Route path="/recipes/edit/:recipe_id" element={<CreateRecipe />} />
 
     </Route>
   )
