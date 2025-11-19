@@ -181,7 +181,7 @@ export const Myprofile = () => {
                             <div className="form-control">
                                 <label>Email</label>
                                 {editing.email ? (
-                                    <div className="d-flex align-items-center flex-wrap">
+                                    <div className="d-flex align-items-center">
                                         <input
                                             className="form-control mx-2 mb-2 flex-grow-1"
                                             type="email"
@@ -206,13 +206,12 @@ export const Myprofile = () => {
                                         </button>
                                     </div>
                                 ) : (
-                                    <div className="d-flex align-items-center flex-wrap">
+                                    <div className="d-flex align-items-center">
                                         <input
                                             readOnly
                                             className="form-control mx-2 mb-0 flex-grow-1"
                                             type="email"
-                                            value={user.email || ""}
-                                            placeholder="Email"
+                                            value={user.email || "Email"}
                                         />
                                         <button
                                             className="btn btn-secondary btn-sm mb-0"

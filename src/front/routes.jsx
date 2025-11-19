@@ -12,6 +12,7 @@ import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import CreateRecipe from "./pages/CreateRecipe";
 
+import AdminCategories from "./pages/AdminCategories";
 
 export const router = createBrowserRouter(
   createRoutesFromElements(
@@ -35,6 +36,7 @@ export const router = createBrowserRouter(
       <Route path="/login" element={<Login />} />
       <Route path="/recipes/create" element={<CreateRecipe />} />
       <Route path="/recipes/edit/:recipe_id" element={<CreateRecipe />} />
+      <Route path="/admin/categories" element={<AdminCategories />} />
 
     </Route>
   )

@@ -8,7 +8,7 @@ from flask_cors import CORS
 import os
 from base64 import b64encode
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_jwt_extended import create_access_token, get_jwt, jwt_required, get_jwt_identity
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity, get_jwt
 from datetime import timedelta
 from functools import wraps
 import json
@@ -152,7 +152,11 @@ def get_categories():
 
 
 @api.route("/categories", methods=["POST"])
+@jwt_required()
 def create_category():
+    claims = get_jwt()
+    if not claims.get("is_administrator"):
+        return jsonify({"message": "Admin role required"}), 403
     data = request.get_json(silent=True)
 
     if data is None:
@@ -194,7 +198,11 @@ def create_category():
 
 
 @api.route("/categories/<int:id>", methods=["PUT"])
+@jwt_required()
 def edit_category(id):
+    claims = get_jwt()
+    if not claims.get("is_administrator"):
+        return jsonify({"message": "Admin role required"}), 403
     data = request.get_json(silent=True)
 
     if data is None:
@@ -234,8 +242,12 @@ def edit_category(id):
 
 
 @api.route("/categories/<int:id>", methods=["DELETE"])
+@jwt_required()
 def delete_category(id):
-
+    claims = get_jwt()
+    if not claims.get("is_administrator"):
+        return jsonify({"message": "Admin role required"}), 403
+    
     category = Category.query.get(id)
     if category is None:
         return jsonify({"message": "Category not found"}), 404
@@ -302,13 +314,13 @@ def login_user():
 
     if not username or not password:
         return jsonify({"message": "Username and password are required"}), 400
-    user = User.query.filter_by(username=username).one_or_none()
-    if user is None:
-        return jsonify({"message": "Ivalid username"}), 401
-    if not check_password_hash(user.password, f"{password}{user.salt}"):
-        return jsonify({"message": "Ivalid credentials"}), 401
-
-    is_admin = user.rol == "admin"
+    user = User.query.filter_by(username=username).one_or_none() 
+    if user is None:  
+        return jsonify({"message": "Invalid username"}), 401 
+    if not check_password_hash(user.password, f"{password}{user.salt}"): 
+        return jsonify({"message": "Invalid credentials"}), 401
+   
+    is_admin = user.rol == "administrador"
     additional_claims = {"is_administrator": is_admin, "rol": user.rol}
     token = create_access_token(identity=str(user.id_user), expires_delta=timedelta(
         days=1), additional_claims=additional_claims)
