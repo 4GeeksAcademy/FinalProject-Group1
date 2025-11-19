@@ -9,7 +9,7 @@ export const Navbar = () => {
 	const logout = () => {
 		dispatch({ type: "SET_TOKEN", payload: null })
 		dispatch({ type: "SET_USER", payload: null })
-		localStorage.removeItem("token")
+		localStorage.removeItem("access_token")
 		localStorage.removeItem("user")
 	}
 

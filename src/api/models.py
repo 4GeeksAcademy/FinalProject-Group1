@@ -1,9 +1,10 @@
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import String, Boolean, DateTime
+from sqlalchemy import Integer, String, Boolean, DateTime, Text, Enum, ForeignKey, Float
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from typing import List
 from datetime import datetime, timezone
 from typing import Optional
+import enum
 
 db = SQLAlchemy()
 
@@ -27,6 +28,9 @@ class User(db.Model):
     is_active: Mapped[bool] = mapped_column(
         Boolean(), nullable=True, default=True)
 
+    recipe_user: Mapped[List["Recipe"]] = relationship(
+        back_populates="user_recipe")
+
     def __repr__(self):
         return f'<User {self.username}>'
 
@@ -48,11 +52,15 @@ class Category(db.Model):
     __tablename__ = "categories"
 
     id_category: Mapped[int] = mapped_column(primary_key=True)
-    name_category: Mapped[str] = mapped_column(String(55), unique=True, nullable=False)
+    name_category: Mapped[str] = mapped_column(
+        String(55), unique=True, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(
         timezone=True), default=lambda: datetime.now(timezone.utc), nullable=False)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(
         timezone.utc), onupdate=lambda: datetime.now(timezone.utc), nullable=False)
+
+    recipe_category: Mapped[List["Recipe"]] = relationship(
+        back_populates="category_recipe")
 
     def __repr__(self):
         return f'<Category {self.name_category}>'
