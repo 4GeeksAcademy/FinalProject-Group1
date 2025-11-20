@@ -2,13 +2,15 @@ export const initialStore = () => {
   return {
     token: localStorage.getItem("access_token") ?? null,
     user: JSON.parse(localStorage.getItem("user")) ?? null,
+    recipe_published: JSON.parse(localStorage.getItem("recipes")) || [],
+    currentUserId: null,
     message: null,
     todos: [
       {
         token: null,
         user: null,
       },
-      {
+      { 
         id: 1,
         title: "Make the bed",
         background: null,
@@ -51,6 +53,12 @@ export default function storeReducer(store, action = {}) {
         ...store,
         user: action.payload,
       };
+      
+    case "SET_RECIPES":
+      return {
+        ...store,
+        recipe_published: action.payload
+      }
 
     case "add_task":
       const { id, color } = action.payload;
@@ -72,8 +80,6 @@ export default function storeReducer(store, action = {}) {
         ...store,
         user: action.payload,
       };
-    default:
-      throw Error("Unknown action.");
 
     case "CHECK_AUTH":
       return {
@@ -81,5 +87,7 @@ export default function storeReducer(store, action = {}) {
         token: localStorage.getItem("access_token") ?? null,
         user: JSON.parse(localStorage.getItem("user")) ?? null,
       };
+    default:
+      throw Error("Unknown action.");
   }
 }

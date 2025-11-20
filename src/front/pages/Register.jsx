@@ -4,7 +4,7 @@ import { useNavigate, Link } from "react-router-dom"
 import { Toaster, toast } from "sonner"
 import "../styles/register.css"
 
-  
+
 const initialUserState = {
     fullname: "",
     username: "",
@@ -145,23 +145,23 @@ const Register = () => {
             } else {
                 toast.error("Error al registrar usuario, intenta nuevamente")
             }
-        } catch (error) { 
+        } catch (error) {
             toast.error("Error de conexión con el servidor. Intenta de nuevo más tarde.");
         }
     }
- 
- 
+
+
     return (
-        <div className="container">
+        <div className="container bg-fondo">
             <Toaster position="top-center" richColors />
             <div className="d-flex flex-column">
                 <div className="row justify-content-center my-4">
                     <div className="col-7 mb-4">
-                        <h1 className="text-center bg-warning-subtle mx-5 p-4">Regístrate en la página</h1>
+                        <h2 className="d-flex text-center bg-my-tittle justify-content-center mx-5 p-4">Regístrate en la página</h2>
                     </div>
                     <div className="col-12 col-md-6">
                         <form
-                            className="border border-secundary form-group p-5 bg-verde"
+                            className="border border-secundary form-group p-5 bg-verdes"
                             onSubmit={handleSubmit}
                         >
                             <div className="form-group mb-3">
@@ -215,8 +215,8 @@ const Register = () => {
                                         required
                                         onFocus={() => setIsPasswordFocused(true)}
                                         onBlur={() => setIsPasswordFocused(false)}
-                                        autoComplete="new-password"  
-                                        />
+                                        autoComplete="new-password"
+                                    />
                                     <button
                                         type="button"
                                         className="btn btn-outline-secondary"
