@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import useGlobalReducer from "../hooks/useGlobalReducer.jsx";
+import storeReducer from "../store.js";
+import { Navigate } from "react-router-dom";
 
 
 export const Myprofile = () => {
@@ -7,6 +9,11 @@ export const Myprofile = () => {
     const urlBase = import.meta.env.VITE_BACKEND_URL;
 
     const { store, dispatch } = useGlobalReducer()
+    console.log("DEBUG token:", store.token);
+    console.log("DEBUG user:", store.user);
+    if (!store.token || !store.user) {
+        return <Navigate to="/login" replace />;
+    }
 
     const [user, setUser] = useState({
         image: "",
