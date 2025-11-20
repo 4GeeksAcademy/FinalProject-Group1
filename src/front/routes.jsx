@@ -11,8 +11,12 @@ import { Login } from "./pages/Login";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import CreateRecipe from "./pages/CreateRecipe";
-
+import AdminProtectedRoute from "./components/AdminProtectedRoute";
 import AdminCategories from "./pages/AdminCategories";
+import PublishedRecipes from "./pages/PublishedRecipes";
+import PendingRecipes from "./pages/PendignRecipes";
+import RejectedRecipes from "./pages/RejectedRecipes";
+import AdminDashboard from "./pages/AdminDashboard";
 
 export const router = createBrowserRouter(
   createRoutesFromElements(
@@ -37,6 +41,34 @@ export const router = createBrowserRouter(
       <Route path="/recipes/create" element={<CreateRecipe />} />
       <Route path="/recipes/edit/:recipe_id" element={<CreateRecipe />} />
       <Route path="/admin/categories" element={<AdminCategories />} />
+
+      <Route path="/status" element={
+        <AdminProtectedRoute>
+          <AdminDashboard />
+        </AdminProtectedRoute>
+      } />
+      <Route path="/status/published" element={
+        <AdminProtectedRoute>
+          <PublishedRecipes />
+        </AdminProtectedRoute>
+      } />
+      <Route path="/status/pending" element={
+        <AdminProtectedRoute>
+          <PendingRecipes />
+        </AdminProtectedRoute>
+      } />
+      <Route path="/status/rejected" element={
+        <AdminProtectedRoute>
+          <RejectedRecipes />
+        </AdminProtectedRoute>
+      } />
+      {/* <Route path="/status/published" element={<PublishedRecipes />} />
+      <Route path="/status/pending" element={<PendingRecipes />} />
+      <Route path="/status/rejected" element={<RejectedRecipes />} />
+      <Route path="/status" element={<AdminDashboard />} /> */}
+      {/* <Route path="/categories-list" element={<Categorias />} />
+      <Route path="/recipes-list" element={<RecipeList />} /> */}
+
 
     </Route>
   )

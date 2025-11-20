@@ -14,6 +14,7 @@ from functools import wraps
 import json
 from .cloudinary_service import cloudinary_service
 from sqlalchemy import select
+from .admin_decorator import admin_required
 
 
 api = Blueprint('api', __name__)
@@ -320,7 +321,7 @@ def login_user():
     if not check_password_hash(user.password, f"{password}{user.salt}"): 
         return jsonify({"message": "Invalid credentials"}), 401
    
-    is_admin = user.rol == "administrador"
+    is_admin = user.rol == "admin"
     additional_claims = {"is_administrator": is_admin, "rol": user.rol}
     token = create_access_token(identity=str(user.id_user), expires_delta=timedelta(
         days=1), additional_claims=additional_claims)
@@ -425,8 +426,9 @@ def create_recipe():
         return jsonify({"message": "Error saving the recipe to the database.", "details": str(error)}), 400
 
 
-@api.route("/recipes", methods=["GET"])
-def get_recipes():
+@api.route("/admin/recipes/status", methods=["GET"])
+@admin_required()
+def get_admin_recipes_by_status():
     try:
         status_param = request.args.get('status')
         if status_param == "pending":
@@ -446,7 +448,7 @@ def get_recipes():
         response_body = [recipe.serialize() for recipe in recipes]
 
         return jsonify({
-            "message": f"List of successfully {status_param} recipes",
+            "message": f"List of successfully {status_param} recipes for Admin",
             "recipes": response_body
         }), 200
 
