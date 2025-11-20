@@ -31,10 +31,10 @@ export const router = createBrowserRouter(
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/login" element={<Login />} />
-            <Route path="/recipes/create" element={<CreateRecipe />} />
             <Route path="/recipes/edit/:recipe_id" element={<CreateRecipe />} />
             <Route path="/admin/categories" element={<AdminCategories />} />
             <Route path="/myprofile" element={<ProtectedRoute><Myprofile /></ProtectedRoute>} />
+             <Route path="/recipes/create" element={<ProtectedRoute><CreateRecipe /></ProtectedRoute>} />
 
         </Route>
     )

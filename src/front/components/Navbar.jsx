@@ -59,9 +59,13 @@ export const Navbar = () => {
 										role="button"
 										data-bs-toggle="dropdown"
 									>
-										<span className="profile-photo-navbar bg-secondary rounded-circle">
-											Foto
-										</span>
+										<img
+											src={store.user?.image || `https://ui-avatars.com/api/?name=${store.user?.fullname || "User"}&background=random`}
+											alt="profile"
+											className="rounded-circle"
+											style={{ width: "40px", height: "40px", objectFit: "cover" }}
+										/>
+
 									</a>
 
 									<ul className="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">

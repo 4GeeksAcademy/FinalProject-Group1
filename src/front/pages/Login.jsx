@@ -39,13 +39,14 @@ export const Login = () => {
 
             if (response.ok) {
                 const { token, user_info } = data;
-                console.log ("Login exitoso, token recibido:", user_info);
+                console.log("Login exitoso, token recibido:", user_info);
                 localStorage.setItem('access_token', token);
                 localStorage.setItem('user', JSON.stringify(user_info));
                 dispatch({ type: "SET_USER", payload: user_info })
                 dispatch({ type: "SET_TOKEN", payload: data.token })
 
                 navigate('/');
+
 
             } else {
                 const errorMessage = data.message || 'Error desconocido al iniciar sesión.';
@@ -72,7 +73,7 @@ export const Login = () => {
                             <form onSubmit={handleSubmit}>
                                 {error && <div className="alert alert-danger">{error}</div>}
 
-                                {/* Campo de Usuario */}
+                               
                                 <div className="mb-3">
                                     <label htmlFor="username">Usuario</label>
                                     <input
@@ -84,7 +85,7 @@ export const Login = () => {
                                         required
                                     />
                                 </div>
-                                {/* Campo de Contraseña */}
+                                
                                 <div className="mb-3">
                                     <label htmlFor="password">Contraseña</label>
                                     <input
@@ -101,7 +102,7 @@ export const Login = () => {
                                 </button>
                             </form>
 
-                            {/* Enlaces requeridos */}
+                           
                             <div className="mt-3 text-center">
                                 <Link to="/register" className="me-3">Registrarme</Link>
                                 <Link to="/forgot-password">Olvidé mi contraseña</Link>
