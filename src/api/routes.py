@@ -3,7 +3,7 @@ This module takes care of starting the API Server, Loading the DB and Adding the
 """
 from flask import Flask, request, jsonify, url_for, Blueprint
 from api.models import db, User, Recipe, Ingredient, RecipeIngredient, difficultyEnum, stateRecipeEnum, UnitEnum, Category
-from api.utils import generate_sitemap, APIException,  val_email, val_password
+from api.utils import generate_sitemap, APIException,  val_email, val_password, get_initials, generate_initials_image
 from flask_cors import CORS
 import os
 from base64 import b64encode
@@ -14,6 +14,8 @@ from functools import wraps
 import json
 from .cloudinary_service import cloudinary_service
 from sqlalchemy import select
+import cloudinary 
+import cloudinary.uploader
 
 
 api = Blueprint('api', __name__)
@@ -28,8 +30,6 @@ def health_check():
     return jsonify({"status": "OK"}), 200
 
 
-
-
 @api.route("/user/<int:user_id>", methods=["GET"])
 @jwt_required()
 def getUser(user_id):
@@ -42,7 +42,6 @@ def getUser(user_id):
         return jsonify({"message": "User not found"}), 404
 
     return jsonify(user.serialize()), 200
-
 
 
 @api.route("/user", methods=["PUT"])
@@ -82,7 +81,7 @@ def updateUser():
             username=username).first()
         if existing_username_user and existing_username_user.id != current_user_id:
             return jsonify({"message": "This username is already in use"}), 400
-    
+
         user.username = username
 
     if fullname:
@@ -315,15 +314,14 @@ def change_password():
     # generar nuevo token
     from flask_jwt_extended import create_access_token
     additional_claims = {"rol": user.rol}
-    new_token = create_access_token(identity=str(user.id_user), additional_claims=additional_claims)
+    new_token = create_access_token(identity=str(
+        user.id_user), additional_claims=additional_claims)
 
     return jsonify({
         "message": "Password updated successfully",
         "token": new_token,
         "user": user.serialize()
     }), 200
-
-
 
 
 @api.route("/login", methods=["POST"])
@@ -339,6 +337,13 @@ def login_user():
         return jsonify({"message": "Invalid username"}), 401
     if not check_password_hash(user.password, f"{password}{user.salt}"):
         return jsonify({"message": "Invalid credentials"}), 401
+    if not user.profile:
+        print("➡ NO TIENE PROFLE, GENERANDO AVATAR...")
+        initials = get_initials(user.fullname)
+        print("Iniciales detectadas:", initials)
+        user.profile = generate_initials_image(initials)
+        print("Avatar generado:", user.profile)
+        db.session.commit()
 
     is_admin = user.rol == "administrador"
     additional_claims = {"is_administrator": is_admin, "rol": user.rol}
@@ -589,4 +594,29 @@ def get_one_recipe(recipe_id):
     return jsonify({
         "message": "Recipe found successfully",
         "recipe": recipe.serialize()
+    }), 200
+
+@api.route("/upload-profile-image", methods=["POST"])
+@jwt_required()
+def upload_profile_image():
+    user_id = get_jwt_identity()
+    user = User.query.get(user_id)
+
+    image = request.files.get("image")
+    if not image:
+        return jsonify({"message": "No image provided"}), 400
+
+    upload_result = cloudinary.uploader.upload(
+        image,
+        folder="profiles",
+        public_id=str(user_id),
+        overwrite=True
+    )
+
+    user.profile = upload_result["secure_url"]
+    db.session.commit()
+
+    return jsonify({
+        "image": user.profile,
+        "user": user.serialize()
     }), 200

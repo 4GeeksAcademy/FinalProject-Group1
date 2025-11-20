@@ -9,19 +9,42 @@ export const Myprofile = () => {
     const urlBase = import.meta.env.VITE_BACKEND_URL;
 
     const { store, dispatch } = useGlobalReducer()
-    console.log("DEBUG token:", store.token);
-    console.log("DEBUG user:", store.user);
     if (!store.token || !store.user) {
         return <Navigate to="/login" replace />;
     }
 
     const [user, setUser] = useState({
-        image: "",
+        profile: "",
         username: "",
         fullname: "",
         email: ""
     });
 
+    const handleImageUpload = async (event) => {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const formData = new FormData();
+        formData.append("image", file);
+
+        const response = await fetch(`${urlBase}/upload-profile-image`, {
+            method: "POST",
+            headers: {
+                "Authorization": "Bearer " + store.token
+            },
+            body: formData
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            setUser({ ...user, profile: data.image });
+            dispatch({ type: "SET_USER", payload: data.user });
+            localStorage.setItem("user", JSON.stringify(data.user));
+        } else {
+            console.error("Error al subir imagen:", data.message);
+        }
+    };
 
 
     const [editing, setEditing] = useState({
@@ -97,7 +120,12 @@ export const Myprofile = () => {
                     },
                 })
                 const data = await response.json();
-                setUser(data);
+                setUser({
+                    profile: data.image,      
+                    username: data.username,
+                    fullname: data.fullname,
+                    email: data.email
+                });
             } catch (error) {
                 console.error("Error cargando el usuario:", error);
             }
@@ -118,7 +146,7 @@ export const Myprofile = () => {
                     fullname: user.fullname,
                     username: user.username,
                     email: user.email,
-                    image: user.image
+                    profile: user.profile
                 })
             });
 
@@ -158,11 +186,19 @@ export const Myprofile = () => {
 
 
                             <div className="form-control d-flex align-items-center">
-                                <img src={user.image || "imagen random"} alt="Profile" />
+                                <img
+                                    src={user.profile || "https://ui-avatars.com/api/?name=" + encodeURIComponent(user.fullname || "User")}
+                                    alt="Profile"
+                                    className="rounded-circle"
+                                    width={80}
+                                />
+
+
                                 <input
                                     type="file"
                                     accept="image/*"
                                     className="form-control mx2"
+                                    onChange={handleImageUpload}
                                 ></input>
                             </div>
 
