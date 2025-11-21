@@ -320,7 +320,7 @@ def login_user():
     if not check_password_hash(user.password, f"{password}{user.salt}"): 
         return jsonify({"message": "Invalid credentials"}), 401
    
-    is_admin = user.rol == "administrador"
+    is_admin = user.rol == "admin"
     additional_claims = {"is_administrator": is_admin, "rol": user.rol}
     token = create_access_token(identity=str(user.id_user), expires_delta=timedelta(
         days=1), additional_claims=additional_claims)
