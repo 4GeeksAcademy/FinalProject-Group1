@@ -1,12 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Toaster, toast } from 'sonner';
 import AdminCardRecipe from './AdminCardRecipe';
+import Pagination from "../components/Pagination"
 
 const urlBase = import.meta.env.VITE_BACKEND_URL;
+const RECIPES_PER_PAGE = 9;
 
 const RejectedRecipes = () => {
     const [recipes, setRecipes] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [currentPage, setCurrentPage] = useState(1);
+
+    const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
     const getRecipesByStatus = async (status) => {
         setIsLoading(true);
@@ -31,6 +36,7 @@ const RejectedRecipes = () => {
             if (data.recipes && Array.isArray(data.recipes)) {
                 setRecipes(data.recipes);
                 toast.success(`Éxito: Se cargaron ${data.recipes.length} recetas ${status}.`, { duration: 1500 });
+                setCurrentPage(1);
             } else {
                 throw new Error("Respuesta del servidor inválida: No se encontró el array 'recipes'.");
             }
@@ -45,21 +51,103 @@ const RejectedRecipes = () => {
     };
 
 
+    const handleDelete = async (recipeId) => {
+        if (!window.confirm("¿Estás seguro de que quieres eliminar esta receta?")) {
+            return;
+        }
+
+        const token = localStorage.getItem('access_token');
+        try {
+            const response = await fetch(`${urlBase}/recipes/${recipeId}`, {
+                method: "DELETE",
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                },
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || "Error al intentar eliminar la receta.");
+            }
+
+            toast.success(data.message || "Receta eliminada exitosamente.");
+
+            getRecipesByStatus('rejected');
+
+        } catch (error) {
+            console.error("Error de eliminación:", error);
+            toast.error(`Eliminación fallida: ${error.message}`);
+        }
+    };
+
+
+    const handleStatusChange = async (recipeId, newStatus) => {
+        const token = localStorage.getItem('access_token');
+
+        if (!window.confirm(`¿Estás seguro de que quieres cambiar el estado de la receta a ${newStatus}?`)) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`${urlBase}/admin/recipes/${recipeId}/status`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
+                body: JSON.stringify({ new_status: newStatus })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || `Error al cambiar el estado a ${newStatus}.`);
+            }
+
+            toast.success(data.message || `Receta actualizada a estado: ${newStatus}.`, { duration: 1500 });
+
+            getRecipesByStatus('rejected', currentPage);
+
+        } catch (error) {
+            console.error("Error de cambio de estado:", error);
+            toast.error(`Fallo al actualizar el estado: ${error.message}`);
+        }
+    };
+
+
     useEffect(() => {
         getRecipesByStatus('rejected');
     }, []);
+
+
+    const currentRecipes = useMemo(() => {
+        const indexOfLastRecipe = currentPage * RECIPES_PER_PAGE;
+        const indexOfFirstRecipe = indexOfLastRecipe - RECIPES_PER_PAGE;
+        return recipes.slice(indexOfFirstRecipe, indexOfLastRecipe);
+    }, [recipes, currentPage]);
 
 
     if (isLoading) {
         return <div className="text-center p-5">Cargando recetas...</div>;
     }
 
+
     return (
         <>
             <Toaster position="top-right" richColors />
             <AdminCardRecipe
-                recipes={recipes}
+                recipes={currentRecipes}
                 title="Recetas Rechazadas"
+                icono="= devuelve la receta a pendientes"
+                handleDelete={handleDelete}
+                handleStatusChange={handleStatusChange}
+            />
+            <Pagination
+                recipesPerPage={RECIPES_PER_PAGE}
+                totalRecipes={recipes.length}
+                currentPage={currentPage}
+                paginate={paginate}
             />
         </>
     );

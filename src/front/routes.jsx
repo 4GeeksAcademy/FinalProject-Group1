@@ -39,12 +39,31 @@ export const router = createBrowserRouter(
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/login" element={<Login />} />
       <Route path="/recipes/create" element={<CreateRecipe />} />
-      <Route path="/recipes/edit/:recipe_id" element={<CreateRecipe />} />
-      <Route path="/admin/categories" element={<AdminCategories />} />
-
+      {/* <Route path="/recipes/edit/:recipe_id" element={<CreateRecipe />} /> */}
+      {/* <Route path="/admin/categories" element={<AdminCategories />} /> */}
+      <Route path="/admin/categories" element={
+        <AdminProtectedRoute>
+          <AdminCategories />
+        </AdminProtectedRoute>
+      } />
       <Route path="/status" element={
         <AdminProtectedRoute>
           <AdminDashboard />
+        </AdminProtectedRoute>
+      } />
+      <Route path="/status/published/recipes/edit/:recipe_id" element={
+        <AdminProtectedRoute>
+          <CreateRecipe />
+        </AdminProtectedRoute>
+      } />
+      <Route path="/status/pending/recipes/edit/:recipe_id" element={
+        <AdminProtectedRoute>
+          <CreateRecipe />
+        </AdminProtectedRoute>
+      } />
+      <Route path="/status/rejected/recipes/edit/:recipe_id" element={
+        <AdminProtectedRoute>
+          <CreateRecipe />
         </AdminProtectedRoute>
       } />
       <Route path="/status/published" element={

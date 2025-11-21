@@ -16,7 +16,7 @@ from .cloudinary_service import cloudinary_service
 from sqlalchemy import select
 from .admin_decorator import admin_required
 
-
+ 
 api = Blueprint('api', __name__)
 
 
@@ -438,18 +438,30 @@ def get_admin_recipes_by_status():
         else:
             status_filter = stateRecipeEnum.PUBLISHED
 
-        query = (
-            db.select(Recipe)
-            .filter(Recipe.state_recipe == status_filter)
+        page = int(request.args.get('page', 1))
+        limit = int(request.args.get('limit', 9))
+ 
+        offset = (page - 1) * limit
+
+        base_query = db.select(Recipe).filter(Recipe.state_recipe == status_filter)
+
+        total_query = db.select(db.func.count()).select_from(base_query)
+        total_count = db.session.execute(total_query).scalar()
+
+        recipes_query = (
+            base_query
             .order_by(Recipe.created_at.desc())
+            .offset(offset) 
+            .limit(limit)  
         )
 
-        recipes = db.session.execute(query).scalars().all()
+        recipes = db.session.execute(recipes_query).scalars().all()
         response_body = [recipe.serialize() for recipe in recipes]
 
         return jsonify({
-            "message": f"List of successfully {status_param} recipes for Admin",
-            "recipes": response_body
+            "message": f"List of successfully {status_param} recipes for Admin (Page {page})",
+            "recipes": response_body,
+            "total_count": total_count
         }), 200
 
     except Exception as error:
@@ -457,6 +469,7 @@ def get_admin_recipes_by_status():
         return jsonify({
             "message": "Internal server error while processing the request.", "Details": str(error)
         }), 500
+
 
 
 @api.route("/recipes/<int:recipe_id>", methods=["PUT"])
@@ -572,3 +585,104 @@ def get_one_recipe(recipe_id):
         "message": "Recipe found successfully",
         "recipe": recipe.serialize()
     }), 200
+
+
+@api.route("/recipes/<int:recipe_id>", methods=["DELETE"])
+@jwt_required()
+def delete_recipe(recipe_id):
+    user_id = int(get_jwt_identity())
+    claims = get_jwt()
+    is_admin = claims.get("rol") == "admin"
+
+    recipe = db.session.get(Recipe, recipe_id)
+    if recipe is None:
+        return jsonify({"message": f"Recipe with ID {recipe_id} not found."}), 404
+
+    if not is_admin:
+        if recipe.user_id != user_id:
+             return jsonify({"message": "Access denied. You can only delete your own recipes."}), 403
+        
+        if recipe.state_recipe == stateRecipeEnum.PUBLISHED:
+            return jsonify({"message": "Access denied. Only administrators can delete published recipes."}), 403
+
+    try:
+        cloudinary_service.delete_image(recipe.image) 
+    except Exception as image_error:
+        print(f"Error al eliminar imagen de Cloudinary para Receta ID {recipe_id}: {str(image_error)}")
+        pass 
+
+    try:
+        db.session.delete(recipe)
+        db.session.commit()
+        return jsonify({"message": f"Recipe with ID {recipe_id} deleted successfully."}), 200
+
+    except Exception as db_error:
+        db.session.rollback()
+        return jsonify({"message": "Error deleting recipe. Check DB logs for constraints.", "details": str(db_error)}), 500
+    
+
+@api.route("/admin/recipes/<int:recipe_id>/status", methods=["PUT"])
+@admin_required()
+def update_recipe_status(recipe_id):
+    try:
+        data = request.json
+        new_status_param = data.get('new_status')
+
+        if not new_status_param:
+            return jsonify({"message": "Falta el parámetro 'new_status'."}), 400
+
+        status_map = {
+            "published": stateRecipeEnum.PUBLISHED,
+            "rejected": stateRecipeEnum.REJECTED,
+            "pending": stateRecipeEnum.PENDING
+        }
+        
+        if new_status_param not in status_map:
+            return jsonify({"message": "Estado no válido."}), 400
+
+        recipe = db.session.get(Recipe, recipe_id)
+        if recipe is None:
+            return jsonify({"message": "Receta no encontrada."}), 404
+
+        recipe.state_recipe = status_map[new_status_param]
+        db.session.commit()
+
+        return jsonify({"message": f"Estado de receta {recipe_id} actualizado a {new_status_param}."}), 200
+
+    except Exception as error:
+        print(f"Error al actualizar el estado de la receta: {error}")
+        db.session.rollback()
+        return jsonify({"message": "Error interno del servidor.", "Details": str(error)}), 500
+    
+
+
+@api.route("/admin/recipes/counts", methods=["GET"])
+@admin_required()
+def get_admin_recipe_counts():
+    try:
+        counts_query = (
+            db.select(Recipe.state_recipe, db.func.count())
+            .group_by(Recipe.state_recipe)
+        )
+        
+        results = db.session.execute(counts_query).all()
+        counts = {
+            "published": 0,
+            "pending": 0,
+            "rejected": 0,
+        }
+        
+        for state_enum, count in results:
+            counts[state_enum.value] = count 
+
+        return jsonify({
+            "message": "Conteo de recetas por estado exitoso",
+            "counts": counts
+        }), 200
+
+    except Exception as error:
+        print(f"Error al obtener conteos de recetas: {error}")
+        return jsonify({
+            "message": "Error interno del servidor al obtener conteos.", 
+            "Details": str(error)
+        }), 500

@@ -9,3 +9,22 @@
 .title-recipes {
   background-color: #ccd5ae;
 }
+
+
+.card-link {
+  text-decoration: none; 
+  color: inherit; 
+}
+
+.card-hover-effect {
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+  cursor: pointer;
+}
+
+
+.card-efect:hover {
+  transform: translateY(-5px); 
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2),
+              0 0 15px 5px #ccd5ae; 
+}
+
