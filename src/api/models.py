@@ -30,6 +30,8 @@ class User(db.Model):
 
     recipe_user: Mapped[List["Recipe"]] = relationship(
         back_populates="user_recipe")
+    recipe_ratings: Mapped[List["RecipeRating"]] = relationship(back_populates="user", cascade="all, delete-orphan")
+    favorites: Mapped[List["RecipeFavorite"]] = relationship(back_populates="user", cascade="all, delete-orphan")
 
     def __repr__(self):
         return f'<User {self.username}>'
@@ -138,11 +140,14 @@ class Recipe(db.Model):
 
     recipe_ingredients_details: Mapped[List["RecipeIngredient"]] = relationship(
         back_populates="recipe", cascade="all, delete-orphan")
+    ratings: Mapped[List["RecipeRating"]] = relationship(back_populates="recipe", cascade="all, delete-orphan")
+    favorites: Mapped[List["RecipeFavorite"]] = relationship(back_populates="recipe", cascade="all, delete-orphan")
 
     category_id: Mapped[int] = mapped_column(
         db.ForeignKey('categories.id_category'), nullable=False)
     category_recipe: Mapped["Category"] = relationship(
         back_populates="recipe_category")
+    
 
     def __repr__(self):
         return f'<Recipe {self.title}>'
@@ -239,3 +244,47 @@ class RecipeIngredient(db.Model):
             "quantity": self.quantity,
             "unit_measure": self.unit_measure.value,
         }
+
+
+class RecipeRating(db.Model):
+    __tablename__ = "recipe_ratings"
+
+    id_rating: Mapped[int] = mapped_column(primary_key=True)
+    value: Mapped[int] = mapped_column(Integer, nullable=False)
+    comment: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc), nullable=False)
+
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.id_user"), nullable=False)
+    user: Mapped["User"] = relationship(back_populates="recipe_ratings")
+    recipe_id: Mapped[int] = mapped_column(ForeignKey("recipe.id_recipe"), nullable=False)
+    recipe: Mapped["Recipe"] = relationship(back_populates="ratings")
+
+    def __repr__(self):
+        return f"<RecipeRating recipe_id={self.recipe_id} user_id={self.user_id} value={self.value}>"
+
+    def serialize(self):
+        return {
+            "id": self.id_rating,
+            "value": self.value,
+            "comment": self.comment,
+            "user_id": self.user_id,
+            "username": self.user.username if self.user else None,
+            "created_at": self.created_at.isoformat()
+        }
+
+
+class RecipeFavorite(db.Model):
+    __tablename__ = "recipe_favorites"
+
+    id_favorite: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.id_user"), nullable=False)
+    recipe_id: Mapped[int] = mapped_column(ForeignKey("recipe.id_recipe"), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc),nullable=False)
+
+    # Relaciones
+    user: Mapped["User"] = relationship(back_populates="favorites")
+    recipe: Mapped["Recipe"] = relationship(back_populates="favorites")
+
+    def __repr__(self):
+        return f"<RecipeFavorite user_id={self.user_id} recipe_id={self.recipe_id}>"
