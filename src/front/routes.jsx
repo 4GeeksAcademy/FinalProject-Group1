@@ -1,5 +1,3 @@
-// Import necessary components and functions from react-router-dom.
-
 import { createBrowserRouter, createRoutesFromElements, Route, } from "react-router-dom";
 import { Layout } from "./pages/Layout";
 import { Home } from "./pages/Home";
@@ -11,8 +9,13 @@ import { Login } from "./pages/Login";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import CreateRecipe from "./pages/CreateRecipe";
-
+import AdminProtectedRoute from "./components/AdminProtectedRoute";
+import PublishedRecipes from "./pages/PublishedRecipes";
+import PendingRecipes from "./pages/PendignRecipes";
+import RejectedRecipes from "./pages/RejectedRecipes";
+import AdminDashboard from "./pages/AdminDashboard";
 import AdminCategories from "./pages/AdminCategories";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 export const router = createBrowserRouter(
   createRoutesFromElements(
@@ -34,11 +37,49 @@ export const router = createBrowserRouter(
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/login" element={<Login />} />
-      <Route path="/recipes/create" element={<CreateRecipe />} />
-      <Route path="/recipes/edit/:recipe_id" element={<CreateRecipe />} />
-      <Route path="/admin/categories" element={<AdminCategories />} />
+      <Route path="/myprofile" element={<ProtectedRoute><Myprofile /></ProtectedRoute>} />
+      <Route path="/recipes/create" element={<ProtectedRoute><CreateRecipe /></ProtectedRoute>} />
+      <Route path="/admin/categories" element={
+        <AdminProtectedRoute>
+          <AdminCategories />
+        </AdminProtectedRoute>
+      } />
+      <Route path="/status" element={
+        <AdminProtectedRoute>
+          <AdminDashboard />
+        </AdminProtectedRoute>
+      } />
+      <Route path="/status/published/recipes/edit/:recipe_id" element={
+        <AdminProtectedRoute>
+          <CreateRecipe />
+        </AdminProtectedRoute>
+      } />
+      <Route path="/status/pending/recipes/edit/:recipe_id" element={
+        <AdminProtectedRoute>
+          <CreateRecipe />
+        </AdminProtectedRoute>
+      } />
+      <Route path="/status/rejected/recipes/edit/:recipe_id" element={
+        <AdminProtectedRoute>
+          <CreateRecipe />
+        </AdminProtectedRoute>
+      } />
+      <Route path="/status/published" element={
+        <AdminProtectedRoute>
+          <PublishedRecipes />
+        </AdminProtectedRoute>
+      } />
+      <Route path="/status/pending" element={
+        <AdminProtectedRoute>
+          <PendingRecipes />
+        </AdminProtectedRoute>
+      } />
+      <Route path="/status/rejected" element={
+        <AdminProtectedRoute>
+          <RejectedRecipes />
+        </AdminProtectedRoute>
+      } />
 
     </Route>
   )
-
 ); 

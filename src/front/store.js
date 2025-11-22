@@ -1,5 +1,5 @@
-export const initialStore=()=>{
-  return{
+export const initialStore = () => {
+  return {
     token: localStorage.getItem("access_token") ?? null,
     user: JSON.parse(localStorage.getItem("user")) ?? null,
     recipe_published: JSON.parse(localStorage.getItem("recipes")) || [],
@@ -8,7 +8,7 @@ export const initialStore=()=>{
     todos: [
       {
         token: null,
-        user: null
+        user: null,
       },
       { 
         id: 1,
@@ -32,26 +32,26 @@ export default function storeReducer(store, action = {}) {
         message: action.payload,
       };
 
-    case 'login_success':
+    case "login_success":
       return {
         ...store,
         token: action.payload.token,
         currentUserId: action.payload.user_id,
-        user: action.payload.user
+        user: action.payload.user,
       };
 
-    case 'logout':
+    case "logout":
       return {
         ...store,
         token: null,
         currentUserId: null,
-        user: null
+        user: null,
       };
 
-    case 'update_user':
+    case "update_user":
       return {
         ...store,
-        user: action.payload
+        user: action.payload,
       };
       
     case "SET_RECIPES":
@@ -69,7 +69,7 @@ export default function storeReducer(store, action = {}) {
           todo.id === id ? { ...todo, background: color } : todo
         ),
       };
-      case "SET_TOKEN":
+    case "SET_TOKEN":
       return {
         ...store,
         token: action.payload,
@@ -79,6 +79,13 @@ export default function storeReducer(store, action = {}) {
       return {
         ...store,
         user: action.payload,
+      };
+
+    case "CHECK_AUTH":
+      return {
+        ...store,
+        token: localStorage.getItem("access_token") ?? null,
+        user: JSON.parse(localStorage.getItem("user")) ?? null,
       };
     default:
       throw Error("Unknown action.");

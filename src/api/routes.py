@@ -14,8 +14,11 @@ from functools import wraps
 import json
 from .cloudinary_service import cloudinary_service
 from sqlalchemy import select
+from .admin_decorator import admin_required
+import cloudinary 
+import cloudinary.uploader
 
-
+ 
 api = Blueprint('api', __name__)
 
 
@@ -28,8 +31,13 @@ def health_check():
     return jsonify({"status": "OK"}), 200
 
 
-@api.route("/users/<int:user_id>", methods=["GET"])
+@api.route("/user/<int:user_id>", methods=["GET"])
+@jwt_required()
 def getUser(user_id):
+    current_user_id = int(get_jwt_identity())
+    if current_user_id != user_id:
+        return jsonify({"msg": "Unauthorized"}), 401
+
     user = User.query.get(user_id)
     if not user:
         return jsonify({"message": "User not found"}), 404
@@ -46,6 +54,7 @@ def updateUser():
         return jsonify({"message": "User not found"}), 404
 
     data = request.get_json()  # or {}
+
     if data is None:
         return jsonify({"message": "Invalid JSON or no data provided"}), 400
 
@@ -62,7 +71,7 @@ def updateUser():
         # Verificar si ya existe el email
 
         existing_email_user = User.query.filter_by(email=email).first()
-        if existing_email_user and existing_email_user.id != current_user_id:
+        if existing_email_user and existing_email_user.id_user != user.id_user:
             return jsonify({"message": "This email is already registered"}), 400
 
         user.email = email
@@ -74,14 +83,10 @@ def updateUser():
         if existing_username_user and existing_username_user.id != current_user_id:
             return jsonify({"message": "This username is already in use"}), 400
 
-    if email:
-        if not val_email(email):
-            return jsonify({"message": "Email is invalid,"}), 400
-        user.email = email
+        user.username = username
+
     if fullname:
         user.fullname = fullname
-    if username:
-        user.username = username
 
     try:
         db.session.commit()
@@ -269,7 +274,6 @@ def delete_category(id):
 @api.route("/change-password", methods=["PUT"])
 @jwt_required()
 def change_password():
-    # Obtener el ID del usuario actual usando el token JWT
     current_user_id = get_jwt_identity()
     user = User.query.get(current_user_id)
 
@@ -278,12 +282,11 @@ def change_password():
 
     data = request.get_json(silent=True)
     if data is None:
-        return jsonify({"message": "Invalid JSON or no data provided"}), 400
+        return jsonify({"message": "Invalid JSON"}), 400
 
     current_password = data.get("current_password")
     new_password = data.get("new_password")
 
-    # Validación de campos de la password
     if not current_password or not new_password:
         return jsonify({"message": "Current and new password are required"}), 400
 
@@ -293,17 +296,33 @@ def change_password():
     if not is_valid:
         return jsonify({"message": "Current password is incorrect"}), 401
 
-    # Validar la nueva contraseña con los parametros que definimoss
+    # validar nueva contraseña
     from api.utils import val_password
     if not val_password(new_password):
-        return jsonify({"message": "New password is invalid. It must have 8+ chars, uppercase, lowercase, number, and special char."}), 400
+        return jsonify({"message": "New password does not meet requirements"}), 400
 
-    # Generar y guardar la nueva contraseña hasheada
-    new_hashed_password = generate_password_hash(f"{new_password}{user.salt}")
+    # generar nuevo salt
+    import secrets
+    new_salt = secrets.token_hex(16)
+
+    # hashear con nuevo salt
+    new_hashed_password = generate_password_hash(f"{new_password}{new_salt}")
+
     user.password = new_hashed_password
+    user.salt = new_salt
     db.session.commit()
 
-    return jsonify({"message": "Password updated successfully"}), 200
+    # generar nuevo token
+    from flask_jwt_extended import create_access_token
+    additional_claims = {"rol": user.rol}
+    new_token = create_access_token(identity=str(
+        user.id_user), additional_claims=additional_claims)
+
+    return jsonify({
+        "message": "Password updated successfully",
+        "token": new_token,
+        "user": user.serialize()
+    }), 200
 
 
 @api.route("/login", methods=["POST"])
@@ -319,6 +338,13 @@ def login_user():
         return jsonify({"message": "Invalid username"}), 401
     if not check_password_hash(user.password, f"{password}{user.salt}"):
         return jsonify({"message": "Invalid credentials"}), 401
+    # if not user.profile:
+    #     print("➡ NO TIENE PROFLE, GENERANDO AVATAR...")
+    #     initials = get_initials(user.fullname)
+    #     print("Iniciales detectadas:", initials)
+    #     user.profile = generate_initials_image(initials)
+    #     print("Avatar generado:", user.profile)
+        # db.session.commit()
 
     is_admin = user.rol == "admin"
     additional_claims = {"is_administrator": is_admin, "rol": user.rol}
@@ -425,8 +451,9 @@ def create_recipe():
         return jsonify({"message": "Error saving the recipe to the database.", "details": str(error)}), 400
 
 
-@api.route("/recipes", methods=["GET"])
-def get_recipes():
+@api.route("/admin/recipes/status", methods=["GET"])
+@admin_required()
+def get_admin_recipes_by_status():
     try:
         status_param = request.args.get('status')
         if status_param == "pending":
@@ -436,18 +463,30 @@ def get_recipes():
         else:
             status_filter = stateRecipeEnum.PUBLISHED
 
-        query = (
-            db.select(Recipe)
-            .filter(Recipe.state_recipe == status_filter)
+        page = int(request.args.get('page', 1))
+        limit = int(request.args.get('limit', 9))
+ 
+        offset = (page - 1) * limit
+
+        base_query = db.select(Recipe).filter(Recipe.state_recipe == status_filter)
+
+        total_query = db.select(db.func.count()).select_from(base_query)
+        total_count = db.session.execute(total_query).scalar()
+
+        recipes_query = (
+            base_query
             .order_by(Recipe.created_at.desc())
+            .offset(offset) 
+            .limit(limit)  
         )
 
-        recipes = db.session.execute(query).scalars().all()
+        recipes = db.session.execute(recipes_query).scalars().all()
         response_body = [recipe.serialize() for recipe in recipes]
 
         return jsonify({
-            "message": f"List of successfully {status_param} recipes",
-            "recipes": response_body
+            "message": f"List of successfully {status_param} recipes for Admin (Page {page})",
+            "recipes": response_body,
+            "total_count": total_count
         }), 200
 
     except Exception as error:
@@ -455,6 +494,7 @@ def get_recipes():
         return jsonify({
             "message": "Internal server error while processing the request.", "Details": str(error)
         }), 500
+
 
 
 @api.route("/recipes/<int:recipe_id>", methods=["PUT"])
@@ -741,3 +781,126 @@ def rate_recipe(recipe_id):
             "message": "Error al registrar la calificación",
             "details": str(error)
         }), 500
+@api.route("/recipes/<int:recipe_id>", methods=["DELETE"])
+@jwt_required()
+def delete_recipe(recipe_id):
+    user_id = int(get_jwt_identity())
+    claims = get_jwt()
+    is_admin = claims.get("rol") == "admin"
+
+    recipe = db.session.get(Recipe, recipe_id)
+    if recipe is None:
+        return jsonify({"message": f"Recipe with ID {recipe_id} not found."}), 404
+
+    if not is_admin:
+        if recipe.user_id != user_id:
+             return jsonify({"message": "Access denied. You can only delete your own recipes."}), 403
+        
+        if recipe.state_recipe == stateRecipeEnum.PUBLISHED:
+            return jsonify({"message": "Access denied. Only administrators can delete published recipes."}), 403
+
+    try:
+        cloudinary_service.delete_image(recipe.image) 
+    except Exception as image_error:
+        print(f"Error al eliminar imagen de Cloudinary para Receta ID {recipe_id}: {str(image_error)}")
+        pass 
+
+    try:
+        db.session.delete(recipe)
+        db.session.commit()
+        return jsonify({"message": f"Recipe with ID {recipe_id} deleted successfully."}), 200
+
+    except Exception as db_error:
+        db.session.rollback()
+        return jsonify({"message": "Error deleting recipe. Check DB logs for constraints.", "details": str(db_error)}), 500
+    
+
+@api.route("/admin/recipes/<int:recipe_id>/status", methods=["PUT"])
+@admin_required()
+def update_recipe_status(recipe_id):
+    try:
+        data = request.json
+        new_status_param = data.get('new_status')
+
+        if not new_status_param:
+            return jsonify({"message": "Falta el parámetro 'new_status'."}), 400
+
+        status_map = {
+            "published": stateRecipeEnum.PUBLISHED,
+            "rejected": stateRecipeEnum.REJECTED,
+            "pending": stateRecipeEnum.PENDING
+        }
+        
+        if new_status_param not in status_map:
+            return jsonify({"message": "Estado no válido."}), 400
+
+        recipe = db.session.get(Recipe, recipe_id)
+        if recipe is None:
+            return jsonify({"message": "Receta no encontrada."}), 404
+
+        recipe.state_recipe = status_map[new_status_param]
+        db.session.commit()
+
+        return jsonify({"message": f"Estado de receta {recipe_id} actualizado a {new_status_param}."}), 200
+
+    except Exception as error:
+        print(f"Error al actualizar el estado de la receta: {error}")
+        db.session.rollback()
+        return jsonify({"message": "Error interno del servidor.", "Details": str(error)}), 500
+    
+
+
+@api.route("/admin/recipes/counts", methods=["GET"])
+@admin_required()
+def get_admin_recipe_counts():
+    try:
+        counts_query = (
+            db.select(Recipe.state_recipe, db.func.count())
+            .group_by(Recipe.state_recipe)
+        )
+        
+        results = db.session.execute(counts_query).all()
+        counts = {
+            "published": 0,
+            "pending": 0,
+            "rejected": 0,
+        }
+        
+        for state_enum, count in results:
+            counts[state_enum.value] = count 
+
+        return jsonify({
+            "message": "Conteo de recetas por estado exitoso",
+            "counts": counts
+        }), 200
+
+    except Exception as error:
+        print(f"Error al obtener conteos de recetas: {error}")
+        return jsonify({
+            "message": "Error interno del servidor al obtener conteos.", 
+            "Details": str(error)
+        }), 500
+@api.route("/upload-profile-image", methods=["POST"])
+@jwt_required()
+def upload_profile_image():
+    user_id = get_jwt_identity()
+    user = User.query.get(user_id)
+
+    image = request.files.get("image")
+    if not image:
+        return jsonify({"message": "No image provided"}), 400
+
+    upload_result = cloudinary.uploader.upload(
+        image,
+        folder="profiles",
+        public_id=str(user_id),
+        overwrite=True
+    )
+
+    user.profile = upload_result["secure_url"]
+    db.session.commit()
+
+    return jsonify({
+        "image": user.profile,
+        "user": user.serialize()
+    }), 200

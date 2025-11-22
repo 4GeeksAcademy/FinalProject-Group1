@@ -1,5 +1,6 @@
 from flask import jsonify, url_for
 import re
+import os
 
 class APIException(Exception):
     status_code = 400
@@ -70,3 +71,17 @@ def val_password(password: str) -> bool:
         return True
     
     return False
+
+def generate_initials_image(initials):
+    return (
+        f"https://res.cloudinary.com/{os.getenv('CLOUDINARY_CLOUD_NAME')}/image/upload/"
+        f"w_200,h_200,c_fill,r_max,co_white,b_rgb:333333/"
+        f"l_text:Arial_90_bold:{initials}/fl_layer_apply,g_center/"
+        "blank.png"
+    )    
+
+def get_initials(fullname):
+    if not fullname:
+        return "U"
+    parts = fullname.split()
+    return "".join([p[0].upper() for p in parts[:2]])
