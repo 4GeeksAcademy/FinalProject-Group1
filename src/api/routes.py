@@ -3,7 +3,7 @@ This module takes care of starting the API Server, Loading the DB and Adding the
 """
 from flask import Flask, request, jsonify, url_for, Blueprint
 from api.models import db, User, Recipe, Ingredient, RecipeIngredient, difficultyEnum, stateRecipeEnum, UnitEnum, Category
-from api.utils import generate_sitemap, APIException,  val_email, val_password
+from api.utils import generate_sitemap, APIException,  val_email, val_password, get_initials, generate_initials_image
 from flask_cors import CORS
 import os
 from base64 import b64encode
@@ -15,6 +15,8 @@ import json
 from .cloudinary_service import cloudinary_service
 from sqlalchemy import select
 from .admin_decorator import admin_required
+import cloudinary 
+import cloudinary.uploader
 
  
 api = Blueprint('api', __name__)
@@ -29,8 +31,13 @@ def health_check():
     return jsonify({"status": "OK"}), 200
 
 
-@api.route("/users/<int:user_id>", methods=["GET"])
+@api.route("/user/<int:user_id>", methods=["GET"])
+@jwt_required()
 def getUser(user_id):
+    current_user_id = int(get_jwt_identity())
+    if current_user_id != user_id:
+        return jsonify({"msg": "Unauthorized"}), 401
+
     user = User.query.get(user_id)
     if not user:
         return jsonify({"message": "User not found"}), 404
@@ -47,6 +54,7 @@ def updateUser():
         return jsonify({"message": "User not found"}), 404
 
     data = request.get_json()  # or {}
+
     if data is None:
         return jsonify({"message": "Invalid JSON or no data provided"}), 400
 
@@ -63,7 +71,7 @@ def updateUser():
         # Verificar si ya existe el email
 
         existing_email_user = User.query.filter_by(email=email).first()
-        if existing_email_user and existing_email_user.id != current_user_id:
+        if existing_email_user and existing_email_user.id_user != user.id_user:
             return jsonify({"message": "This email is already registered"}), 400
 
         user.email = email
@@ -75,14 +83,10 @@ def updateUser():
         if existing_username_user and existing_username_user.id != current_user_id:
             return jsonify({"message": "This username is already in use"}), 400
 
-    if email:
-        if not val_email(email):
-            return jsonify({"message": "Email is invalid,"}), 400
-        user.email = email
+        user.username = username
+
     if fullname:
         user.fullname = fullname
-    if username:
-        user.username = username
 
     try:
         db.session.commit()
@@ -118,6 +122,7 @@ def register_user():
         return jsonify({"message": "The email address is already registered."}), 422
     if User.query.filter_by(username=username).first():
         return jsonify({"message": "The username is already registered"}), 409
+
 
     salt = b64encode(os.urandom(16)).decode("utf-8")
     hashed_password = generate_password_hash(f"{data['password']}{salt}")
@@ -248,7 +253,7 @@ def delete_category(id):
     claims = get_jwt()
     if not claims.get("is_administrator"):
         return jsonify({"message": "Admin role required"}), 403
-    
+
     category = Category.query.get(id)
     if category is None:
         return jsonify({"message": "Category not found"}), 404
@@ -270,7 +275,6 @@ def delete_category(id):
 @api.route("/change-password", methods=["PUT"])
 @jwt_required()
 def change_password():
-    # Obtener el ID del usuario actual usando el token JWT
     current_user_id = get_jwt_identity()
     user = User.query.get(current_user_id)
 
@@ -279,12 +283,11 @@ def change_password():
 
     data = request.get_json(silent=True)
     if data is None:
-        return jsonify({"message": "Invalid JSON or no data provided"}), 400
+        return jsonify({"message": "Invalid JSON"}), 400
 
     current_password = data.get("current_password")
     new_password = data.get("new_password")
 
-    # Validación de campos de la password
     if not current_password or not new_password:
         return jsonify({"message": "Current and new password are required"}), 400
 
@@ -294,17 +297,33 @@ def change_password():
     if not is_valid:
         return jsonify({"message": "Current password is incorrect"}), 401
 
-    # Validar la nueva contraseña con los parametros que definimoss
+    # validar nueva contraseña
     from api.utils import val_password
     if not val_password(new_password):
-        return jsonify({"message": "New password is invalid. It must have 8+ chars, uppercase, lowercase, number, and special char."}), 400
+        return jsonify({"message": "New password does not meet requirements"}), 400
 
-    # Generar y guardar la nueva contraseña hasheada
-    new_hashed_password = generate_password_hash(f"{new_password}{user.salt}")
+    # generar nuevo salt
+    import secrets
+    new_salt = secrets.token_hex(16)
+
+    # hashear con nuevo salt
+    new_hashed_password = generate_password_hash(f"{new_password}{new_salt}")
+
     user.password = new_hashed_password
+    user.salt = new_salt
     db.session.commit()
 
-    return jsonify({"message": "Password updated successfully"}), 200
+    # generar nuevo token
+    from flask_jwt_extended import create_access_token
+    additional_claims = {"rol": user.rol}
+    new_token = create_access_token(identity=str(
+        user.id_user), additional_claims=additional_claims)
+
+    return jsonify({
+        "message": "Password updated successfully",
+        "token": new_token,
+        "user": user.serialize()
+    }), 200
 
 
 @api.route("/login", methods=["POST"])
@@ -315,12 +334,19 @@ def login_user():
 
     if not username or not password:
         return jsonify({"message": "Username and password are required"}), 400
-    user = User.query.filter_by(username=username).one_or_none() 
-    if user is None:  
-        return jsonify({"message": "Invalid username"}), 401 
-    if not check_password_hash(user.password, f"{password}{user.salt}"): 
+    user = User.query.filter_by(username=username).one_or_none()
+    if user is None:
+        return jsonify({"message": "Invalid username"}), 401
+    if not check_password_hash(user.password, f"{password}{user.salt}"):
         return jsonify({"message": "Invalid credentials"}), 401
-   
+    # if not user.profile:
+    #     print("➡ NO TIENE PROFLE, GENERANDO AVATAR...")
+    #     initials = get_initials(user.fullname)
+    #     print("Iniciales detectadas:", initials)
+    #     user.profile = generate_initials_image(initials)
+    #     print("Avatar generado:", user.profile)
+        # db.session.commit()
+
     is_admin = user.rol == "admin"
     additional_claims = {"is_administrator": is_admin, "rol": user.rol}
     token = create_access_token(identity=str(user.id_user), expires_delta=timedelta(
@@ -686,3 +712,27 @@ def get_admin_recipe_counts():
             "message": "Error interno del servidor al obtener conteos.", 
             "Details": str(error)
         }), 500
+@api.route("/upload-profile-image", methods=["POST"])
+@jwt_required()
+def upload_profile_image():
+    user_id = get_jwt_identity()
+    user = User.query.get(user_id)
+
+    image = request.files.get("image")
+    if not image:
+        return jsonify({"message": "No image provided"}), 400
+
+    upload_result = cloudinary.uploader.upload(
+        image,
+        folder="profiles",
+        public_id=str(user_id),
+        overwrite=True
+    )
+
+    user.profile = upload_result["secure_url"]
+    db.session.commit()
+
+    return jsonify({
+        "image": user.profile,
+        "user": user.serialize()
+    }), 200

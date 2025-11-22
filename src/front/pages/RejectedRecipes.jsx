@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Toaster, toast } from 'sonner';
 import AdminCardRecipe from './AdminCardRecipe';
 import Pagination from "../components/Pagination"
@@ -10,15 +10,21 @@ const RejectedRecipes = () => {
     const [recipes, setRecipes] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [currentPage, setCurrentPage] = useState(1);
+    const [totalRecipes, setTotalRecipes] = useState(0);
 
-    const paginate = (pageNumber) => setCurrentPage(pageNumber);
+    const paginate = (pageNumber) => {
+        setCurrentPage(pageNumber);
+    };
 
-    const getRecipesByStatus = async (status) => {
+
+    const getRecipesByStatus = async (status, page = 1, limit = RECIPES_PER_PAGE) => {
         setIsLoading(true);
         const token = localStorage.getItem('access_token');
 
+        const url = `${urlBase}/admin/recipes/status?status=${status}&page=${page}&limit=${limit}`
+
         try {
-            const response = await fetch(`${urlBase}/admin/recipes/status?status=${status}`, {
+            const response = await fetch(url, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -35,8 +41,8 @@ const RejectedRecipes = () => {
 
             if (data.recipes && Array.isArray(data.recipes)) {
                 setRecipes(data.recipes);
-                toast.success(`Éxito: Se cargaron ${data.recipes.length} recetas ${status}.`, { duration: 1500 });
-                setCurrentPage(1);
+                setTotalRecipes(data.total_count);
+                toast.success(`Éxito: Se cargaron ${data.recipes.length} recetas de la página ${page}.`, { duration: 1500 });
             } else {
                 throw new Error("Respuesta del servidor inválida: No se encontró el array 'recipes'.");
             }
@@ -45,6 +51,7 @@ const RejectedRecipes = () => {
             console.error(`Error al obtener recetas ${status}:`, error);
             toast.error(`Error de carga. Verifica API/Network: ${error.message}`);
             setRecipes([]);
+            setTotalRecipes(0);
         } finally {
             setIsLoading(false);
         }
@@ -73,7 +80,17 @@ const RejectedRecipes = () => {
 
             toast.success(data.message || "Receta eliminada exitosamente.");
 
-            getRecipesByStatus('rejected');
+            const remainingRecipesOnPage = recipes.length - 1;
+            const totalPages = Math.ceil((totalRecipes - 1) / RECIPES_PER_PAGE);
+
+            let pageToFetch = currentPage;
+
+            if (remainingRecipesOnPage === 0 && currentPage > 1 && currentPage > totalPages) {
+                pageToFetch = currentPage - 1;
+                setCurrentPage(pageToFetch);
+            }
+
+            getRecipesByStatus('rejected', pageToFetch);
 
         } catch (error) {
             console.error("Error de eliminación:", error);
@@ -107,7 +124,16 @@ const RejectedRecipes = () => {
 
             toast.success(data.message || `Receta actualizada a estado: ${newStatus}.`, { duration: 1500 });
 
-            getRecipesByStatus('rejected', currentPage);
+            const remainingRecipesOnPage = recipes.length - 1;
+            const totalPages = Math.ceil((totalRecipes - 1) / RECIPES_PER_PAGE);
+
+            let pageToFetch = currentPage;
+            if (remainingRecipesOnPage === 0 && currentPage > 1 && currentPage > totalPages) {
+                pageToFetch = currentPage - 1;
+                setCurrentPage(pageToFetch);
+            }
+
+            getRecipesByStatus('rejected', pageToFetch);
 
         } catch (error) {
             console.error("Error de cambio de estado:", error);
@@ -115,18 +141,9 @@ const RejectedRecipes = () => {
         }
     };
 
-
     useEffect(() => {
-        getRecipesByStatus('rejected');
-    }, []);
-
-
-    const currentRecipes = useMemo(() => {
-        const indexOfLastRecipe = currentPage * RECIPES_PER_PAGE;
-        const indexOfFirstRecipe = indexOfLastRecipe - RECIPES_PER_PAGE;
-        return recipes.slice(indexOfFirstRecipe, indexOfLastRecipe);
-    }, [recipes, currentPage]);
-
+        getRecipesByStatus('rejected', currentPage);
+    }, [currentPage]);
 
     if (isLoading) {
         return <div className="text-center p-5">Cargando recetas...</div>;
@@ -137,7 +154,7 @@ const RejectedRecipes = () => {
         <>
             <Toaster position="top-right" richColors />
             <AdminCardRecipe
-                recipes={currentRecipes}
+                recipes={recipes}
                 title="Recetas Rechazadas"
                 icono="= devuelve la receta a pendientes"
                 handleDelete={handleDelete}
@@ -145,7 +162,7 @@ const RejectedRecipes = () => {
             />
             <Pagination
                 recipesPerPage={RECIPES_PER_PAGE}
-                totalRecipes={recipes.length}
+                totalRecipes={totalRecipes}
                 currentPage={currentPage}
                 paginate={paginate}
             />

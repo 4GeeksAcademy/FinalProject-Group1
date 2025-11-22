@@ -1,5 +1,3 @@
-// Import necessary components and functions from react-router-dom.
-
 import { createBrowserRouter, createRoutesFromElements, Route, } from "react-router-dom";
 import { Layout } from "./pages/Layout";
 import { Home } from "./pages/Home";
@@ -12,11 +10,12 @@ import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import CreateRecipe from "./pages/CreateRecipe";
 import AdminProtectedRoute from "./components/AdminProtectedRoute";
-import AdminCategories from "./pages/AdminCategories";
 import PublishedRecipes from "./pages/PublishedRecipes";
 import PendingRecipes from "./pages/PendignRecipes";
 import RejectedRecipes from "./pages/RejectedRecipes";
 import AdminDashboard from "./pages/AdminDashboard";
+import AdminCategories from "./pages/AdminCategories";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 export const router = createBrowserRouter(
   createRoutesFromElements(
@@ -38,7 +37,8 @@ export const router = createBrowserRouter(
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/login" element={<Login />} />
-      <Route path="/recipes/create" element={<CreateRecipe />} />
+      <Route path="/myprofile" element={<ProtectedRoute><Myprofile /></ProtectedRoute>} />
+      <Route path="/recipes/create" element={<ProtectedRoute><CreateRecipe /></ProtectedRoute>} />
       {/* <Route path="/recipes/edit/:recipe_id" element={<CreateRecipe />} /> */}
       {/* <Route path="/admin/categories" element={<AdminCategories />} /> */}
       <Route path="/admin/categories" element={
@@ -81,15 +81,7 @@ export const router = createBrowserRouter(
           <RejectedRecipes />
         </AdminProtectedRoute>
       } />
-      {/* <Route path="/status/published" element={<PublishedRecipes />} />
-      <Route path="/status/pending" element={<PendingRecipes />} />
-      <Route path="/status/rejected" element={<RejectedRecipes />} />
-      <Route path="/status" element={<AdminDashboard />} /> */}
-      {/* <Route path="/categories-list" element={<Categorias />} />
-      <Route path="/recipes-list" element={<RecipeList />} /> */}
-
 
     </Route>
   )
-
 ); 

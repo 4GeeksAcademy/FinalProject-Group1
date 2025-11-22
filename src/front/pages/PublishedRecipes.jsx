@@ -11,7 +11,7 @@ const PublishedRecipes = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [currentPage, setCurrentPage] = useState(1);
     const [totalRecipes, setTotalRecipes] = useState(0);
- 
+
     const paginate = (pageNumber) => {
         setCurrentPage(pageNumber);
     };
@@ -43,7 +43,6 @@ const PublishedRecipes = () => {
                 setRecipes(data.recipes);
                 setTotalRecipes(data.total_count);
                 toast.success(`Éxito: Se cargaron ${data.recipes.length} recetas de la página ${page}.`, { duration: 1500 });
-                // setCurrentPage(1);
             } else {
                 throw new Error("Respuesta del servidor inválida: No se encontró el array 'recipes'.");
             }
@@ -57,7 +56,6 @@ const PublishedRecipes = () => {
             setIsLoading(false);
         }
     };
-
 
 
     const handleDelete = async (recipeId) => {
@@ -126,15 +124,13 @@ const PublishedRecipes = () => {
 
             toast.success(data.message || `Receta actualizada a estado: ${newStatus}.`, { duration: 1500 });
 
-            const remainingRecipesOnPage = recipes.length - 1; // Recetas que quedan VISIBLES en el cliente
-            const totalPages = Math.ceil((totalRecipes - 1) / RECIPES_PER_PAGE); // Total de páginas DESPUÉS de la operación
+            const remainingRecipesOnPage = recipes.length - 1;
+            const totalPages = Math.ceil((totalRecipes - 1) / RECIPES_PER_PAGE);
 
             let pageToFetch = currentPage;
-
-            // Caso especial: Si el cambio de estado resulta en que la página actual se vacía
             if (remainingRecipesOnPage === 0 && currentPage > 1 && currentPage > totalPages) {
-                pageToFetch = currentPage - 1; // Volver a la página anterior
-                setCurrentPage(pageToFetch); // Actualiza el estado de la página para el componente Pagination
+                pageToFetch = currentPage - 1;
+                setCurrentPage(pageToFetch);
             }
 
             getRecipesByStatus('published', pageToFetch);
@@ -149,8 +145,6 @@ const PublishedRecipes = () => {
         getRecipesByStatus('published', currentPage);
     }, [currentPage]);
 
-
-
     if (isLoading) {
         return <div className="text-center p-5">Cargando recetas...</div>;
     }
@@ -162,7 +156,7 @@ const PublishedRecipes = () => {
             <AdminCardRecipe
                 recipes={recipes}
                 title="Recetas Publicadas"
-                icono= "= devuelve la receta a pendientes"
+                icono="= devuelve la receta a pendientes"
                 handleDelete={handleDelete}
                 handleStatusChange={handleStatusChange}
             />

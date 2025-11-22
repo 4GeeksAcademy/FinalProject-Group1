@@ -59,9 +59,8 @@ const AdminDashboard = () => {
                         <div className="card bg-verde p-3 border border-0 card-efect">
                             <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQW3CZJnlA3T0rimd9FQkLEhhFf-tmLyRQ1fA&s" className="card-img-top" alt="publicadas" />
                             <div className="card-body">
-                                <h5 className="card-title">Publicadas</h5>
+                                <h5>Publicadas</h5>
                                 <p className='fs-2 text m-0'><b>{counts.published}</b></p>
-                                <p className='m-0'>recetas</p>
                             </div>
                         </div>
                     </Link>
@@ -71,7 +70,7 @@ const AdminDashboard = () => {
                         <div className="card bg-verde p-3 border border-0 card-efect">
                             <img src="https://thumbs.dreamstime.com/b/revisi%C3%B3n-de-archivos-listas-icono-vectores-aislados-que-se-puede-modificar-o-editar-f%C3%A1cilmente-161259836.jpg" className="card-img-top" alt="pendientes" />
                             <div className="card-body">
-                                <h5 className="card-title">Pendientes</h5>
+                                <h5>Pendientes</h5>
                                 <p className='fs-2 text m-0'><b>{counts.pending}</b></p>
                             </div>
                         </div>
@@ -82,8 +81,8 @@ const AdminDashboard = () => {
                         <div className="card bg-verde p-3 border border-0 card-efect">
                             <img src="https://cdn-icons-png.flaticon.com/512/7933/7933285.png" className="card-img-top" alt="rechazadas" />
                             <div className="card-body">
-                                <h5 className="card-title">Rechazadas</h5>
-                                <p><span className='fs-2 text'><b>{counts.rejected}</b></span> recetas </p>
+                                <h5>Rechazadas</h5>
+                                <p className='fs-2 text m-0'><b>{counts.rejected}</b></p>
                             </div>
                         </div>
                     </Link>
