@@ -123,7 +123,6 @@ def register_user():
     if User.query.filter_by(username=username).first():
         return jsonify({"message": "The username is already registered"}), 409
 
-
     salt = b64encode(os.urandom(16)).decode("utf-8")
     hashed_password = generate_password_hash(f"{data['password']}{salt}")
 
