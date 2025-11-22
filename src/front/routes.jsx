@@ -39,8 +39,6 @@ export const router = createBrowserRouter(
       <Route path="/login" element={<Login />} />
       <Route path="/myprofile" element={<ProtectedRoute><Myprofile /></ProtectedRoute>} />
       <Route path="/recipes/create" element={<ProtectedRoute><CreateRecipe /></ProtectedRoute>} />
-      {/* <Route path="/recipes/edit/:recipe_id" element={<CreateRecipe />} /> */}
-      {/* <Route path="/admin/categories" element={<AdminCategories />} /> */}
       <Route path="/admin/categories" element={
         <AdminProtectedRoute>
           <AdminCategories />
