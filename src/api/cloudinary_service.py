@@ -1,6 +1,8 @@
 import cloudinary
 import cloudinary.uploader as uploader
 import os
+import cloudinary.api as api
+from urllib.parse import urlparse
 
 
 class CloudinaryService:
@@ -23,5 +25,39 @@ class CloudinaryService:
         except Exception as error:
             print(f"Cloudinary Upload Error: {error}")
             raise Exception("Error uploading image. Please verify your Cloudinary credentials.")
+        
+
+    def delete_image(self, image_url: str):
+        if not image_url:
+            return True 
+
+        try:
+            parsed_url = urlparse(image_url)
+            path = parsed_url.path 
+
+            parts = path.split('/upload/')
+            if len(parts) < 2:
+
+                print("Cloudinary Delete Error: URL inválida o no contiene /upload/.")
+                return False 
+            
+
+            version_and_id = parts[1]
+            
+            public_id_with_extension = "/".join(version_and_id.split('/')[1:])
+
+            public_id = os.path.splitext(public_id_with_extension)[0]
+
+            result = api.destroy(public_id)
+
+            if result.get("result") not in ["ok", "not found"]:
+                raise Exception(f"Cloudinary returned status: {result.get('result')}")
+
+            return True
+
+        except Exception as error:
+
+            print(f"Cloudinary Delete Error: Falló al eliminar {image_url}. Detalles: {error}")
+            return False
 
 cloudinary_service = CloudinaryService()

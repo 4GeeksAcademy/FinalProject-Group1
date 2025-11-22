@@ -1,5 +1,6 @@
 import { Link, NavLink } from "react-router-dom";
 import useGlobalReducer from "../hooks/useGlobalReducer.jsx";
+import "../styles/navbar.css"
 
 export const Navbar = () => {
 	const { store, dispatch } = useGlobalReducer();
@@ -10,6 +11,9 @@ export const Navbar = () => {
 		localStorage.removeItem("access_token")
 		localStorage.removeItem("user")
 	}
+
+	const userRole = store.user ? store.user.rol : null;
+	const isAdmin = userRole === "admin";
 
 	return (
 		<nav className="container navbar navbar-expand-lg bg-body-tertiary p-0">
@@ -40,6 +44,29 @@ export const Navbar = () => {
 							<input className="form-control me-2 pt-0" type="search" placeholder="Search" />
 							<button className="btn btn-outline-success py-0" type="submit">Search</button>
 						</form>
+						<div>
+							{
+								isAdmin ? (
+									<div>
+
+										<li className="menus me-4 mt-2">
+											<a href="#">Gestionar</a>
+											<ul className="sub-menu sin-estilo">
+												<li className="py-2"><Link to={"/status"} ><span>Recetas</span></Link></li>
+												<li className="py-2"><Link to={"/admin/categories"}><span>Categorías</span></Link></li>
+											</ul>
+										</li>
+										<li className="menus me-4 mt-2">
+											<a href="#">Crear</a>
+											<ul className="sub-menu sin-estilo">
+												<li className="py-2"><Link to={"/recipes/create"}><span>Receta</span></Link></li>
+												<li className="py-2"><span>Administrador</span></li>
+											</ul>
+										</li>
+									</div>
+								) : null
+							}
+						</div>
 
 						<li className="nav-item d-flex align-items-center">
 
