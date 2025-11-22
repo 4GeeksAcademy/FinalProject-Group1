@@ -35,7 +35,7 @@ class User(db.Model):
         return f'<User {self.username}>'
 
     def serialize(self):
-   
+
         if self.profile is None:
             initials_url = f"https://ui-avatars.com/api/?name={self.username}&size=128&background=random&rounded=true"
             return {
@@ -47,7 +47,7 @@ class User(db.Model):
                 "is_Active": self.is_active,
                 "image": initials_url
             }
-        
+
         return {
             "id": self.id_user,
             "username": self.username,
@@ -57,7 +57,6 @@ class User(db.Model):
             "is_Active": self.is_active,
             "image": self.profile
         }
-
 
 
 # Empieza código de categoría
@@ -152,6 +151,8 @@ class Recipe(db.Model):
         ingredients_list = [
             item.serialize() for item in self.recipe_ingredients_details
         ]
+
+        creator_display_name = self.user_recipe.fullname if self.user_recipe.fullname else self.user_recipe.username
         return {
             "id": self.id_recipe,
             "title": self.title,
@@ -165,6 +166,7 @@ class Recipe(db.Model):
             "vote_count": self.vote_count,
             "nutritional_data": self.nutritional_data,
             "creator_id": self.user_id,
+            "creator_name": creator_display_name,
             "category_id": self.category_id,
             "category_name": self.category_recipe.name_category,
             "ingredients": ingredients_list,
