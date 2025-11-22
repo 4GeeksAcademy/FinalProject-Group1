@@ -2,14 +2,14 @@
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
 from flask import Flask, request, jsonify, url_for, Blueprint
-from api.models import db, User, Recipe, Ingredient, RecipeIngredient, difficultyEnum, stateRecipeEnum, UnitEnum, Category
+from api.models import db, User, Recipe, Ingredient, RecipeIngredient, difficultyEnum, stateRecipeEnum, UnitEnum, Category, RecipeFavorite, RecipeRating
 from api.utils import generate_sitemap, APIException,  val_email, val_password
 from flask_cors import CORS
 import os
 from base64 import b64encode
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity, get_jwt
-from datetime import timedelta
+from datetime import timedelta, datetime, timezone
 from functools import wraps
 import json
 from .cloudinary_service import cloudinary_service
@@ -247,7 +247,7 @@ def delete_category(id):
     claims = get_jwt()
     if not claims.get("is_administrator"):
         return jsonify({"message": "Admin role required"}), 403
-    
+
     category = Category.query.get(id)
     if category is None:
         return jsonify({"message": "Category not found"}), 404
@@ -314,12 +314,12 @@ def login_user():
 
     if not username or not password:
         return jsonify({"message": "Username and password are required"}), 400
-    user = User.query.filter_by(username=username).one_or_none() 
-    if user is None:  
-        return jsonify({"message": "Invalid username"}), 401 
-    if not check_password_hash(user.password, f"{password}{user.salt}"): 
+    user = User.query.filter_by(username=username).one_or_none()
+    if user is None:
+        return jsonify({"message": "Invalid username"}), 401
+    if not check_password_hash(user.password, f"{password}{user.salt}"):
         return jsonify({"message": "Invalid credentials"}), 401
-   
+
     is_admin = user.rol == "admin"
     additional_claims = {"is_administrator": is_admin, "rol": user.rol}
     token = create_access_token(identity=str(user.id_user), expires_delta=timedelta(
@@ -570,3 +570,174 @@ def get_one_recipe(recipe_id):
         "message": "Recipe found successfully",
         "recipe": recipe.serialize()
     }), 200
+
+
+@api.route("/api/recetas/<int:recipe_id>", methods=["GET"])
+@jwt_required(optional=True)
+def get_recipe_detail(recipe_id):
+    current_user_id = get_jwt_identity()
+    if current_user_id is not None:
+        try:
+            current_user_id = int(current_user_id)
+        except ValueError:
+            current_user_id = None
+
+    recipe = Recipe.query.filter_by(
+        id_recipe=recipe_id,
+        state_recipe=stateRecipeEnum.PUBLISHED
+    ).first()
+
+    if recipe is None:
+        return jsonify({"message": "Receta no encontrada"}), 404
+
+    recipe_data = recipe.serialize()
+
+    ratings = recipe.ratings
+
+    if ratings:
+        total_votes = len(ratings)
+        avg = sum(r.value for r in ratings) / total_votes
+    else:
+        total_votes = 0
+        avg = None
+
+    comments = [r.serialize() for r in ratings if r.comment]
+
+    is_favorite = False
+    if current_user_id is not None:
+        fav = RecipeFavorite.query.filter_by(
+            user_id=current_user_id,
+            recipe_id=recipe.id_recipe
+        ).first()
+        is_favorite = fav is not None
+
+    recipe_data.update({
+        "avg_rating": avg,
+        "vote_count": total_votes,
+        "comments": comments,
+        "is_favorite": is_favorite
+    })
+
+    return jsonify(recipe_data), 200
+
+
+@api.route("/api/recetas/<int:recipe_id>/favorito", methods=["POST"])
+@jwt_required()
+def toggle_favorite(recipe_id):
+    current_user_id = get_jwt_identity()
+    try:
+        current_user_id = int(current_user_id)
+    except (TypeError, ValueError):
+        return jsonify({"message": "Invalid user identity"}), 401
+
+    recipe = db.session.get(Recipe, recipe_id)
+    if recipe is None or recipe.state_recipe != stateRecipeEnum.PUBLISHED:
+        return jsonify({"message": "Receta no encontrada o no disponible"}), 404
+
+    try:
+        favorite = RecipeFavorite.query.filter_by(
+            user_id=current_user_id,
+            recipe_id=recipe_id
+        ).first()
+
+        if favorite:
+            db.session.delete(favorite)
+            db.session.commit()
+            return jsonify({
+                "message": "Receta eliminada de favoritos",
+                "is_favorite": False
+            }), 200
+        else:
+            new_favorite = RecipeFavorite(
+                user_id=current_user_id,
+                recipe_id=recipe_id
+            )
+            db.session.add(new_favorite)
+            db.session.commit()
+            return jsonify({
+                "message": "Receta añadida a favoritos",
+                "is_favorite": True
+            }), 201
+
+    except Exception as error:
+        db.session.rollback()
+        return jsonify({
+            "message": "Error al actualizar favorito",
+            "details": str(error)
+        }), 500
+
+
+@api.route("/api/recetas/<int:recipe_id>/calificar", methods=["POST"])
+@jwt_required()
+def rate_recipe(recipe_id):
+    current_user_id = get_jwt_identity()
+    try:
+        current_user_id = int(current_user_id)
+    except (TypeError, ValueError):
+        return jsonify({"message": "Invalid user identity"}), 401
+
+    recipe = db.session.get(Recipe, recipe_id)
+    if recipe is None or recipe.state_recipe != stateRecipeEnum.PUBLISHED:
+        return jsonify({"message": "Receta no encontrada o no disponible"}), 404
+
+    data = request.get_json(silent=True)
+    if data is None:
+        return jsonify({"message": "JSON inválido o no enviado"}), 400
+
+    value = data.get("value")
+    comment = data.get("comment")
+
+    try:
+        value = int(value)
+    except (TypeError, ValueError):
+        return jsonify({"message": "La calificación debe ser un número entero"}), 400
+
+    if value < 1 or value > 5:
+        return jsonify({"message": "La calificación debe estar entre 1 y 5"}), 400
+
+    try:
+        rating = RecipeRating.query.filter_by(
+            user_id=current_user_id,
+            recipe_id=recipe_id
+        ).first()
+
+        if rating:
+            rating.value = value
+            rating.comment = comment
+            rating.updated_at = datetime.now(timezone.utc)
+        else:
+            rating = RecipeRating(
+                value=value,
+                comment=comment,
+                user_id=current_user_id,
+                recipe_id=recipe_id
+            )
+            db.session.add(rating)
+
+        db.session.commit()
+
+        all_ratings = RecipeRating.query.filter_by(recipe_id=recipe_id).all()
+        if all_ratings:
+            total_votes = len(all_ratings)
+            avg = sum(r.value for r in all_ratings) / total_votes
+        else:
+            total_votes = 0
+            avg = None
+
+        recipe.avg_rating = avg
+        recipe.vote_count = total_votes
+        db.session.commit()
+
+        return jsonify({
+            "message": "Calificación registrada correctamente",
+            "rating": rating.serialize(),
+            "avg_rating": avg,
+            "vote_count": total_votes
+        }), 201
+
+    except Exception as error:
+        db.session.rollback()
+        return jsonify({
+            "message": "Error al registrar la calificación",
+            "details": str(error)
+        }), 500

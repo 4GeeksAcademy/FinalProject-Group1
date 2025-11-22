@@ -233,7 +233,7 @@ class RecipeIngredient(db.Model):
 class RecipeRating(db.Model):
     __tablename__ = "recipe_ratings"
 
-    id_ratings: Mapped[int] = mapped_column(primary_key=True)
+    id_rating: Mapped[int] = mapped_column(primary_key=True)
     value: Mapped[int] = mapped_column(Integer, nullable=False)
     comment: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), nullable=False)
@@ -266,6 +266,7 @@ class RecipeFavorite(db.Model):
     recipe_id: Mapped[int] = mapped_column(ForeignKey("recipe.id_recipe"), nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc),nullable=False)
 
+    # Relaciones
     user: Mapped["User"] = relationship(back_populates="favorites")
     recipe: Mapped["Recipe"] = relationship(back_populates="favorites")
 
