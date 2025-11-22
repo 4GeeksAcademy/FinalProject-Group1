@@ -11,11 +11,6 @@ const UNITS = [
     { label: "Cucharada", value: "tbsp" },
     { label: "Cucharadita", value: "tsp" },
 ];
-const MOCK_CATEGORIES = [
-    { id: 1, name: "Postres" },
-    { id: 2, name: "Platos Principales" },
-    { id: 3, name: "Entradas" },
-];
 
 const initialIngredient = {
     name: "",
@@ -29,7 +24,7 @@ const initialRecipeState = {
     prep_time_min: 30,
     difficulty: DIFFICULTIES[0],
     portions: 4,
-    category_id: MOCK_CATEGORIES[0].id,
+    category_id: null,
     image_url_existing: null,
 };
 
@@ -44,6 +39,7 @@ const CreateRecipe = () => {
     const [recipeData, setRecipeData] = useState(initialRecipeState);
     const [ingredients, setIngredients] = useState([initialIngredient]);
     const [imageFile, setImageFile] = useState(null);
+    const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
@@ -72,7 +68,30 @@ const CreateRecipe = () => {
     };
 
 
+    const loadCategories = async () => {
+        try {
+            const response = await fetch(`${urlBase}/categories`);
+            const data = await response.json();
+
+            if (response.ok) {
+                setCategories(data);
+                if (data.length > 0 && !isEditMode) {
+                    setRecipeData(prev => ({
+                        ...prev,
+                        category_id: String(data[0].id)
+                    }));
+                }
+            } else {
+                toast.error("Error al cargar la lista de categorías.");
+            }
+        } catch (error) {
+            toast.error("Error de conexión al obtener categorías.");
+        }
+    };
+
+
     useEffect(() => {
+        loadCategories()
         if (isEditMode) {
             loadRecipeData();
         }
@@ -115,7 +134,7 @@ const CreateRecipe = () => {
                     prep_time_min: data.recipe.prep_time_min,
                     difficulty: data.recipe.difficulty.toUpperCase(),
                     portions: data.recipe.portions,
-                    category_id: data.recipe.category_id,
+                    category_id: String(data.recipe.category_id),
                     image_url_existing: data.recipe.image,
                 };
 
@@ -346,11 +365,14 @@ const CreateRecipe = () => {
                                         id="selectCategory"
                                         name="category_id"
                                         onChange={handleChange}
-                                        value={recipeData.category_id}
+                                        value={recipeData.category_id || ""}
                                         required
                                     >
-                                        {MOCK_CATEGORIES.map(item => (
-                                            <option key={item.id} value={item.id}>{item.name}</option>
+                                        {categories.length === 0 && (
+                                            <option value="" disabled>Cargando categorías...</option>
+                                        )}
+                                        {categories.map(item => (
+                                            <option key={item.id} value={String(item.id)}>{item.name_category}</option>
                                         ))}
                                     </select>
                                 </div>

@@ -711,6 +711,8 @@ def get_admin_recipe_counts():
             "message": "Error interno del servidor al obtener conteos.", 
             "Details": str(error)
         }), 500
+
+
 @api.route("/upload-profile-image", methods=["POST"])
 @jwt_required()
 def upload_profile_image():
