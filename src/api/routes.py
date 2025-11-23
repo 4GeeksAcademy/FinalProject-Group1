@@ -904,3 +904,12 @@ def upload_profile_image():
         "image": user.profile,
         "user": user.serialize()
     }), 200
+
+
+@api.route("/recipes/<int:recipe_id>/comments", methods=["GET"])
+def get_comments(recipe_id):
+    recipe = Recipe.query.get(recipe_id)
+    if not recipe:
+        return jsonify({"msg": "Receta no encontrada"}), 404
+    
+    return jsonify([comments.serialize() for comments in recipe.comments]), 200
