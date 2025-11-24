@@ -120,7 +120,7 @@ const CreateRecipe = () => {
             if (response.ok) {
                 const recipeStatus = data.recipe.status;
 
-                const canAccess = userRole === "admin" || recipeStatus === "pending";
+                const canAccess = userRole === "admin" || recipeStatus === "pending" || recipeStatus === "rejected";
 
                 if (!canAccess) {
                     toast.error("Acceso denegado. Solo los administradores pueden editar recetas publicadas.");
@@ -463,7 +463,7 @@ const CreateRecipe = () => {
                             <h4 className="mb-4 text-success border-bottom pb-2">Ingredientes</h4>
                             <p className="alert alert-primary py-2 px-3 mb-4">
                                 <i className="fa-solid fa-circle-info me-2"></i>
-                                **OBSERVACIÓN:** Ingresa los ingredientes en **singular** (ej: "Huevo", no "Huevos").
+                                **OBSERVACIÓN:** Ingresa los ingredientes en **singular** (ejemplo: "Huevo", no "Huevos").
                             </p>
 
 
