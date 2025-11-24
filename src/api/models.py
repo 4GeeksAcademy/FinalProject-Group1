@@ -37,19 +37,16 @@ class User(db.Model):
         return f'<User {self.username}>'
 
     def serialize(self):
-
-        if self.profile is None:
-            initials_url = f"https://ui-avatars.com/api/?name={self.username}&size=128&background=random&rounded=true"
-            return {
-                "id": self.id_user,
-                "username": self.username,
-                "email": self.email,
-                "fullname": self.fullname,
-                "rol": self.rol,
-                "is_Active": self.is_active,
-                "created_at": self.created_at.isoformat(),
-                "image": initials_url
-            }
+        return {
+            "id": self.id_user,
+            "username": self.username,
+            "email": self.email,
+            "fullname": self.fullname,
+            "rol": self.rol,
+            "is_Active": self.is_active,
+            "created_at": self.created_at.isoformat(),
+            "image": self.profile or f"https://ui-avatars.com/api/?name={self.username}&size=128&background=random&rounded=true"
+        }
 
 # Empieza código de categoría
 
