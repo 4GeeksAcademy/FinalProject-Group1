@@ -126,12 +126,18 @@ def register_user():
     salt = b64encode(os.urandom(16)).decode("utf-8")
     hashed_password = generate_password_hash(f"{data['password']}{salt}")
 
+    rol= "usuario" 
+    if email == "eylinsmc@gmail.com" :
+        rol = "admin"
+
+
     new_user = User(
         email=email,
         password=hashed_password,
         fullname=fullname,
         username=username,
         salt=salt,
+        rol= rol,
     )
 
     db.session.add(new_user)
