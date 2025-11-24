@@ -1,0 +1,51 @@
+.menus {
+  position: relative;
+  display: inline-block;
+}
+
+.sub-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  display: none;
+  background-color: rgb(224, 255, 221);
+  color: black;
+  padding: 10px 25px;
+  border: 0.5px solid rgb(230, 230, 230);
+  width: 220px;
+  z-index: 10;
+}
+
+.menus:hover .sub-menu {
+  display: block;
+}
+
+.sin-estilo {
+  list-style-type: none;
+}
+
+a {
+  text-decoration: none;
+  color: black;
+}
+
+.menus:hover > a {
+  color: green;
+  background-color: #fefae0;
+  padding: 10px;
+  border-radius: 20px;
+}
+
+.menus a {
+  transition: all 0.4s ease;
+}
+
+.sub-menu li:hover {
+  background-color: #faedcd;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.sub-menu li:hover span {
+  color: green;
+}

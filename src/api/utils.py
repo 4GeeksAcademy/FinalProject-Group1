@@ -1,4 +1,6 @@
 from flask import jsonify, url_for
+import re
+import os
 
 class APIException(Exception):
     status_code = 400
@@ -39,3 +41,47 @@ def generate_sitemap(app):
         <p>Start working on your project by following the <a href="https://start.4geeksacademy.com/starters/full-stack" target="_blank">Quick Start</a></p>
         <p>Remember to specify a real endpoint path like: </p>
         <ul style="text-align: left;">"""+links_html+"</ul></div>"
+
+
+
+def val_email(correo: str) -> bool:
+    pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+    if re.fullmatch(pattern, correo):
+        return True
+    else:
+        return False
+
+PASSWORD_REGEX = r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()\-_=+{};:,<.\>]).{8,}$"
+
+
+def val_password(password: str) -> bool:
+    """
+    Verifica si una contraseña cumple con los requisitos de seguridad principales
+    mediante una única expresión regular (regex).
+
+    Requisitos:
+    - Mínimo 8 caracteres.
+    - Al menos una letra minúscula.
+    - Al menos una letra mayúscula.
+    - Al menos un número.
+    - Al menos un carácter especial (!@#$%^&*()_-+=;:,<.>).
+    """
+    # Usamos re.fullmatch para asegurar que toda la cadena coincida con el patrón.
+    if re.fullmatch(PASSWORD_REGEX, password):
+        return True
+    
+    return False
+
+def generate_initials_image(initials):
+    return (
+        f"https://res.cloudinary.com/{os.getenv('CLOUDINARY_CLOUD_NAME')}/image/upload/"
+        f"w_200,h_200,c_fill,r_max,co_white,b_rgb:333333/"
+        f"l_text:Arial_90_bold:{initials}/fl_layer_apply,g_center/"
+        "blank.png"
+    )    
+
+def get_initials(fullname):
+    if not fullname:
+        return "U"
+    parts = fullname.split()
+    return "".join([p[0].upper() for p in parts[:2]])
