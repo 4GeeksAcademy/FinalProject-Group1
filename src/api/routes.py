@@ -735,3 +735,120 @@ def upload_profile_image():
         "image": user.profile,
         "user": user.serialize()
     }), 200
+# RUTAS PARA HOME Y CATEGORÍAS
+
+@api.route("/recipes/resumen", methods=["GET"])
+def get_recipes_summary():
+    """
+    Devuelve un resumen con todas las categorías y 5-8 recetas publicadas por categoría
+    para los carruseles del home
+    """
+    try:
+        categories = Category.query.order_by(Category.name_category).all()
+        
+        summary = {}
+        
+        for category in categories:
+            # Obtener  recetas publicadas de esta categoría
+            recipes = (
+                db.session.query(Recipe)
+                .filter(
+                    Recipe.category_id == category.id_category,
+                    Recipe.state_recipe == stateRecipeEnum.PUBLISHED
+                )
+                .order_by(Recipe.created_at.desc())
+                .limit(12)
+                .all()
+            )
+            
+            # Solo incluir categorías que tengan recetas
+            if recipes:
+                summary[category.name_category] = {
+                    "category_id": category.id_category,
+                    "category_name": category.name_category,
+                    "recipes": [
+                        {
+                            "id": recipe.id_recipe,
+                            "title": recipe.title,
+                            "image": recipe.image,
+                            "portions": recipe.portions,
+                            "prep_time_min": recipe.preparation_time_min,
+                            "difficulty": recipe.difficulty.value
+                        }
+                        for recipe in recipes
+                    ]
+                }
+        
+        return jsonify({
+            "message": "Recipe summary retrieved successfully",
+            "categories": summary
+        }), 200
+        
+    except Exception as error:
+        logger.error(f"Error getting recipe summary: {error}")
+        return jsonify({
+            "message": "Error retrieving recipe summary",
+            "details": str(error)
+        }), 500
+
+
+@api.route("/recipes/category/<int:category_id>", methods=["GET"])
+def get_recipes_by_category(category_id):
+    """
+    Devuelve recetas de una categoría específica con paginación
+    Query params: page (default 1), per_page (default 12)
+    """
+    try:
+        page = request.args.get('page', 1, type=int)
+        per_page = request.args.get('per_page', 20, type=int)
+        
+        # Verificar que la categoría existe
+        category = Category.query.get(category_id)
+        if not category:
+            return jsonify({"message": "Category not found"}), 404
+        
+        # Query con paginación
+        pagination = (
+            db.session.query(Recipe)
+            .filter(
+                Recipe.category_id == category_id,
+                Recipe.state_recipe == stateRecipeEnum.PUBLISHED
+            )
+            .order_by(Recipe.created_at.desc())
+            .paginate(page=page, per_page=per_page, error_out=False)
+        )
+        
+        recipes_list = [
+            {
+                "id": recipe.id_recipe,
+                "title": recipe.title,
+                "image": recipe.image,
+                "portions": recipe.portions,
+                "prep_time_min": recipe.preparation_time_min,
+                "difficulty": recipe.difficulty.value,
+                "avg_rating": recipe.avg_rating,
+                "vote_count": recipe.vote_count
+            }
+            for recipe in pagination.items
+        ]
+        
+        return jsonify({
+            "message": "Recipes retrieved successfully",
+            "category_name": category.name_category,
+            "recipes": recipes_list,
+            "pagination": {
+                "page": page,
+                "per_page": per_page,
+                "total": pagination.total,
+                "pages": pagination.pages,
+                "has_next": pagination.has_next,
+                "has_prev": pagination.has_prev
+            }
+        }), 200
+        
+    except Exception as error:
+        logger.error(f"Error getting recipes by category: {error}")
+        return jsonify({
+            "message": "Error retrieving recipes",
+            "details": str(error)
+        }), 500
