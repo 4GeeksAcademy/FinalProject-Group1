@@ -16,6 +16,7 @@ import RejectedRecipes from "./pages/RejectedRecipes";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminCategories from "./pages/AdminCategories";
 import ProtectedRoute from "./components/ProtectedRoute";
+import AdminUsuarios from "./pages/AdminUsuarios";
 
 export const router = createBrowserRouter(
   createRoutesFromElements(
@@ -33,12 +34,12 @@ export const router = createBrowserRouter(
       <Route path="/single/:theId" element={<Single />} />  {/* Dynamic route for single items */}
       <Route path="/register" element={< Register />} />
       <Route path="/demo" element={<Demo />} />
-      <Route path="/myprofile" element={<Myprofile />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/login" element={<Login />} />
       <Route path="/myprofile" element={<ProtectedRoute><Myprofile /></ProtectedRoute>} />
       <Route path="/recipes/create" element={<ProtectedRoute><CreateRecipe /></ProtectedRoute>} />
+      <Route path="/recipes/edit/:recipe_id" element={<ProtectedRoute><CreateRecipe /></ProtectedRoute>} />
       <Route path="/admin/categories" element={
         <AdminProtectedRoute>
           <AdminCategories />
@@ -77,6 +78,11 @@ export const router = createBrowserRouter(
       <Route path="/status/rejected" element={
         <AdminProtectedRoute>
           <RejectedRecipes />
+        </AdminProtectedRoute>
+      } />
+      <Route path="/administrar/users" element={
+        <AdminProtectedRoute>
+          <AdminUsuarios />
         </AdminProtectedRoute>
       } />
 

@@ -8,7 +8,7 @@ import enum
 
 db = SQLAlchemy()
 
-
+ 
 class User(db.Model):
     id_user: Mapped[int] = mapped_column(primary_key=True)
     username: Mapped[str] = mapped_column(
@@ -47,19 +47,9 @@ class User(db.Model):
                 "fullname": self.fullname,
                 "rol": self.rol,
                 "is_Active": self.is_active,
+                "created_at": self.created_at.isoformat(),
                 "image": initials_url
             }
-
-        return {
-            "id": self.id_user,
-            "username": self.username,
-            "email": self.email,
-            "fullname": self.fullname,
-            "rol": self.rol,
-            "is_Active": self.is_active,
-            "image": self.profile
-        }
-
 
 # Empieza código de categoría
 

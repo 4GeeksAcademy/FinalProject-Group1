@@ -49,14 +49,14 @@ const AdminCardRecipe = ({ recipes, title, handleDelete, handleStatusChange, ico
                                                     className='border border-0 me-2'
                                                     title="Publicar Receta"
                                                 >
-                                                    <i class="fa-solid fa-circle-up fa-2xl text-success"></i>
+                                                    <i className="fa-solid fa-circle-up fa-2xl text-success"></i>
                                                 </button>
                                                 <button
                                                     onClick={() => handleStatusChange(item.id, 'rejected')}
                                                     className='border border-0'
                                                     title="Rechazar Receta"
                                                 >
-                                                    <i class="fa-solid fa-circle-down fa-2xl text-info"></i>
+                                                    <i className="fa-solid fa-circle-down fa-2xl text-info"></i>
                                                 </button>
                                             </>
                                         )}
@@ -66,7 +66,7 @@ const AdminCardRecipe = ({ recipes, title, handleDelete, handleStatusChange, ico
                                                 className='border border-0'
                                                 title="Revertir a Pendiente"
                                             >
-                                                <i class="fa-solid fa-circle-down fa-2xl text-info"></i>
+                                                <i className="fa-solid fa-circle-down fa-2xl text-info"></i>
                                             </button>
                                         )}
                                     </span>
