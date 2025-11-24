@@ -6,17 +6,22 @@ import useGlobalReducer from "../hooks/useGlobalReducer"
 import { useEffect } from "react"
 // Base component that maintains the navbar and footer throughout the page and the scroll to top functionality.
 export const Layout = () => {
-    const { dispatch } = useGlobalReducer();
+   return (
+      <div style={{ 
+    minHeight: "100vh",
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "space-between"
+}}>
+            <ScrollToTop>
+                <Navbar />
 
-    useEffect(() => {
-        dispatch({ type: "CHECK_AUTH" });
-    }, []);
-    return (
-        <ScrollToTop>
-            <Navbar />
-            <Outlet />
-            <Footer />
+                <main style={{ flex: 1 }}>
+                    <Outlet />
+                </main>
 
-        </ScrollToTop>
-    )
+                <Footer />
+            </ScrollToTop>
+        </div>
+    );
 }

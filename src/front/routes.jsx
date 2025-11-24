@@ -16,6 +16,10 @@ import RejectedRecipes from "./pages/RejectedRecipes";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminCategories from "./pages/AdminCategories";
 import ProtectedRoute from "./components/ProtectedRoute";
+import { CategoryView } from "./pages/CategoryView";
+import { CategoriesListView } from './pages/CategoriesListView';
+import { RecipeDetail } from "./pages/RecipeDetail";
+
 import AdminUsuarios from "./pages/AdminUsuarios";
 
 export const router = createBrowserRouter(
@@ -80,6 +84,9 @@ export const router = createBrowserRouter(
           <RejectedRecipes />
         </AdminProtectedRoute>
       } />
+       <Route path="/category/:categoryId" element={<CategoryView />} />
+       <Route path="/recipe/:recipeId" element={<RecipeDetail />} />
+       <Route path="/categories" element={<CategoriesListView />} />
       <Route path="/administrar/users" element={
         <AdminProtectedRoute>
           <AdminUsuarios />
