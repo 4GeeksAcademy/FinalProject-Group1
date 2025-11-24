@@ -47,23 +47,23 @@ export const Navbar = () => {
 						<div>
 							{
 								isAdmin ? (
-									<div>
+									<>
 
 										<li className="menus me-4 mt-2">
 											<a href="#">Gestionar</a>
 											<ul className="sub-menu sin-estilo">
 												<li className="py-2"><Link to={"/status"} ><span>Recetas</span></Link></li>
-												<li className="py-2"><Link to={"/admin/categories"}><span>Categorías</span></Link></li>
+												<li className="py-2"><Link to={"/administrar/users"}><span>Usuarios</span></Link></li>
 											</ul>
 										</li>
 										<li className="menus me-4 mt-2">
 											<a href="#">Crear</a>
 											<ul className="sub-menu sin-estilo">
 												<li className="py-2"><Link to={"/recipes/create"}><span>Receta</span></Link></li>
-												<li className="py-2"><span>Administrador</span></li>
+												<li className="py-2"><Link to={"/admin/categories"}><span>Categorías</span></Link></li>
 											</ul>
 										</li>
-									</div>
+									</>
 								) : null
 							}
 						</div>
@@ -102,7 +102,6 @@ export const Navbar = () => {
 												Mi Perfil
 											</NavLink>
 										</li>
-
 										<li>
 											<button className="dropdown-item" onClick={logout}>
 												Cerrar sesión
@@ -117,6 +116,6 @@ export const Navbar = () => {
 					</ul>
 				</div>
 			</div>
-		</nav>
+		</nav >
 	);
 };

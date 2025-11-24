@@ -2,23 +2,23 @@
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
 from flask import Flask, request, jsonify, url_for, Blueprint
-from api.models import db, User, Recipe, Ingredient, RecipeIngredient, difficultyEnum, stateRecipeEnum, UnitEnum, Category
-from api.utils import generate_sitemap, APIException,  val_email, val_password, get_initials, generate_initials_image
+from api.models import db, User, Recipe, Ingredient, RecipeIngredient, difficultyEnum, stateRecipeEnum, UnitEnum, Category, RecipeFavorite, RecipeRating
+from api.utils import generate_sitemap, APIException,  val_email, val_password
 from flask_cors import CORS
 import os
 from base64 import b64encode
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity, get_jwt
-from datetime import timedelta
+from datetime import timedelta, datetime, timezone
 from functools import wraps
 import json
 from .cloudinary_service import cloudinary_service
 from sqlalchemy import select
 from .admin_decorator import admin_required
-import cloudinary 
+import cloudinary
 import cloudinary.uploader
+from datetime import datetime, timezone
 
- 
 api = Blueprint('api', __name__)
 
 
@@ -338,6 +338,11 @@ def login_user():
         return jsonify({"message": "Invalid username"}), 401
     if not check_password_hash(user.password, f"{password}{user.salt}"):
         return jsonify({"message": "Invalid credentials"}), 401
+
+    # Para bloquear el acceso si no está activo el usuario.
+    if not user.is_active:
+        return jsonify({"message": "Su cuenta está inhabilitada. Contacte al administrador."}), 403
+
     # if not user.profile:
     #     print("➡ NO TIENE PROFLE, GENERANDO AVATAR...")
     #     initials = get_initials(user.fullname)
@@ -465,10 +470,11 @@ def get_admin_recipes_by_status():
 
         page = int(request.args.get('page', 1))
         limit = int(request.args.get('limit', 9))
- 
+
         offset = (page - 1) * limit
 
-        base_query = db.select(Recipe).filter(Recipe.state_recipe == status_filter)
+        base_query = db.select(Recipe).filter(
+            Recipe.state_recipe == status_filter)
 
         total_query = db.select(db.func.count()).select_from(base_query)
         total_count = db.session.execute(total_query).scalar()
@@ -476,8 +482,8 @@ def get_admin_recipes_by_status():
         recipes_query = (
             base_query
             .order_by(Recipe.created_at.desc())
-            .offset(offset) 
-            .limit(limit)  
+            .offset(offset)
+            .limit(limit)
         )
 
         recipes = db.session.execute(recipes_query).scalars().all()
@@ -496,7 +502,6 @@ def get_admin_recipes_by_status():
         }), 500
 
 
-
 @api.route("/recipes/<int:recipe_id>", methods=["PUT"])
 @jwt_required()
 def edit_recipe(recipe_id):
@@ -509,18 +514,15 @@ def edit_recipe(recipe_id):
     if recipe is None:
         return jsonify({"message": f"Recipe with ID {recipe_id} not found."}), 404
 
-    if is_admin:
-        pass
-
-    else:
+    if not is_admin:
+        if recipe.user_id != user_id:
+            return jsonify({"message": "Not authorized"}), 403
         if recipe.state_recipe == stateRecipeEnum.PUBLISHED:
-            return jsonify({"message": "Access denied. Only administrators can edit published recipes."}), 403
+            return jsonify({"message": "Cannot edit published recipes"}), 403
 
-        if recipe.state_recipe == stateRecipeEnum.PENDING:
-            if recipe.user_id != user_id:
-                return jsonify({"message": "Access denied. You can only edit your own pending recipes."}), 403
-        else:
-            return jsonify({"message": "Access denied. You do not have permission to edit this recipe."}), 403
+        if recipe.state_recipe == stateRecipeEnum.REJECTED:
+            recipe.state_recipe = stateRecipeEnum.PENDING
+            print(f"Receta {recipe_id} reenviada a revisión automáticamente.")
 
     data_form = request.form
     data_files = request.files
@@ -544,6 +546,7 @@ def edit_recipe(recipe_id):
         recipe.portions = int(data_form.get("portions", recipe.portions))
         recipe.category_id = int(data_form.get(
             "category_id", recipe.category_id))
+
         new_difficulty_str = data_form.get("difficulty")
         if new_difficulty_str:
             recipe.difficulty = difficultyEnum(
@@ -552,9 +555,6 @@ def edit_recipe(recipe_id):
     except ValueError as error:
         db.session.rollback()
         return jsonify({"message": "Invalid data type for one or more fields.", "details": str(error)}), 400
-    except Exception as error:
-        db.session.rollback()
-        return jsonify({"message": "Error updating basic recipe fields.", "details": str(error)}), 400
 
     image_file = data_files.get("image")
     if image_file:
@@ -562,11 +562,12 @@ def edit_recipe(recipe_id):
             new_image_url = cloudinary_service.upload_image(
                 image_file, folder_name="recipe_images")
             recipe.image = new_image_url
-
         except Exception as error:
             return jsonify({"message": f"Image update failed. Details: {str(error)}"}), 500
+
     try:
         recipe.recipe_ingredients_details = []
+
         recipe_ingredient_objects = []
         for item in ingredients_list:
             ingredient_name = item.get("name").strip().lower()
@@ -578,7 +579,12 @@ def edit_recipe(recipe_id):
                 name=ingredient_name).one_or_none()
             if ingredient_catalog is None:
                 ingredient_catalog = Ingredient(
-                    name=ingredient_name, calories_per_100=0.0, protein_per_100=0.0, carbs_per_100=0.0, fat_per_100=0.0)
+                    name=ingredient_name,
+                    calories_per_100=0.0,
+                    protein_per_100=0.0,
+                    carbs_per_100=0.0,
+                    fat_per_100=0.0
+                )
                 db.session.add(ingredient_catalog)
                 db.session.flush()
 
@@ -593,7 +599,11 @@ def edit_recipe(recipe_id):
         db.session.add_all(recipe_ingredient_objects)
         db.session.commit()
 
-        return jsonify({"message": "Recipe updated successfully.", "recipe": recipe.serialize()}), 200
+        return jsonify({
+            "message": "Recipe updated successfully.",
+            "recipe": recipe.serialize(),
+            "new_status": recipe.state_recipe.value
+        }), 200
 
     except Exception as error:
         db.session.rollback()
@@ -612,6 +622,175 @@ def get_one_recipe(recipe_id):
     }), 200
 
 
+@api.route("/api/recetas/<int:recipe_id>", methods=["GET"])
+@jwt_required(optional=True)
+def get_recipe_detail(recipe_id):
+    current_user_id = get_jwt_identity()
+    if current_user_id is not None:
+        try:
+            current_user_id = int(current_user_id)
+        except ValueError:
+            current_user_id = None
+
+    recipe = Recipe.query.filter_by(
+        id_recipe=recipe_id,
+        state_recipe=stateRecipeEnum.PUBLISHED
+    ).first()
+
+    if recipe is None:
+        return jsonify({"message": "Receta no encontrada"}), 404
+
+    recipe_data = recipe.serialize()
+
+    ratings = recipe.ratings
+
+    if ratings:
+        total_votes = len(ratings)
+        avg = sum(r.value for r in ratings) / total_votes
+    else:
+        total_votes = 0
+        avg = None
+
+    comments = [r.serialize() for r in ratings if r.comment]
+
+    is_favorite = False
+    if current_user_id is not None:
+        fav = RecipeFavorite.query.filter_by(
+            user_id=current_user_id,
+            recipe_id=recipe.id_recipe
+        ).first()
+        is_favorite = fav is not None
+
+    recipe_data.update({
+        "avg_rating": avg,
+        "vote_count": total_votes,
+        "comments": comments,
+        "is_favorite": is_favorite
+    })
+
+    return jsonify(recipe_data), 200
+
+
+@api.route("/api/recetas/<int:recipe_id>/favorito", methods=["POST"])
+@jwt_required()
+def toggle_favorite(recipe_id):
+    current_user_id = get_jwt_identity()
+    try:
+        current_user_id = int(current_user_id)
+    except (TypeError, ValueError):
+        return jsonify({"message": "Invalid user identity"}), 401
+
+    recipe = db.session.get(Recipe, recipe_id)
+    if recipe is None or recipe.state_recipe != stateRecipeEnum.PUBLISHED:
+        return jsonify({"message": "Receta no encontrada o no disponible"}), 404
+
+    try:
+        favorite = RecipeFavorite.query.filter_by(
+            user_id=current_user_id,
+            recipe_id=recipe_id
+        ).first()
+
+        if favorite:
+            db.session.delete(favorite)
+            db.session.commit()
+            return jsonify({
+                "message": "Receta eliminada de favoritos",
+                "is_favorite": False
+            }), 200
+        else:
+            new_favorite = RecipeFavorite(
+                user_id=current_user_id,
+                recipe_id=recipe_id
+            )
+            db.session.add(new_favorite)
+            db.session.commit()
+            return jsonify({
+                "message": "Receta añadida a favoritos",
+                "is_favorite": True
+            }), 201
+
+    except Exception as error:
+        db.session.rollback()
+        return jsonify({
+            "message": "Error al actualizar favorito",
+            "details": str(error)
+        }), 500
+
+
+@api.route("/api/recetas/<int:recipe_id>/calificar", methods=["POST"])
+@jwt_required()
+def rate_recipe(recipe_id):
+    current_user_id = get_jwt_identity()
+    try:
+        current_user_id = int(current_user_id)
+    except (TypeError, ValueError):
+        return jsonify({"message": "Invalid user identity"}), 401
+
+    recipe = db.session.get(Recipe, recipe_id)
+    if recipe is None or recipe.state_recipe != stateRecipeEnum.PUBLISHED:
+        return jsonify({"message": "Receta no encontrada o no disponible"}), 404
+
+    data = request.get_json(silent=True)
+    if data is None:
+        return jsonify({"message": "JSON inválido o no enviado"}), 400
+
+    value = data.get("value")
+    comment = data.get("comment")
+
+    try:
+        value = int(value)
+    except (TypeError, ValueError):
+        return jsonify({"message": "La calificación debe ser un número entero"}), 400
+
+    if value < 1 or value > 5:
+        return jsonify({"message": "La calificación debe estar entre 1 y 5"}), 400
+
+    try:
+        rating = RecipeRating.query.filter_by(
+            user_id=current_user_id,
+            recipe_id=recipe_id
+        ).first()
+
+        if rating:
+            rating.value = value
+            rating.comment = comment
+            rating.updated_at = datetime.now(timezone.utc)
+        else:
+            rating = RecipeRating(
+                value=value,
+                comment=comment,
+                user_id=current_user_id,
+                recipe_id=recipe_id
+            )
+            db.session.add(rating)
+
+        db.session.commit()
+
+        all_ratings = RecipeRating.query.filter_by(recipe_id=recipe_id).all()
+        if all_ratings:
+            total_votes = len(all_ratings)
+            avg = sum(r.value for r in all_ratings) / total_votes
+        else:
+            total_votes = 0
+            avg = None
+
+        recipe.avg_rating = avg
+        recipe.vote_count = total_votes
+        db.session.commit()
+
+        return jsonify({
+            "message": "Calificación registrada correctamente",
+            "rating": rating.serialize(),
+            "avg_rating": avg,
+            "vote_count": total_votes
+        }), 201
+
+    except Exception as error:
+        db.session.rollback()
+        return jsonify({
+            "message": "Error al registrar la calificación",
+            "details": str(error)
+        }), 500
 @api.route("/recipes/<int:recipe_id>", methods=["DELETE"])
 @jwt_required()
 def delete_recipe(recipe_id):
@@ -625,16 +804,17 @@ def delete_recipe(recipe_id):
 
     if not is_admin:
         if recipe.user_id != user_id:
-             return jsonify({"message": "Access denied. You can only delete your own recipes."}), 403
-        
+            return jsonify({"message": "Access denied. You can only delete your own recipes."}), 403
+
         if recipe.state_recipe == stateRecipeEnum.PUBLISHED:
             return jsonify({"message": "Access denied. Only administrators can delete published recipes."}), 403
 
     try:
-        cloudinary_service.delete_image(recipe.image) 
+        cloudinary_service.delete_image(recipe.image)
     except Exception as image_error:
-        print(f"Error al eliminar imagen de Cloudinary para Receta ID {recipe_id}: {str(image_error)}")
-        pass 
+        print(
+            f"Error al eliminar imagen de Cloudinary para Receta ID {recipe_id}: {str(image_error)}")
+        pass
 
     try:
         db.session.delete(recipe)
@@ -644,7 +824,7 @@ def delete_recipe(recipe_id):
     except Exception as db_error:
         db.session.rollback()
         return jsonify({"message": "Error deleting recipe. Check DB logs for constraints.", "details": str(db_error)}), 500
-    
+
 
 @api.route("/admin/recipes/<int:recipe_id>/status", methods=["PUT"])
 @admin_required()
@@ -661,7 +841,7 @@ def update_recipe_status(recipe_id):
             "rejected": stateRecipeEnum.REJECTED,
             "pending": stateRecipeEnum.PENDING
         }
-        
+
         if new_status_param not in status_map:
             return jsonify({"message": "Estado no válido."}), 400
 
@@ -678,7 +858,6 @@ def update_recipe_status(recipe_id):
         print(f"Error al actualizar el estado de la receta: {error}")
         db.session.rollback()
         return jsonify({"message": "Error interno del servidor.", "Details": str(error)}), 500
-    
 
 
 @api.route("/admin/recipes/counts", methods=["GET"])
@@ -689,16 +868,16 @@ def get_admin_recipe_counts():
             db.select(Recipe.state_recipe, db.func.count())
             .group_by(Recipe.state_recipe)
         )
-        
+
         results = db.session.execute(counts_query).all()
         counts = {
             "published": 0,
             "pending": 0,
             "rejected": 0,
         }
-        
+
         for state_enum, count in results:
-            counts[state_enum.value] = count 
+            counts[state_enum.value] = count
 
         return jsonify({
             "message": "Conteo de recetas por estado exitoso",
@@ -708,9 +887,11 @@ def get_admin_recipe_counts():
     except Exception as error:
         print(f"Error al obtener conteos de recetas: {error}")
         return jsonify({
-            "message": "Error interno del servidor al obtener conteos.", 
+            "message": "Error interno del servidor al obtener conteos.",
             "Details": str(error)
         }), 500
+
+
 @api.route("/upload-profile-image", methods=["POST"])
 @jwt_required()
 def upload_profile_image():
@@ -852,3 +1033,92 @@ def get_recipes_by_category(category_id):
             "message": "Error retrieving recipes",
             "details": str(error)
         }), 500
+
+
+@api.route("/admin/users", methods=["GET"])
+@admin_required()
+def get_all_users():
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 15, type=int)
+    try:
+        query = db.select(User).order_by(User.created_at.desc())
+        pagination = db.paginate(
+            query, page=page, per_page=per_page, error_out=False)
+        user_list = [user.serialize() for user in pagination.items]
+
+        return jsonify({
+            "users": user_list,
+            "total_users": pagination.total,
+            "total_pages": pagination.pages,
+            "current_page": pagination.page,
+            "per_page": pagination.per_page,
+            "has_next": pagination.has_next,
+            "has_prev": pagination.has_prev
+        }), 200
+
+    except Exception as error:
+        print(f"Error al obtener usuarios: {error}")
+        return jsonify({"message": "Server error fetching users.", "Details": str(error)}), 500
+
+
+@api.route("/admin/user/role/<int:user_id>", methods=["PUT"])
+@admin_required()
+def update_user_role(user_id):
+    data = request.get_json()
+    new_role = data.get("rol")
+
+    if new_role not in ["admin", "usuario"]:
+        return jsonify({"message": "Invalid role value."}), 400
+
+    user = db.session.get(User, user_id)
+    if not user:
+        return jsonify({"message": "User not found."}), 404
+
+    try:
+        user.rol = new_role
+        user.updated_at = datetime.now(timezone.utc)
+        db.session.commit()
+        return jsonify({"message": f"Role for user {user.username} updated to {new_role}."}), 200
+    except Exception as error:
+        db.session.rollback()
+        return jsonify({"message": "Database error while updating role.", "Details": str(error)}), 500
+
+
+@api.route("/admin/user/change-active/<int:user_id>", methods=["PUT"])
+@admin_required()
+def change_user_active(user_id):
+    user = db.session.get(User, user_id)
+    if not user:
+        return jsonify({"message": "User not found."}), 404
+
+    try:
+        user.is_active = not user.is_active
+        user.updated_at = datetime.now(timezone.utc)
+        db.session.commit()
+        # se hizo esto para usar en el mensaje del estatus a activo o inactivo, solo par ainformar
+        if user.is_active:
+            status = "Active"
+        else:
+            status = "Inactive"
+        return jsonify({"message": f"User {user.username} status changed to {status}."}), 200
+    except Exception as error:
+        db.session.rollback()
+        return jsonify({"message": "Database error while toggling status.", "Details": str(error)}), 500
+
+
+@api.route("/admin/user/<int:user_id>", methods=["DELETE"])
+@admin_required()
+def delete_user(user_id):
+    user = db.session.get(User, user_id)
+    if not user:
+        return jsonify({"message": "User not found."}), 404
+
+    try:
+        db.session.delete(user)
+        db.session.commit()
+        return jsonify({"message": f"User {user.username} deleted successfully."}), 200
+    except Exception as error:
+        db.session.rollback()
+        return jsonify({"message": "Database error while deleting user.", "Details": str(error)}), 500
+
+
