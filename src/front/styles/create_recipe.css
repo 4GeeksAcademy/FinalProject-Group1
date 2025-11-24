@@ -1,0 +1,17 @@
+.prevew-image {
+  max-width: 150px;
+  max-height: 150 px;
+  object-fit: cover;
+}
+
+.bg-fondo {
+  background-color: #fefae0;
+}
+
+.bg-formulario {
+  background-color: #e9edc9;
+}
+
+.bg-titulo {
+  background-color: #ccd5ae;
+}
