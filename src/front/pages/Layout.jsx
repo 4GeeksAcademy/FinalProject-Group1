@@ -1,18 +1,23 @@
-import { Outlet } from "react-router-dom/dist"
-import ScrollToTop from "../components/ScrollToTop"
-import { Navbar } from "../components/Navbar"
-import { Footer } from "../components/Footer"
 
+import { Outlet } from 'react-router-dom';
+import Navbar from '../components/Navbar.jsx';
+import Footer from '../components/Footer.jsx';
+import useTheme from '../hooks/useTheme.jsx';
 
+const Layout = () => {
+    // Inicializar el hook. El hook se encarga de aplicar la clase 'dark-mode' al <html>.
+    const { theme } = useTheme();
 
-// Base component that maintains the navbar and footer throughout the page and the scroll to top functionality.
-export const Layout = () => {
-   return (
-        <ScrollToTop>
+    return (
+        <div className="app-container">
             <Navbar />
-            <Outlet />
+            <main>
+                { }
+                <Outlet />
+            </main>
             <Footer />
-            
-        </ScrollToTop>
-    )
+        </div>
+    );
 }
+
+export default Layout;
