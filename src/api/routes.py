@@ -2,7 +2,7 @@
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
 from flask import Flask, request, jsonify, url_for, Blueprint
-from api.models import db, User, Recipe, Ingredient, RecipeIngredient, difficultyEnum, stateRecipeEnum, UnitEnum, Category, RecipeFavorite, RecipeRating
+from api.models import db, User, Recipe, Ingredient, RecipeIngredient, difficultyEnum, stateRecipeEnum, UnitEnum, Category, RecipeFavorite, RecipeRating, Comment
 from api.utils import generate_sitemap, APIException,  val_email, val_password
 from flask_cors import CORS
 import os
@@ -913,3 +913,108 @@ def get_comments(recipe_id):
         return jsonify({"msg": "Receta no encontrada"}), 404
     
     return jsonify([comments.serialize() for comments in recipe.comments]), 200
+
+
+@api.route('/recipes/<int:recipe_id>/comments', methods=['POST'])
+@jwt_required()
+def create_comment(recipe_id):
+    comment_data = request.get_json()
+    comment_text = comment_data.get("text", "").trim()
+
+    if not comment_text:
+        return jsonify({"error": "El comentario no puede estar vacío."}), 400
+
+    recipe = Recipe.query.get(recipe_id)
+    if not recipe:
+        return jsonify({"error": "Receta no encontrada."}), 404
+
+    user_id = get_jwt_identity()
+
+    new_comment = Comment(
+        text=comment_text,
+        user_id=user_id,
+        recipe_id=recipe_id
+    )
+
+    db.session.add(new_comment)
+    db.session.commit()
+
+    return jsonify({
+        "message": "Comentario creado",
+        "comment": {
+            "id": new_comment.id,
+            "text": new_comment.text,
+            "user_id": new_comment.user_id,
+            "recipe_id": new_comment.recipe_id,
+            "created_at": new_comment.created_at
+        }
+    }), 201
+
+
+@api.route('/comments/<int:comment_id>', methods=['PUT'])
+@jwt_required()
+def update_comment(comment_id):
+    update_data = request.get_json()
+    updated_text = update_data.get("text", "").strip()
+
+    if not updated_text:
+        return jsonify({"error": "El comentario no puede estar vacío."}), 400
+
+    user_id = get_jwt_identity()
+
+    existing_comment = Comment.query.get(comment_id)
+    if not existing_comment:
+        return jsonify({"error": "Comentario no encontrado."}), 404
+
+    if existing_comment.user_id != user_id:
+        return jsonify({"error": "No tienes permiso para editar este comentario."}), 403
+
+    existing_comment.text = updated_text
+    db.session.commit()
+
+    return jsonify({
+        "message": "Comentario actualizado",
+        "comment": {
+            "id": existing_comment.id,
+            "text": existing_comment.text
+        }
+    }), 200
+
+
+@api.route('/comments/<int:comment_id>', methods=['DELETE'])
+@jwt_required()
+def delete_comment(comment_id):
+    user_id = get_jwt_identity()
+
+    comment_to_delete = Comment.query.get(comment_id)
+    if not comment_to_delete:
+        return jsonify({"error": "Comentario no encontrado."}), 404
+
+    if comment_to_delete.user_id != user_id:
+        return jsonify({"error": "No tienes permiso para eliminar este comentario."}), 403
+
+    db.session.delete(comment_to_delete)
+    db.session.commit()
+
+    return jsonify({"message": "Comentario eliminado"}), 200
+
+
+@api.route('/recipes/<int:recipe_id>/comments', methods=['GET'])
+def get_recipe_comments(recipe_id):
+    recipe = Recipe.query.get(recipe_id)
+    if not recipe:
+        return jsonify({"error": "Receta no encontrada"}), 404
+
+    comments = Comment.query.filter_by(recipe_id=recipe_id).order_by(Comment.created_at.desc()).all()
+
+    formatted_comments = [
+        {
+            "id": comment.id,
+            "text": comment.text,
+            "user_id": comment.user_id,
+            "created_at": comment.created_at
+        }
+        for comment in comments
+    ]
+
+    return jsonify(formatted_comments), 200
