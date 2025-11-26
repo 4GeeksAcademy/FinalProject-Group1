@@ -26,7 +26,7 @@ export const Footer = () => {
 	}
 
 	return (
-		<footer className="bg-body-tertiary border-top py-1 mt-5">
+		<footer className="bg-body-tertiary border-top py-1">
 			<div className="container">
 				<div className="row align-items-center">
 

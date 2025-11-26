@@ -24,29 +24,39 @@ class User(db.Model):
     password: Mapped[str] = mapped_column(String(255), nullable=False)
     salt: Mapped[str] = mapped_column(String(50), nullable=False)
     profile: Mapped[str] = mapped_column(String(
-        255), nullable=False, default="https://ui-avatars.com/api/?name=User&size=128&background=random&rounded=true")
+        255), nullable=True, default=None)
     is_active: Mapped[bool] = mapped_column(
         Boolean(), nullable=True, default=True)
 
     recipe_user: Mapped[List["Recipe"]] = relationship(
-        back_populates="user_recipe")
+        back_populates="user_recipe",
+        cascade="all, delete-orphan"
+    )
+    recipe_ratings: Mapped[List["RecipeRating"]] = relationship(
+        back_populates="user", cascade="all, delete-orphan")
+    favorites: Mapped[List["RecipeFavorite"]] = relationship(
+        back_populates="user", cascade="all, delete-orphan")
 
     def __repr__(self):
         return f'<User {self.username}>'
 
     def serialize(self):
-        return {
-            "id": self.id_user,
-            "username": self.username,
-            "email": self.email,
-            "fullname": self.fullname,
-            "rol": self.rol,
-            "is_Active": self.is_active,
-            "image": self.profile
-        }
 
+        if self.profile is None:
+            initials_url = f"https://ui-avatars.com/api/?name={self.username}&size=128&background=random&rounded=true"
+            return {
+                "id": self.id_user,
+                "username": self.username,
+                "email": self.email,
+                "fullname": self.fullname,
+                "rol": self.rol,
+                "is_Active": self.is_active,
+                "created_at": self.created_at.isoformat(),
+                "image": initials_url
+            }
 
 # Empieza código de categoría
+
 
 class Category(db.Model):
     __tablename__ = "categories"
@@ -71,7 +81,7 @@ class Category(db.Model):
             "name_category": self.name_category,
         }
 
-
+ 
 class difficultyEnum(enum.Enum):
     EASY = "fácil"
     MEDIUM = "medio"
@@ -120,10 +130,16 @@ class Recipe(db.Model):
         timezone.utc), onupdate=lambda: datetime.now(timezone.utc), nullable=False)
 
     user_id: Mapped[int] = mapped_column(
-        db.ForeignKey('user.id_user'), nullable=False)
+        db.ForeignKey('user.id_user', ondelete='CASCADE'),
+        nullable=False
+    )
     user_recipe: Mapped["User"] = relationship(back_populates="recipe_user")
 
     recipe_ingredients_details: Mapped[List["RecipeIngredient"]] = relationship(
+        back_populates="recipe", cascade="all, delete-orphan")
+    ratings: Mapped[List["RecipeRating"]] = relationship(
+        back_populates="recipe", cascade="all, delete-orphan")
+    favorites: Mapped[List["RecipeFavorite"]] = relationship(
         back_populates="recipe", cascade="all, delete-orphan")
 
     category_id: Mapped[int] = mapped_column(
@@ -138,6 +154,8 @@ class Recipe(db.Model):
         ingredients_list = [
             item.serialize() for item in self.recipe_ingredients_details
         ]
+
+        creator_display_name = self.user_recipe.fullname if self.user_recipe.fullname else self.user_recipe.username
         return {
             "id": self.id_recipe,
             "title": self.title,
@@ -151,6 +169,7 @@ class Recipe(db.Model):
             "vote_count": self.vote_count,
             "nutritional_data": self.nutritional_data,
             "creator_id": self.user_id,
+            "creator_name": creator_display_name,
             "category_id": self.category_id,
             "category_name": self.category_recipe.name_category,
             "ingredients": ingredients_list,
@@ -223,3 +242,54 @@ class RecipeIngredient(db.Model):
             "quantity": self.quantity,
             "unit_measure": self.unit_measure.value,
         }
+
+
+class RecipeRating(db.Model):
+    __tablename__ = "recipe_ratings"
+
+    id_rating: Mapped[int] = mapped_column(primary_key=True)
+    value: Mapped[int] = mapped_column(Integer, nullable=False)
+    comment: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(
+        timezone=True), default=lambda: datetime.now(timezone.utc), nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(
+        timezone.utc), onupdate=lambda: datetime.now(timezone.utc), nullable=False)
+
+    user_id: Mapped[int] = mapped_column(
+        ForeignKey("user.id_user"), nullable=False)
+    user: Mapped["User"] = relationship(back_populates="recipe_ratings")
+    recipe_id: Mapped[int] = mapped_column(
+        ForeignKey("recipe.id_recipe"), nullable=False)
+    recipe: Mapped["Recipe"] = relationship(back_populates="ratings")
+
+    def __repr__(self):
+        return f"<RecipeRating recipe_id={self.recipe_id} user_id={self.user_id} value={self.value}>"
+
+    def serialize(self):
+        return {
+            "id": self.id_rating,
+            "value": self.value,
+            "comment": self.comment,
+            "user_id": self.user_id,
+            "username": self.user.username if self.user else None,
+            "created_at": self.created_at.isoformat()
+        }
+
+
+class RecipeFavorite(db.Model):
+    __tablename__ = "recipe_favorites"
+
+    id_favorite: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(
+        ForeignKey("user.id_user"), nullable=False)
+    recipe_id: Mapped[int] = mapped_column(
+        ForeignKey("recipe.id_recipe"), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(
+        timezone=True), default=lambda: datetime.now(timezone.utc), nullable=False)
+
+    # Relaciones
+    user: Mapped["User"] = relationship(back_populates="favorites")
+    recipe: Mapped["Recipe"] = relationship(back_populates="favorites")
+
+    def __repr__(self):
+        return f"<RecipeFavorite user_id={self.user_id} recipe_id={self.recipe_id}>"
