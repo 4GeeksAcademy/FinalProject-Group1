@@ -151,30 +151,37 @@ class Recipe(db.Model):
         return f'<Recipe {self.title}>'
 
     def serialize(self):
-        ingredients_list = [
-            item.serialize() for item in self.recipe_ingredients_details
-        ]
+        difficulty = (
+            self.difficulty.value
+            if isinstance(self.difficulty, enum.Enum)
+            else self.difficulty
+        )
+        status = (
+            self.state_recipe.value
+            if isinstance(self.state_recipe, enum.Enum)
+            else self.state_recipe
+        )
 
-        creator_display_name = self.user_recipe.fullname if self.user_recipe.fullname else self.user_recipe.username
+        ingredients_list = [item.serialize() for item in self.recipe_ingredients_details]
+
         return {
             "id": self.id_recipe,
             "title": self.title,
             "steps": self.steps,
             "image": self.image,
             "prep_time_min": self.preparation_time_min,
-            "difficulty": self.difficulty.value,
+            "difficulty": difficulty,
             "portions": self.portions,
-            "status": self.state_recipe.value,
+            "status": status,
             "avg_rating": self.avg_rating,
             "vote_count": self.vote_count,
             "nutritional_data": self.nutritional_data,
             "creator_id": self.user_id,
-            "creator_name": creator_display_name,
             "category_id": self.category_id,
             "category_name": self.category_recipe.name_category,
             "ingredients": ingredients_list,
             "created_at": self.created_at.isoformat(),
-        }
+    }
 
 
 # Clase ingrediente (el catálogo)
@@ -235,12 +242,17 @@ class RecipeIngredient(db.Model):
         back_populates="recipe_ingredients_details")
 
     def serialize(self):
+        unit = (
+            self.unit_measure.value
+            if isinstance(self.unit_measure, enum.Enum)
+            else self.unit_measure
+        )
         return {
             "id": self.id_recipe_ingredient,
             "ingredient_id": self.ingredient_catalog_id,
             "name": self.ingredient_catalog.name,
             "quantity": self.quantity,
-            "unit_measure": self.unit_measure.value,
+            "unit_measure": unit,
         }
 
 
