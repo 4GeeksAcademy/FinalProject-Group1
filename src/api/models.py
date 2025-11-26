@@ -29,7 +29,9 @@ class User(db.Model):
         Boolean(), nullable=True, default=True)
 
     recipe_user: Mapped[List["Recipe"]] = relationship(
-        back_populates="user_recipe")
+        back_populates="user_recipe",
+        cascade="all, delete-orphan"
+    )
     recipe_ratings: Mapped[List["RecipeRating"]] = relationship(
         back_populates="user", cascade="all, delete-orphan")
     favorites: Mapped[List["RecipeFavorite"]] = relationship(
@@ -51,21 +53,12 @@ class User(db.Model):
                 "fullname": self.fullname,
                 "rol": self.rol,
                 "is_Active": self.is_active,
+                "created_at": self.created_at.isoformat(),
                 "image": initials_url
             }
 
-        return {
-            "id": self.id_user,
-            "username": self.username,
-            "email": self.email,
-            "fullname": self.fullname,
-            "rol": self.rol,
-            "is_Active": self.is_active,
-            "image": self.profile
-        }
-
-
 # Empieza código de categoría
+
 
 class Category(db.Model):
     __tablename__ = "categories"
@@ -90,7 +83,7 @@ class Category(db.Model):
             "name_category": self.name_category,
         }
 
-
+ 
 class difficultyEnum(enum.Enum):
     EASY = "fácil"
     MEDIUM = "medio"
@@ -139,7 +132,9 @@ class Recipe(db.Model):
         timezone.utc), onupdate=lambda: datetime.now(timezone.utc), nullable=False)
 
     user_id: Mapped[int] = mapped_column(
-        db.ForeignKey('user.id_user'), nullable=False)
+        db.ForeignKey('user.id_user', ondelete='CASCADE'),
+        nullable=False
+    )
     user_recipe: Mapped["User"] = relationship(back_populates="recipe_user")
 
     recipe_ingredients_details: Mapped[List["RecipeIngredient"]] = relationship(
