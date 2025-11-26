@@ -8,7 +8,7 @@ import enum
 
 db = SQLAlchemy()
 
- 
+
 class User(db.Model):
     id_user: Mapped[int] = mapped_column(primary_key=True)
     username: Mapped[str] = mapped_column(
@@ -29,9 +29,13 @@ class User(db.Model):
         Boolean(), nullable=True, default=True)
 
     recipe_user: Mapped[List["Recipe"]] = relationship(
-        back_populates="user_recipe")
-    recipe_ratings: Mapped[List["RecipeRating"]] = relationship(back_populates="user", cascade="all, delete-orphan")
-    favorites: Mapped[List["RecipeFavorite"]] = relationship(back_populates="user", cascade="all, delete-orphan")
+        back_populates="user_recipe",
+        cascade="all, delete-orphan"
+    )
+    recipe_ratings: Mapped[List["RecipeRating"]] = relationship(
+        back_populates="user", cascade="all, delete-orphan")
+    favorites: Mapped[List["RecipeFavorite"]] = relationship(
+        back_populates="user", cascade="all, delete-orphan")
 
     def __repr__(self):
         return f'<User {self.username}>'
@@ -52,6 +56,7 @@ class User(db.Model):
             }
 
 # Empieza código de categoría
+
 
 class Category(db.Model):
     __tablename__ = "categories"
@@ -76,7 +81,7 @@ class Category(db.Model):
             "name_category": self.name_category,
         }
 
-
+ 
 class difficultyEnum(enum.Enum):
     EASY = "fácil"
     MEDIUM = "medio"
@@ -125,19 +130,22 @@ class Recipe(db.Model):
         timezone.utc), onupdate=lambda: datetime.now(timezone.utc), nullable=False)
 
     user_id: Mapped[int] = mapped_column(
-        db.ForeignKey('user.id_user'), nullable=False)
+        db.ForeignKey('user.id_user', ondelete='CASCADE'),
+        nullable=False
+    )
     user_recipe: Mapped["User"] = relationship(back_populates="recipe_user")
 
     recipe_ingredients_details: Mapped[List["RecipeIngredient"]] = relationship(
         back_populates="recipe", cascade="all, delete-orphan")
-    ratings: Mapped[List["RecipeRating"]] = relationship(back_populates="recipe", cascade="all, delete-orphan")
-    favorites: Mapped[List["RecipeFavorite"]] = relationship(back_populates="recipe", cascade="all, delete-orphan")
+    ratings: Mapped[List["RecipeRating"]] = relationship(
+        back_populates="recipe", cascade="all, delete-orphan")
+    favorites: Mapped[List["RecipeFavorite"]] = relationship(
+        back_populates="recipe", cascade="all, delete-orphan")
 
     category_id: Mapped[int] = mapped_column(
         db.ForeignKey('categories.id_category'), nullable=False)
     category_recipe: Mapped["Category"] = relationship(
         back_populates="recipe_category")
-    
 
     def __repr__(self):
         return f'<Recipe {self.title}>'
@@ -242,12 +250,16 @@ class RecipeRating(db.Model):
     id_rating: Mapped[int] = mapped_column(primary_key=True)
     value: Mapped[int] = mapped_column(Integer, nullable=False)
     comment: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), nullable=False)
-    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(
+        timezone=True), default=lambda: datetime.now(timezone.utc), nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(
+        timezone.utc), onupdate=lambda: datetime.now(timezone.utc), nullable=False)
 
-    user_id: Mapped[int] = mapped_column(ForeignKey("user.id_user"), nullable=False)
+    user_id: Mapped[int] = mapped_column(
+        ForeignKey("user.id_user"), nullable=False)
     user: Mapped["User"] = relationship(back_populates="recipe_ratings")
-    recipe_id: Mapped[int] = mapped_column(ForeignKey("recipe.id_recipe"), nullable=False)
+    recipe_id: Mapped[int] = mapped_column(
+        ForeignKey("recipe.id_recipe"), nullable=False)
     recipe: Mapped["Recipe"] = relationship(back_populates="ratings")
 
     def __repr__(self):
@@ -268,9 +280,12 @@ class RecipeFavorite(db.Model):
     __tablename__ = "recipe_favorites"
 
     id_favorite: Mapped[int] = mapped_column(primary_key=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey("user.id_user"), nullable=False)
-    recipe_id: Mapped[int] = mapped_column(ForeignKey("recipe.id_recipe"), nullable=False)
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc),nullable=False)
+    user_id: Mapped[int] = mapped_column(
+        ForeignKey("user.id_user"), nullable=False)
+    recipe_id: Mapped[int] = mapped_column(
+        ForeignKey("recipe.id_recipe"), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(
+        timezone=True), default=lambda: datetime.now(timezone.utc), nullable=False)
 
     # Relaciones
     user: Mapped["User"] = relationship(back_populates="favorites")
