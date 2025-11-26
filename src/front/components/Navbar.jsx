@@ -3,7 +3,8 @@ import useGlobalReducer from "../hooks/useGlobalReducer.jsx";
 import useTheme from '../hooks/useTheme.jsx';
 import "../styles/navbar.css"
 
-const Navbar = () => {
+// AHORA USA EXPORTACIÓN NOMBRADA para coincidir con import { Navbar } de Layout.jsx
+export const Navbar = () => {
     const { store, dispatch } = useGlobalReducer();
     const { theme, toggleTheme } = useTheme();
 
@@ -80,7 +81,6 @@ const Navbar = () => {
                                 </NavLink>
                             ) : (
                                 <>
-                                    {/* Botón de Tema al lado del perfil, solo visible si está logueado */}
                                     <li className="nav-item d-flex align-items-center me-2">
                                         <button
                                             className={`btn btn-outline-secondary py-1 px-3 ${buttonTextClass} theme-toggle-button`}
@@ -133,5 +133,4 @@ const Navbar = () => {
         </nav >
     );
 };
-
-export default Navbar;
+export default Navbar

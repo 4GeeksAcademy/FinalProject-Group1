@@ -1,13 +1,11 @@
 import { Outlet } from "react-router-dom";
-import ScrollToTop from "../components/ScrollToTop";
-import { Navbar } from "../components/Navbar"; 
-import { Footer } from "../components/Footer"; 
-import useGlobalReducer from "../hooks/useGlobalReducer";
-import { useEffect } from "react"; 
+import ScrollToTop from "../components/ScrollToTop"; 
+import Navbar from "../components/Navbar"; 
+import Footer from "../components/Footer"; 
 import useTheme from '../hooks/useTheme.jsx';
 
 const Layout = () => {
-    const { theme } = useTheme();
+    useTheme();
 
     return (
         <div style={{ 
