@@ -21,6 +21,7 @@ import { CategoriesListView } from './pages/CategoriesListView';
 import { RecipeDetail } from "./pages/RecipeDetail";
 
 import AdminUsuarios from "./pages/AdminUsuarios";
+import UserDashboard from "./pages/UserDashboard";
 
 export const router = createBrowserRouter(
   createRoutesFromElements(
@@ -84,14 +85,16 @@ export const router = createBrowserRouter(
           <RejectedRecipes />
         </AdminProtectedRoute>
       } />
-       <Route path="/category/:categoryId" element={<CategoryView />} />
-       <Route path="/recipe/:recipeId" element={<RecipeDetail />} />
-       <Route path="/categories" element={<CategoriesListView />} />
+      <Route path="/category/:categoryId" element={<CategoryView />} />
+      <Route path="/recipe/:recipeId" element={<RecipeDetail />} />
+      <Route path="/categories" element={<CategoriesListView />} />
       <Route path="/administrar/users" element={
         <AdminProtectedRoute>
           <AdminUsuarios />
         </AdminProtectedRoute>
       } />
+
+      <Route path="/user/status" element={<ProtectedRoute><UserDashboard /></ProtectedRoute>} />
 
     </Route>
   )

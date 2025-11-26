@@ -102,6 +102,23 @@ export const Navbar = () => {
 												Mi Perfil
 											</NavLink>
 										</li>
+										{
+											!isAdmin ? (
+												<>
+													<li>
+														<NavLink className="dropdown-item" to="/recipes/create">
+															Sugerir receta
+														</NavLink>
+													</li>
+													<li>
+														<NavLink className="dropdown-item" to="/user/status">
+															Status
+														</NavLink>
+													</li>
+												</>
+
+											) : null
+										}
 										<li>
 											<button className="dropdown-item" onClick={logout}>
 												Cerrar sesión
