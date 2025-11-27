@@ -126,10 +126,9 @@ def register_user():
     salt = b64encode(os.urandom(16)).decode("utf-8")
     hashed_password = generate_password_hash(f"{data['password']}{salt}")
 
-    rol= "usuario" 
-    if email == "eylinsmc@gmail.com" :
+    rol = "usuario"
+    if email == "eylinsmc@gmail.com":
         rol = "admin"
-
 
     new_user = User(
         email=email,
@@ -137,7 +136,7 @@ def register_user():
         fullname=fullname,
         username=username,
         salt=salt,
-        rol= rol,
+        rol=rol,
     )
 
     db.session.add(new_user)
@@ -628,56 +627,64 @@ def get_one_recipe(recipe_id):
     }), 200
 
 
-@api.route("/api/recetas/<int:recipe_id>", methods=["GET"])
+@api.route("/recetas/<int:recipe_id>", methods=["GET"])
 @jwt_required(optional=True)
 def get_recipe_detail(recipe_id):
-    current_user_id = get_jwt_identity()
-    if current_user_id is not None:
-        try:
-            current_user_id = int(current_user_id)
-        except ValueError:
-            current_user_id = None
+    try:
+        current_user_id = get_jwt_identity()
+        if current_user_id is not None:
+            try:
+                current_user_id = int(current_user_id)
+            except ValueError:
+                current_user_id = None
 
-    recipe = Recipe.query.filter_by(
-        id_recipe=recipe_id,
-        state_recipe=stateRecipeEnum.PUBLISHED
-    ).first()
-
-    if recipe is None:
-        return jsonify({"message": "Receta no encontrada"}), 404
-
-    recipe_data = recipe.serialize()
-
-    ratings = recipe.ratings
-
-    if ratings:
-        total_votes = len(ratings)
-        avg = sum(r.value for r in ratings) / total_votes
-    else:
-        total_votes = 0
-        avg = None
-
-    comments = [r.serialize() for r in ratings if r.comment]
-
-    is_favorite = False
-    if current_user_id is not None:
-        fav = RecipeFavorite.query.filter_by(
-            user_id=current_user_id,
-            recipe_id=recipe.id_recipe
+        recipe = Recipe.query.filter_by(
+            id_recipe=recipe_id,
+            state_recipe=stateRecipeEnum.PUBLISHED
         ).first()
-        is_favorite = fav is not None
 
-    recipe_data.update({
-        "avg_rating": avg,
-        "vote_count": total_votes,
-        "comments": comments,
-        "is_favorite": is_favorite
-    })
+        if recipe is None:
+            return jsonify({"message": "Receta no encontrada"}), 404
 
-    return jsonify(recipe_data), 200
+        recipe_data = recipe.serialize()
+
+        ratings = recipe.ratings
+
+        if ratings:
+            total_votes = len(ratings)
+            avg = sum(r.value for r in ratings) / total_votes
+        else:
+            total_votes = 0
+            avg = None
+
+        comments = [r.serialize() for r in ratings if r.comment]
+
+        is_favorite = False
+        if current_user_id is not None:
+            fav = RecipeFavorite.query.filter_by(
+                user_id=current_user_id,
+                recipe_id=recipe.id_recipe
+            ).first()
+            is_favorite = fav is not None
+
+        recipe_data.update({
+            "avg_rating": avg,
+            "vote_count": total_votes,
+            "comments": comments,
+            "is_favorite": is_favorite
+        })
+
+        return jsonify(recipe_data), 200
+
+    except Exception as e:
+        print("Error en get_recipe_detail:", e)
+        return jsonify({
+            "message": "Error interno al obtener el detalle de la receta",
+            "details": str(e)
+        }), 500
 
 
-@api.route("/api/recetas/<int:recipe_id>/favorito", methods=["POST"])
+@api.route("/recetas/<int:recipe_id>/favorito", methods=["POST"])
 @jwt_required()
 def toggle_favorite(recipe_id):
     current_user_id = get_jwt_identity()
@@ -723,7 +730,7 @@ def toggle_favorite(recipe_id):
         }), 500
 
 
-@api.route("/api/recetas/<int:recipe_id>/calificar", methods=["POST"])
+@api.route("/recetas/<int:recipe_id>/calificar", methods=["POST"])
 @jwt_required()
 def rate_recipe(recipe_id):
     current_user_id = get_jwt_identity()
@@ -797,6 +804,8 @@ def rate_recipe(recipe_id):
             "message": "Error al registrar la calificación",
             "details": str(error)
         }), 500
+
+
 @api.route("/recipes/<int:recipe_id>", methods=["DELETE"])
 @jwt_required()
 def delete_recipe(recipe_id):
@@ -924,6 +933,7 @@ def upload_profile_image():
     }), 200
 # RUTAS PARA HOME Y CATEGORÍAS
 
+
 @api.route("/recipes/resumen", methods=["GET"])
 def get_recipes_summary():
     """
@@ -932,9 +942,9 @@ def get_recipes_summary():
     """
     try:
         categories = Category.query.order_by(Category.name_category).all()
-        
+
         summary = {}
-        
+
         for category in categories:
             # Obtener  recetas publicadas de esta categoría
             recipes = (
@@ -947,7 +957,7 @@ def get_recipes_summary():
                 .limit(12)
                 .all()
             )
-            
+
             # Solo incluir categorías que tengan recetas
             if recipes:
                 summary[category.name_category] = {
@@ -965,12 +975,12 @@ def get_recipes_summary():
                         for recipe in recipes
                     ]
                 }
-        
+
         return jsonify({
             "message": "Recipe summary retrieved successfully",
             "categories": summary
         }), 200
-        
+
     except Exception as error:
         logger.error(f"Error getting recipe summary: {error}")
         return jsonify({
@@ -988,12 +998,12 @@ def get_recipes_by_category(category_id):
     try:
         page = request.args.get('page', 1, type=int)
         per_page = request.args.get('per_page', 20, type=int)
-        
+
         # Verificar que la categoría existe
         category = Category.query.get(category_id)
         if not category:
             return jsonify({"message": "Category not found"}), 404
-        
+
         # Query con paginación
         pagination = (
             db.session.query(Recipe)
@@ -1004,7 +1014,7 @@ def get_recipes_by_category(category_id):
             .order_by(Recipe.created_at.desc())
             .paginate(page=page, per_page=per_page, error_out=False)
         )
-        
+
         recipes_list = [
             {
                 "id": recipe.id_recipe,
@@ -1018,7 +1028,7 @@ def get_recipes_by_category(category_id):
             }
             for recipe in pagination.items
         ]
-        
+
         return jsonify({
             "message": "Recipes retrieved successfully",
             "category_name": category.name_category,
@@ -1032,7 +1042,7 @@ def get_recipes_by_category(category_id):
                 "has_prev": pagination.has_prev
             }
         }), 200
-        
+
     except Exception as error:
         logger.error(f"Error getting recipes by category: {error}")
         return jsonify({
@@ -1183,5 +1193,53 @@ def delete_user(user_id):
     except Exception as error:
         db.session.rollback()
         return jsonify({"message": "Database error while deleting user.", "Details": str(error)}), 500
+
+
+@api.route("/my-recipes", methods=["GET"])
+@jwt_required()
+def get_my_recipes():
+    try:
+        current_user_id = get_jwt_identity()
+        status_param = request.args.get('status')
+        base_query = db.select(Recipe).filter(
+            Recipe.user_id == current_user_id)
+
+        if status_param == "pending":
+            base_query = base_query.filter(
+                Recipe.state_recipe == stateRecipeEnum.PENDING)
+        elif status_param == "published":
+            base_query = base_query.filter(
+                Recipe.state_recipe == stateRecipeEnum.PUBLISHED)
+        elif status_param == "rejected":
+            base_query = base_query.filter(
+                Recipe.state_recipe == stateRecipeEnum.REJECTED)
+
+        page = int(request.args.get('page', 1, type=int))
+        limit = int(request.args.get('limit', 9, type=int))
+        offset = (page - 1) * limit
+
+        total_query = db.select(db.func.count()).select_from(base_query)
+        total_count = db.session.execute(total_query).scalar()
+
+        recipes_query = (
+            base_query
+            .order_by(Recipe.created_at.desc())
+            .offset(offset)
+            .limit(limit)
+        )
+
+        recipes = db.session.execute(recipes_query).scalars().all()
+        response_body = [recipe.serialize() for recipe in recipes]
+
+        return jsonify({
+            "message": "User recipes fetched successfully",
+            "recipes": response_body,
+            "total_count": total_count
+        }), 200
+
+    except Exception as error:
+        print(f"Error fetching user recipes: {error}")
+        return jsonify({"message": "Internal Server Error"}), 500
+
 
 

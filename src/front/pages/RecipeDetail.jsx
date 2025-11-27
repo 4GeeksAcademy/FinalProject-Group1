@@ -1,12 +1,130 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { Link, useParams } from 'react-router-dom';
 import '../styles/recipeDetail.css';
 
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+
 export const RecipeDetail = () => {
-  // TODO: Implementar lógica de fetch por otro desarrollador
-  // Usar: import.meta.env.VITE_BACKEND_URL para la API URL
-  
-  const recipe = null; // Placeholder - conectar con API
+  const { recipeId } = useParams();
+
+  const [recipe, setRecipe] = useState(null);
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const token = localStorage.getItem('token');
+
+  // Detalle de receta
+  useEffect(() => {
+    const fetchRecipe = async () => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const res = await fetch(`${BACKEND_URL}/recetas/${recipeId}`, {
+          headers: {
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+        });
+
+        const text = await res.text();
+
+        if (!res.ok) {
+          let message = 'Error al cargar la receta';
+          try {
+            const errData = JSON.parse(text);
+            if (errData?.message) message = errData.message;
+          } catch {
+          }
+
+          if (res.status === 404) {
+            message = 'Receta no encontrada';
+          }
+
+          throw new Error(message);
+        }
+
+        let data;
+        try {
+          data = JSON.parse(text);
+        } catch {
+          throw new Error('Respuesta inválida del servidor (no es JSON)');
+        }
+
+        setRecipe(data);
+        setIsFavorite(Boolean(data.is_favorite));
+      } catch (err) {
+        console.error('Error en fetchRecipe:', err);
+        setError(err.message || 'Error al conectar con el servidor');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRecipe();
+  }, [recipeId, token]);
+
+  // Favoritos
+  const handleToggleFavorite = async () => {
+    if (!token) {
+      alert('Debes iniciar sesión para añadir a favoritos.');
+      return;
+    }
+
+    try {
+      const res = await fetch(`${BACKEND_URL}/recetas/${recipeId}/favorito`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const text = await res.text();
+      let data = {};
+      try {
+        data = JSON.parse(text);
+      } catch {
+        throw new Error('Respuesta inválida del servidor al actualizar favorito');
+      }
+
+      if (!res.ok) {
+        throw new Error(data.message || 'Error al actualizar favorito');
+      }
+
+      setIsFavorite(Boolean(data.is_favorite));
+    } catch (err) {
+      console.error('Error en favorito:', err);
+      alert(err.message || 'Error al actualizar favorito');
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="recipe-detail-container">
+        <Link to="/" className="back-button">
+          <i className="bi bi-arrow-left"></i> Volver
+        </Link>
+        <p>Cargando receta...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="recipe-detail-container">
+        <Link to="/" className="back-button">
+          <i className="bi bi-arrow-left"></i> Volver
+        </Link>
+        <div className="error-container">
+          <h2>Ups, algo salió mal</h2>
+          <p className="text-muted">{error}</p>
+          <Link to="/" className="btn btn-warning">
+            Volver al inicio
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   if (!recipe) {
     return (
@@ -16,12 +134,34 @@ export const RecipeDetail = () => {
         </Link>
         <div className="error-container">
           <h2>Receta no encontrada</h2>
-          <p className="text-muted">La funcionalidad será implementada próximamente</p>
-          <Link to="/" className="btn btn-warning">Volver al inicio</Link>
+          <p className="text-muted">
+            La funcionalidad será implementada próximamente
+          </p>
+          <Link to="/" className="btn btn-warning">
+            Volver al inicio
+          </Link>
         </div>
       </div>
     );
   }
+
+  const {
+    title,
+    difficulty,
+    prep_time_min,
+    portions,
+    category_name,
+    avg_rating,
+    vote_count,
+    image,
+    ingredients = [],
+    steps,
+    nutritional_data,
+  } = recipe;
+
+  const stepsList = steps
+    ? steps.split('\n').filter((step) => step.trim())
+    : [];
 
   return (
     <div className="recipe-detail-container">
@@ -31,42 +171,66 @@ export const RecipeDetail = () => {
 
       <div className="recipe-hero">
         <div className="recipe-hero-content">
-          <h1 className="recipe-detail-title">{recipe.title}</h1>
-          
+          <h1 className="recipe-detail-title">{title}</h1>
+
           <div className="recipe-badges">
             <span className="badge-item difficulty">
-              <i className="bi bi-speedometer2"></i> {recipe.difficulty}
+              <i className="bi bi-speedometer2"></i> {difficulty}
             </span>
             <span className="badge-item">
-              <i className="bi bi-clock"></i> {recipe.prep_time_min} min
+              <i className="bi bi-clock"></i> {prep_time_min} min
             </span>
             <span className="badge-item">
-              <i className="bi bi-people"></i> {recipe.portions} porciones
+              <i className="bi bi-people"></i> {portions} porciones
             </span>
             <span className="badge-item category">
-              <i className="bi bi-tag"></i> {recipe.category_name}
+              <i className="bi bi-tag"></i> {category_name}
             </span>
           </div>
 
-          {recipe.avg_rating && (
+          {avg_rating != null && (
             <div className="recipe-detail-rating">
               <div className="stars">
                 {[...Array(5)].map((_, i) => (
-                  <i 
+                  <i
                     key={i}
-                    className={`bi ${i < Math.round(recipe.avg_rating) ? 'bi-star-fill' : 'bi-star'}`}
+                    className={`bi ${
+                      i < Math.round(avg_rating)
+                        ? 'bi-star-fill'
+                        : 'bi-star'
+                    }`}
                   ></i>
                 ))}
               </div>
               <span className="rating-text">
-                {recipe.avg_rating.toFixed(1)} ({recipe.vote_count} valoraciones)
+                {avg_rating.toFixed(1)} ({vote_count} valoraciones)
               </span>
             </div>
           )}
+
+          {/* Botón favoritos */}
+          <div style={{ marginTop: '20px' }}>
+            <button
+              type="button"
+              className="badge-item"
+              onClick={handleToggleFavorite}
+              disabled={!token}
+              style={{ cursor: token ? 'pointer' : 'not-allowed' }}
+            >
+              <i
+                className={
+                  isFavorite ? 'bi bi-star-fill' : 'bi bi-star'
+                }
+              ></i>
+              {isFavorite
+                ? ' Quitar de favoritos'
+                : ' Añadir a favoritos'}
+            </button>
+          </div>
         </div>
 
         <div className="recipe-hero-image">
-          <img src={recipe.image} alt={recipe.title} />
+          <img src={image} alt={title} />
         </div>
       </div>
 
@@ -76,10 +240,12 @@ export const RecipeDetail = () => {
             <i className="bi bi-basket"></i> Ingredientes
           </h2>
           <div className="ingredients-list">
-            {recipe.ingredients.map((ingredient) => (
+            {ingredients.map((ingredient) => (
               <div key={ingredient.id} className="ingredient-item">
                 <span className="ingredient-bullet">•</span>
-                <span className="ingredient-name">{ingredient.name}</span>
+                <span className="ingredient-name">
+                  {ingredient.name}
+                </span>
                 <span className="ingredient-quantity">
                   {ingredient.quantity} {ingredient.unit_measure}
                 </span>
@@ -93,7 +259,7 @@ export const RecipeDetail = () => {
             <i className="bi bi-list-ol"></i> Preparación
           </h2>
           <div className="steps-content">
-            {recipe.steps.split('\n').filter(step => step.trim()).map((step, index) => (
+            {stepsList.map((step, index) => (
               <div key={index} className="step-item">
                 <div className="step-number">{index + 1}</div>
                 <p className="step-text">{step}</p>
@@ -103,13 +269,13 @@ export const RecipeDetail = () => {
         </div>
       </div>
 
-      {recipe.nutritional_data && (
+      {nutritional_data && (
         <div className="nutritional-section">
           <h2 className="section-title">
             <i className="bi bi-heart-pulse"></i> Información Nutricional
           </h2>
           <div className="nutritional-content">
-            <p>{recipe.nutritional_data}</p>
+            <p>{nutritional_data}</p>
           </div>
         </div>
       )}
