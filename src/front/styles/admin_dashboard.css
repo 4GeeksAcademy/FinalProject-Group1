@@ -1,19 +1,18 @@
 .bg-pinki {
-  background-color: #faedcd;
+  background-color: var(--color-background-tag);
 }
 
 .bg-verde {
-  background-color: #ccd5ae;
+  background-color: var(--color-background-pill);
 }
 
 .title-recipes {
-  background-color: #ccd5ae;
+  background-color: var(--color-background-pill);
 }
 
-
 .card-link {
-  text-decoration: none; 
-  color: inherit; 
+  text-decoration: none;
+  color: inherit;
 }
 
 .card-hover-effect {
@@ -21,10 +20,20 @@
   cursor: pointer;
 }
 
-
-.card-efect:hover {
-  transform: translateY(-5px); 
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2),
-              0 0 15px 5px #ccd5ae; 
+.dark-mode .bg-pinki {
+  background-color: var(--color-background-tag);
 }
 
+.dark-mode .bg-verde {
+  background-color: var(--color-background-pill);
+}
+
+.dark-mode .title-recipes {
+  background-color: var(--color-background-pill);
+  color: var(--color-text-main);
+}
+
+.card-efect:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2), 0 0 15px 5px #ccd5ae;
+}
