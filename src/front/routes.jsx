@@ -19,8 +19,8 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import { CategoryView } from "./pages/CategoryView";
 import { CategoriesListView } from './pages/CategoriesListView';
 import { RecipeDetail } from "./pages/RecipeDetail";
-
 import AdminUsuarios from "./pages/AdminUsuarios";
+import { SearchResults } from './pages/SearchResults';
 
 export const router = createBrowserRouter(
   createRoutesFromElements(
@@ -87,6 +87,7 @@ export const router = createBrowserRouter(
        <Route path="/category/:categoryId" element={<CategoryView />} />
        <Route path="/recipe/:recipeId" element={<RecipeDetail />} />
        <Route path="/categories" element={<CategoriesListView />} />
+       <Route path="/search" element={<SearchResults />} />
       <Route path="/administrar/users" element={
         <AdminProtectedRoute>
           <AdminUsuarios />
