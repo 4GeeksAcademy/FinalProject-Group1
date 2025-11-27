@@ -15,39 +15,46 @@
 .search-icon {
     position: absolute;
     left: 18px;
-    color: var(--color-tan);
+    /* Usar color de acento / resalte */
+    color: var(--color-text-highlight);
     font-size: 1.08rem;
     pointer-events: none;
+    transition: color 0.4s ease;
 }
 
 .search-input {
     width: 100%;
     padding: 14.4px 45px 14.4px 50px;
-    border: 2px solid var(--color-sage);
+    /* Usamos var(--color-border-main) */
+    border: 2px solid var(--color-border-main);
     border-radius: 27px;
     font-size: 1rem;
     font-weight: 500;
-    color: var(--color-dark);
-    background: white;
+    /* Usamos var(--color-text-main) */
+    color: var(--color-text-main);
+    /* Usamos var(--color-background-main) para que cambie en modo oscuro */
+    background: var(--color-background-main);
     transition: all 0.3s ease;
     box-shadow: 0 4.5px 18px rgba(0, 0, 0, 0.06);
 }
 
 .search-input:focus {
     outline: none;
-    border-color: var(--color-tan);
+    /* Usamos color de resalte para el foco */
+    border-color: var(--color-text-highlight);
     box-shadow: 0 4.5px 22.5px rgba(212, 163, 115, 0.2);
 }
 
 .search-input::placeholder {
-    color: #999;
+    color: var(--color-text-meta); /* Usamos un color sutil */
     font-weight: 400;
 }
 
 .clear-search-btn {
     position: absolute;
     right: 18px;
-    background: var(--color-cream);
+    /* Usamos variables de fondo */
+    background: var(--color-background-section);
     border: none;
     width: 27px;
     height: 27px;
@@ -57,12 +64,12 @@
     justify-content: center;
     cursor: pointer;
     transition: all 0.3s ease;
-    color: var(--color-dark);
+    color: var(--color-text-main);
 }
 
 .clear-search-btn:hover {
-    background: var(--color-tan);
-    color: white;
+    background: var(--color-text-highlight); /* Usamos el color principal para el hover */
+    color: white; /* Texto blanco sobre el color principal */
 }
 
 .search-dropdown {
@@ -70,12 +77,14 @@
     top: calc(100% + 9px);
     left: 0;
     right: 0;
-    background: white;
+    /* Usamos variables de fondo y borde */
+    background: var(--color-background-section);
     border-radius: 18px;
     box-shadow: 0 9px 36px rgba(0, 0, 0, 0.12);
     max-height: 270px;
     overflow-y: auto;
-    border: 2px solid var(--color-light-sage);
+    border: 2px solid var(--color-border-main);
+    transition: background 0.4s ease, border-color 0.4s ease;
 }
 
 .dropdown-item {
@@ -85,7 +94,8 @@
     padding: 13.5px 18px;
     cursor: pointer;
     transition: all 0.2s ease;
-    border-bottom: 1px solid #f5f5f5;
+    border-bottom: 1px solid var(--color-border-main);
+    color: var(--color-text-main);
 }
 
 .dropdown-item:last-child {
@@ -93,34 +103,35 @@
 }
 
 .dropdown-item:hover {
-    background: var(--color-cream);
+    background: var(--color-background-tag); /* Fondo claro de hover */
 }
 
 .dropdown-item i {
-    color: var(--color-tan);
+    color: var(--color-text-highlight);
     font-size: 1rem;
+    transition: color 0.4s ease;
 }
 
 .dropdown-item span {
     font-weight: 500;
-    color: var(--color-dark);
+    color: var(--color-text-main);
 }
 
 .dropdown-item.no-results {
     cursor: default;
-    color: #999;
+    color: var(--color-text-meta);
 }
 
 .dropdown-item.no-results:hover {
-    background: white;
+    background: var(--color-background-section); /* Evitar hover en modo oscuro */
 }
 
 .dropdown-item.no-results i {
-    color: #ccc;
+    color: var(--color-border-main);
 }
 
 .dropdown-item.no-results span {
-    color: #999;
+    color: var(--color-text-meta);
 }
 
 /* ===== CATEGORIES GRID ===== */
@@ -136,7 +147,8 @@
 
 /* ===== CATEGORY CARD ===== */
 .category-card {
-    background: white;
+    /* Fondo de tarjeta ajustado a la variable */
+    background: var(--color-background-section);
     border-radius: 18px;
     padding: 27px;
     display: flex;
@@ -151,14 +163,17 @@
 
 .category-card:hover {
     transform: translateY(-7.2px);
-    box-shadow: 0 13.5px 40.5px rgba(0, 0, 0, 0.12);
-    border-color: var(--color-tan);
+    /* Mantener box-shadow semi-fijo o ajustar al modo oscuro si deseas un efecto más sutil */
+    box-shadow: 0 13.5px 40.5px rgba(0, 0, 0, 0.12); 
+    /* Borde de hover usa el color de acento */
+    border-color: var(--color-text-highlight);
 }
 
 .category-card-icon {
     width: 63px;
     height: 63px;
-    background: linear-gradient(135deg, var(--color-cream), var(--color-peach));
+    /* Usamos las variables para los gradientes */
+    background: var(--color-background-tag); 
     border-radius: 16.2px;
     display: flex;
     align-items: center;
@@ -168,17 +183,18 @@
 }
 
 .category-card:hover .category-card-icon {
-    background: linear-gradient(135deg, var(--color-tan), var(--color-orange));
+    /* Gradiente ajustado al hover principal */
+    background: var(--color-text-highlight); 
 }
 
 .category-card-icon i {
     font-size: 1.62rem;
-    color: var(--color-tan);
+    color: var(--color-text-highlight);
     transition: all 0.3s ease;
 }
 
 .category-card:hover .category-card-icon i {
-    color: white;
+    color: var(--color-background-main); /* Blanco o fondo principal para contraste */
 }
 
 .category-card-content {
@@ -188,13 +204,13 @@
 .category-card-title {
     font-size: 1.17rem;
     font-weight: 700;
-    color: var(--color-dark);
+    color: var(--color-text-title);
     margin: 0 0 6.3px 0;
     transition: color 0.3s ease;
 }
 
 .category-card:hover .category-card-title {
-    color: var(--color-tan);
+    color: var(--color-text-highlight);
 }
 
 .category-card-link {
@@ -203,7 +219,7 @@
     gap: 6.3px;
     font-size: 0.855rem;
     font-weight: 600;
-    color: var(--color-tan);
+    color: var(--color-text-highlight);
 }
 
 .category-card-link i {
