@@ -1050,6 +1050,63 @@ def get_recipes_by_category(category_id):
             "details": str(error)
         }), 500
 
+# ENDPOINT DE BÚSQUEDA DE RECETAS
+# Permite buscar recetas por título para el componente SearchResults
+
+@api.route("/recipes/search", methods=["GET"])
+def search_recipes():
+    """
+    Busca recetas por título
+    Query param: q (término de búsqueda)
+    """
+    try:
+        query = request.args.get('q', '').strip()
+        
+        if not query or len(query) < 2:
+            return jsonify({
+                "message": "Search term must be at least 2 characters",
+                "recipes": []
+            }), 400
+        
+        # Buscar recetas publicadas que coincidan con el término
+        recipes = (
+            db.session.query(Recipe)
+            .filter(
+                Recipe.title.ilike(f'%{query}%'),
+                Recipe.state_recipe == stateRecipeEnum.PUBLISHED
+            )
+            .order_by(Recipe.created_at.desc())
+            .limit(50)
+            .all()
+        )
+        
+        recipes_list = [
+            {
+                "id": recipe.id_recipe,
+                "title": recipe.title,
+                "image": recipe.image,
+                "portions": recipe.portions,
+                "prep_time_min": recipe.preparation_time_min,
+                "difficulty": recipe.difficulty.value,
+                "avg_rating": recipe.avg_rating,
+                "vote_count": recipe.vote_count
+            }
+            for recipe in recipes
+        ]
+        
+        return jsonify({
+            "message": "Search completed successfully",
+            "recipes": recipes_list,
+            "total": len(recipes_list)
+        }), 200
+        
+    except Exception as error:
+        print(f"Error searching recipes: {error}")
+        return jsonify({
+            "message": "Error performing search",
+            "details": str(error),
+            "recipes": []
+        }), 500
 
 @api.route("/admin/users", methods=["GET"])
 @admin_required()

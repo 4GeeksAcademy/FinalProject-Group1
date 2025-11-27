@@ -1,4 +1,4 @@
-/* ===== SEARCH DROPDOWN ===== */
+/* ===== SEARCH BAR ===== */
 .search-dropdown-container {
     max-width: 450px;
     margin: 36px auto 0;
@@ -24,9 +24,8 @@
 
 .search-input {
     width: 100%;
-    padding: 14.4px 45px 14.4px 50px;
-    /* Usamos var(--color-border-main) */
-    border: 2px solid var(--color-border-main);
+    padding: 14.4px 50px 14.4px 50px;
+    border: 2px solid var(--color-sage);
     border-radius: 27px;
     font-size: 1rem;
     font-weight: 500;
@@ -35,7 +34,7 @@
     /* Usamos var(--color-background-main) para que cambie en modo oscuro */
     background: var(--color-background-main);
     transition: all 0.3s ease;
-    box-shadow: 0 4.5px 18px rgba(0, 0, 0, 0.06);
+    box-shadow: 0 4.5px 18px rgba(0, 0, 0, 0.08);
 }
 
 .search-input:focus {
