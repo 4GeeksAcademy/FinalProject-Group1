@@ -627,55 +627,64 @@ def get_one_recipe(recipe_id):
     }), 200
 
 
-@api.route("/api/recetas/<int:recipe_id>", methods=["GET"])
+@api.route("/recetas/<int:recipe_id>", methods=["GET"])
 @jwt_required(optional=True)
 def get_recipe_detail(recipe_id):
-    current_user_id = get_jwt_identity()
-    if current_user_id is not None:
-        try:
-            current_user_id = int(current_user_id)
-        except ValueError:
-            current_user_id = None
+    try:
+        current_user_id = get_jwt_identity()
+        if current_user_id is not None:
+            try:
+                current_user_id = int(current_user_id)
+            except ValueError:
+                current_user_id = None
 
-    recipe = Recipe.query.filter_by(
-        id_recipe=recipe_id,
-        state_recipe=stateRecipeEnum.PUBLISHED
-    ).first()
-
-    if recipe is None:
-        return jsonify({"message": "Receta no encontrada"}), 404
-
-    recipe_data = recipe.serialize()
-
-    ratings = recipe.ratings
-
-    if ratings:
-        total_votes = len(ratings)
-        avg = sum(r.value for r in ratings) / total_votes
-    else:
-        total_votes = 0
-        avg = None
-
-    comments = [r.serialize() for r in ratings if r.comment]
-
-    is_favorite = False
-    if current_user_id is not None:
-        fav = RecipeFavorite.query.filter_by(
-            user_id=current_user_id,
-            recipe_id=recipe.id_recipe
+        recipe = Recipe.query.filter_by(
+            id_recipe=recipe_id,
+            state_recipe=stateRecipeEnum.PUBLISHED
         ).first()
-        is_favorite = fav is not None
 
-    recipe_data.update({
-        "avg_rating": avg,
-        "vote_count": total_votes,
-        "comments": comments,
-        "is_favorite": is_favorite
-    })
+        if recipe is None:
+            return jsonify({"message": "Receta no encontrada"}), 404
 
-    return jsonify(recipe_data), 200
+        recipe_data = recipe.serialize()
 
-@api.route("/api/recetas/<int:recipe_id>/favorito", methods=["POST"])
+        ratings = recipe.ratings
+
+        if ratings:
+            total_votes = len(ratings)
+            avg = sum(r.value for r in ratings) / total_votes
+        else:
+            total_votes = 0
+            avg = None
+
+        comments = [r.serialize() for r in ratings if r.comment]
+
+        is_favorite = False
+        if current_user_id is not None:
+            fav = RecipeFavorite.query.filter_by(
+                user_id=current_user_id,
+                recipe_id=recipe.id_recipe
+            ).first()
+            is_favorite = fav is not None
+
+        recipe_data.update({
+            "avg_rating": avg,
+            "vote_count": total_votes,
+            "comments": comments,
+            "is_favorite": is_favorite
+        })
+
+        return jsonify(recipe_data), 200
+
+    except Exception as e:
+        print("Error en get_recipe_detail:", e)
+        return jsonify({
+            "message": "Error interno al obtener el detalle de la receta",
+            "details": str(e)
+        }), 500
+
+
+@api.route("/recetas/<int:recipe_id>/favorito", methods=["POST"])
 @jwt_required()
 def toggle_favorite(recipe_id):
     current_user_id = get_jwt_identity()
@@ -721,7 +730,7 @@ def toggle_favorite(recipe_id):
         }), 500
 
 
-@api.route("/api/recetas/<int:recipe_id>/calificar", methods=["POST"])
+@api.route("/recetas/<int:recipe_id>/calificar", methods=["POST"])
 @jwt_required()
 def rate_recipe(recipe_id):
     current_user_id = get_jwt_identity()
@@ -1155,6 +1164,63 @@ def get_recipes_by_category(category_id):
             "details": str(error)
         }), 500
 
+# ENDPOINT DE BÚSQUEDA DE RECETAS
+# Permite buscar recetas por título para el componente SearchResults
+
+@api.route("/recipes/search", methods=["GET"])
+def search_recipes():
+    """
+    Busca recetas por título
+    Query param: q (término de búsqueda)
+    """
+    try:
+        query = request.args.get('q', '').strip()
+        
+        if not query or len(query) < 2:
+            return jsonify({
+                "message": "Search term must be at least 2 characters",
+                "recipes": []
+            }), 400
+        
+        # Buscar recetas publicadas que coincidan con el término
+        recipes = (
+            db.session.query(Recipe)
+            .filter(
+                Recipe.title.ilike(f'%{query}%'),
+                Recipe.state_recipe == stateRecipeEnum.PUBLISHED
+            )
+            .order_by(Recipe.created_at.desc())
+            .limit(50)
+            .all()
+        )
+        
+        recipes_list = [
+            {
+                "id": recipe.id_recipe,
+                "title": recipe.title,
+                "image": recipe.image,
+                "portions": recipe.portions,
+                "prep_time_min": recipe.preparation_time_min,
+                "difficulty": recipe.difficulty.value,
+                "avg_rating": recipe.avg_rating,
+                "vote_count": recipe.vote_count
+            }
+            for recipe in recipes
+        ]
+        
+        return jsonify({
+            "message": "Search completed successfully",
+            "recipes": recipes_list,
+            "total": len(recipes_list)
+        }), 200
+        
+    except Exception as error:
+        print(f"Error searching recipes: {error}")
+        return jsonify({
+            "message": "Error performing search",
+            "details": str(error),
+            "recipes": []
+        }), 500
 
 @api.route("/admin/users", methods=["GET"])
 @admin_required()

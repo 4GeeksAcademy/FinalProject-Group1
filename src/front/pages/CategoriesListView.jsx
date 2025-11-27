@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import "../styles/categoriesListView.css";
 
@@ -8,42 +8,13 @@ const getApiUrl = () => {
 
 export const CategoriesListView = () => {
     const [categories, setCategories] = useState([]);
-    const [filteredCategories, setFilteredCategories] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
-    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [loading, setLoading] = useState(true);
     const [currentPage, setCurrentPage] = useState(1);
     const categoriesPerPage = 25;
-    const dropdownRef = useRef(null);
 
     useEffect(() => {
         fetchCategories();
-    }, []);
-
-    useEffect(() => {
-        // Filtrar categorías según el término de búsqueda
-        if (searchTerm.trim() === '') {
-            setFilteredCategories(categories);
-        } else {
-            const filtered = categories.filter(category =>
-                category.name_category.toLowerCase().includes(searchTerm.toLowerCase())
-            );
-            setFilteredCategories(filtered);
-        }
-        // Resetear a la primera página cuando cambia el filtro
-        setCurrentPage(1);
-    }, [searchTerm, categories]);
-
-    useEffect(() => {
-        // Cerrar dropdown al hacer click fuera
-        const handleClickOutside = (event) => {
-            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-                setIsDropdownOpen(false);
-            }
-        };
-
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
     const fetchCategories = async () => {
@@ -54,7 +25,6 @@ export const CategoriesListView = () => {
 
             if (response.ok) {
                 setCategories(data);
-                setFilteredCategories(data);
             }
         } catch (error) {
             console.error('Error fetching categories:', error);
@@ -63,28 +33,15 @@ export const CategoriesListView = () => {
         }
     };
 
-    const handleSearchChange = (e) => {
-        setSearchTerm(e.target.value);
-        setIsDropdownOpen(true);
-    };
-
-    const handleCategorySelect = (category) => {
-        setSearchTerm(category.name_category);
-        setIsDropdownOpen(false);
-        // Filtrar para mostrar solo esa categoría
-        setFilteredCategories([category]);
-    };
-
-    const clearSearch = () => {
-        setSearchTerm('');
-        setFilteredCategories(categories);
-        setIsDropdownOpen(false);
-    };
-
     const handlePageChange = (newPage) => {
         setCurrentPage(newPage);
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
+
+    // Filtrar categorías según búsqueda
+    const filteredCategories = categories.filter(category =>
+        category.name_category.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
     // Calcular categorías para la página actual
     const indexOfLastCategory = currentPage * categoriesPerPage;
@@ -127,8 +84,8 @@ export const CategoriesListView = () => {
                     </p>
                 </div>
 
-                {/* Search Dropdown */}
-                <div className="search-dropdown-container" ref={dropdownRef}>
+                {/* Search Bar */}
+                <div className="search-dropdown-container">
                     <div className="search-input-wrapper">
                         <i className="fa-solid fa-search search-icon"></i>
                         <input
@@ -136,41 +93,14 @@ export const CategoriesListView = () => {
                             className="search-input"
                             placeholder="Buscar categoría..."
                             value={searchTerm}
-                            onChange={handleSearchChange}
-                            onFocus={() => setIsDropdownOpen(true)}
+                            onChange={(e) => setSearchTerm(e.target.value)}
                         />
                         {searchTerm && (
-                            <button className="clear-search-btn" onClick={clearSearch}>
+                            <button className="clear-search-btn" onClick={() => setSearchTerm('')}>
                                 <i className="fa-solid fa-times"></i>
                             </button>
                         )}
                     </div>
-
-                    {isDropdownOpen && searchTerm && (
-                        <div className="search-dropdown">
-                            {categories.filter(cat => 
-                                cat.name_category.toLowerCase().includes(searchTerm.toLowerCase())
-                            ).length > 0 ? (
-                                categories
-                                    .filter(cat => cat.name_category.toLowerCase().includes(searchTerm.toLowerCase()))
-                                    .map((category) => (
-                                        <div
-                                            key={category.id}
-                                            className="dropdown-item"
-                                            onClick={() => handleCategorySelect(category)}
-                                        >
-                                            <i className="fa-solid fa-utensils"></i>
-                                            <span>{category.name_category}</span>
-                                        </div>
-                                    ))
-                            ) : (
-                                <div className="dropdown-item no-results">
-                                    <i className="fa-solid fa-search"></i>
-                                    <span>No se encontraron categorías</span>
-                                </div>
-                            )}
-                        </div>
-                    )}
                 </div>
             </div>
 
@@ -178,13 +108,31 @@ export const CategoriesListView = () => {
             {filteredCategories.length === 0 ? (
                 <div className="no-recipes-modern">
                     <div className="empty-state-category">
-                        <i className="fa-solid fa-folder-open"></i>
-                        <h3>No hay categorías disponibles</h3>
-                        <p>Aún no se han creado categorías</p>
-                        <Link to="/" className="btn-back-home">
-                            <i className="fa-solid fa-house"></i>
-                            Volver al inicio
-                        </Link>
+                        <i className="fa-solid fa-inbox"></i>
+                        <h3>
+                            {searchTerm 
+                                ? 'No se encontraron categorías con ese criterio' 
+                                : 'No hay categorías disponibles'}
+                        </h3>
+                        <p>
+                            {searchTerm 
+                                ? 'Intenta con otro término de búsqueda' 
+                                : 'Aún no se han creado categorías'}
+                        </p>
+                        {searchTerm ? (
+                            <button 
+                                onClick={() => setSearchTerm('')}
+                                className="btn-back-home"
+                            >
+                                <i className="fa-solid fa-rotate-left"></i>
+                                Limpiar búsqueda
+                            </button>
+                        ) : (
+                            <Link to="/" className="btn-back-home">
+                                <i className="fa-solid fa-house"></i>
+                                Volver al inicio
+                            </Link>
+                        )}
                     </div>
                 </div>
             ) : (
@@ -211,7 +159,7 @@ export const CategoriesListView = () => {
                     </div>
 
                     {/* Pagination */}
-                    {totalPages > 1 && (
+                    {!searchTerm && totalPages > 1 && (
                         <div className="pagination-modern">
                             <button
                                 className="pagination-btn"
