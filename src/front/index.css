@@ -1,4 +1,52 @@
+/* Ocultar scrollbar en toda la página y prevenir scroll horizontal */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
+html {
+  width: 100%;
+  overflow-x: hidden;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+html::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  overflow-x: hidden;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+body::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+/* Asegurar que el root no tenga problemas */
+#root {
+  width: 100%;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+.profile-photo-navbar {
+  width: 3rem;
+  height: 3rem;
+  display: inline-block;
+  background-color: #6c757d;
+  border-radius: 50%;
+  text-align: center;
+  line-height: 1rem;
+  color: white;
+  font-size: 0.5rem;
+}
 :root {
   /* Modo Claro (Valores basados en tu CSS original) */
   --color-text-main: #333333;
@@ -329,4 +377,7 @@ body {
     background-color: var(--color-background-tag); 
     color: var(--color-text-title); 
     border-color: var(--color-text-highlight);
+  .admin-title {
+    font-size: 1.4rem;
+  }
 }
