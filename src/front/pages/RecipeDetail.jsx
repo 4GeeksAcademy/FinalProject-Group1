@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import '../styles/recipeDetail.css';
+import BannerRecetas from "../assets/img/BannerRecetas.png";
+import useGlobalReducer from "../hooks/useGlobalReducer.jsx";
 import Comment from './Comment';
 
 
@@ -9,12 +11,65 @@ const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 export const RecipeDetail = () => {
   const { recipeId } = useParams();
 
+  const { store } = useGlobalReducer();
+  const token = store.token;
+
   const [recipe, setRecipe] = useState(null);
   const [isFavorite, setIsFavorite] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const token = localStorage.getItem('token');
+  const [userRating, setUserRating] = useState(0);
+  const [hoverRating, setHoverRating] = useState(0);
+  const [isRatingLoading, setIsRatingLoading] = useState(false);
+
+
+  if (!token) {
+    return (
+      <div className='info'>
+        <Link to="/" className="back-button positions">
+          <i className="bi bi-arrow-left"></i> Volver
+        </Link>
+
+        <img
+          src={BannerRecetas}
+          alt="pareja cocinando"
+          className='image-sesion'
+        />
+
+        <h1 className='title-sesion '>
+          <i className="fa-solid fa-lock pe-4" ></i>
+          Acceso Requerido
+        </h1>
+
+        <p className='comment-sesion'>
+          **Debes iniciar sesión para ver los detalles de la receta.**
+        </p>
+
+        <div className="action-buttons">
+          {/* Botón para ir a Iniciar Sesión */}
+          <Link
+            to="/login"
+            className="btn btn-warning btn-sesion"
+          >
+            Iniciar Sesión
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+
+  if (!recipeId) {
+    return (
+      <div className="recipe-detail-container">
+        <Link to="/" className="back-button">
+          <i className="bi bi-arrow-left"></i> Volver
+        </Link>
+        <p>Esperando ID de la receta...</p>
+      </div>
+    );
+  }
 
   // Detalle de receta
   useEffect(() => {
@@ -22,6 +77,11 @@ export const RecipeDetail = () => {
       setLoading(true);
       setError(null);
 
+      if (!recipeId) {
+        console.error("Error: recipeId es indefinido. No se puede cargar la receta.");
+        setLoading(false);
+        return; // Detiene la ejecución del fetch
+      }
       try {
         const res = await fetch(`${BACKEND_URL}/recetas/${recipeId}`, {
           headers: {
@@ -55,6 +115,7 @@ export const RecipeDetail = () => {
 
         setRecipe(data);
         setIsFavorite(Boolean(data.is_favorite));
+        setUserRating(data.user_rating || 0);
       } catch (err) {
         console.error('Error en fetchRecipe:', err);
         setError(err.message || 'Error al conectar con el servidor');
@@ -63,8 +124,59 @@ export const RecipeDetail = () => {
       }
     };
 
-    fetchRecipe();
+    if (token && recipeId) {
+      fetchRecipe();
+    }
   }, [recipeId, token]);
+
+
+  const handleRate = async (ratingValue) => {
+    if (!token) {
+      alert('Debes iniciar sesión para calificar.');
+      return;
+    }
+    if (isRatingLoading) return; // Evita clics dobles
+
+    setIsRatingLoading(true);
+
+    try {
+      const res = await fetch(`${BACKEND_URL}/recipe/${recipeId}/rate`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ rating: ratingValue }),
+      });
+
+      const text = await res.text();
+      let data;
+      try {
+        data = JSON.parse(text);
+      } catch {
+        throw new Error('Respuesta inválida del servidor al calificar');
+      }
+
+      if (!res.ok) {
+        throw new Error(data.message || 'Error al enviar la calificación');
+      }
+
+      setUserRating(ratingValue);
+
+      setRecipe((prevRecipe) => ({
+        ...prevRecipe,
+        avg_rating: data.avg_rating,
+        vote_count: data.vote_count,
+      }));
+
+      console.log(data.message);
+    } catch (err) {
+      console.error('Error al calificar:', err);
+      alert(err.message || 'Error al calificar la receta.');
+    } finally {
+      setIsRatingLoading(false);
+    }
+  };
 
   // Favoritos
   const handleToggleFavorite = async () => {
@@ -190,28 +302,32 @@ export const RecipeDetail = () => {
             </span>
           </div>
 
-          {avg_rating != null && (
-            <div className="recipe-detail-rating">
-              <div className="stars">
-                {[...Array(5)].map((_, i) => (
+          <div className="recipe-detail-rating recipe-global-rating"
+            onMouseLeave={() => token && setHoverRating(0)}>
+            <div className={`stars ${token ? 'stars-interactive' : ''} ${isRatingLoading ? 'disabled' : ''}`}>
+              {[...Array(5)].map((_, i) => {
+                const starValue = i + 1;
+                const displayValue = hoverRating 
+                  || userRating
+                  || (token ? 0 : (recipe.avg_rating || 0));
+                return (
                   <i
-                    key={i}
-                    className={`bi ${
-                      i < Math.round(avg_rating)
-                        ? 'bi-star-fill'
-                        : 'bi-star'
-                    }`}
+                    key={`avg-${i}`}
+                    className={`bi ${starValue <= displayValue
+                      ? 'bi-star-fill'
+                      : 'bi-star'
+                      } ${token ? 'clickable star-item' : ''}`} 
+                    onMouseEnter={() => token && setHoverRating(starValue)}
+                    onClick={() => token && handleRate(starValue)}
                   ></i>
-                ))}
-              </div>
-              <span className="rating-text">
-                {avg_rating.toFixed(1)} ({vote_count} valoraciones)
-              </span>
+                );
+              })}
             </div>
-          )}
-
-          {/* Botón favoritos */}
-          <div style={{ marginTop: '20px' }}>
+            <span className="rating-text">
+              Promedio: {(recipe.avg_rating || 0).toFixed(1)} | Votos: {recipe.vote_count || 0}
+            </span>
+          </div>
+          <div className='mt-4'>
             <button
               type="button"
               className="badge-item"

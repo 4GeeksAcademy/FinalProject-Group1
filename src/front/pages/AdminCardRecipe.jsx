@@ -70,7 +70,7 @@ const AdminCardRecipe = ({ recipes, title, handleDelete, handleStatusChange, ico
                                         )}
                                     </span>
                                     <span className="mt-3">
-                                        <Link to={"/"}><i className="fa-solid fa-book fa-lg mx-3"></i></Link>
+                                        <Link to={`/recipe/${item.id}`}><i className="fa-solid fa-book fa-lg mx-3"></i></Link>
                                         <Link to={`recipes/edit/${item.id}`}><i className="fa-solid fa-pencil fa-lg mx-3 text-success"></i></Link>
                                         <button
                                             onClick={() => handleDelete(item.id)}

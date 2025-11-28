@@ -86,11 +86,12 @@ export const router = createBrowserRouter(
         </AdminProtectedRoute>
       } />
        <Route path="/category/:categoryId" element={<CategoryView />} />
-       <Route path="/recipe/:recipeId" element={<RecipeDetail />} />
+       {/* <Route path="/recipe/:recipeId" element={<RecipeDetail />} /> */}
        <Route path="/categories" element={<CategoriesListView />} />
        <Route path="/search" element={<SearchResults />} />
       <Route path="/category/:categoryId" element={<CategoryView />} />
       <Route path="/recipe/:recipeId" element={<RecipeDetail />} />
+      
       <Route path="/categories" element={<CategoriesListView />} />
       <Route path="/administrar/users" element={
         <AdminProtectedRoute>
@@ -99,7 +100,7 @@ export const router = createBrowserRouter(
       } />
 
       <Route path="/user/status" element={<ProtectedRoute><UserDashboard /></ProtectedRoute>} />
-
+      
     </Route>
   )
 ); 

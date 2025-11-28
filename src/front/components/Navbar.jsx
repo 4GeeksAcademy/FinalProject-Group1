@@ -1,4 +1,4 @@
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import useGlobalReducer from "../hooks/useGlobalReducer.jsx";
 import useTheme from '../hooks/useTheme.jsx';
 import "../styles/navbar.css"
@@ -7,12 +7,14 @@ import "../styles/navbar.css"
 export const Navbar = () => {
     const { store, dispatch } = useGlobalReducer();
     const { theme, toggleTheme } = useTheme();
+    const navigate = useNavigate();
 
     const logout = () => {
         dispatch({ type: "SET_TOKEN", payload: null })
         dispatch({ type: "SET_USER", payload: null })
         localStorage.removeItem("access_token")
         localStorage.removeItem("user")
+        navigate("/");
     }
 
 
@@ -20,7 +22,7 @@ export const Navbar = () => {
     const icon = theme === 'light' ? '🌙' : '☀️';
     const buttonLabel = theme === 'light' ? 'Cambiar a modo oscuro' : 'Cambiar a modo claro';
     const buttonTextClass = theme === 'dark' ? 'text-white' : 'text-black';
-    
+
     const userRole = store.user ? store.user.rol : null;
     const isAdmin = userRole === "admin";
 
