@@ -390,29 +390,26 @@
   margin-bottom: 5px;
 }
 
-/* Contenedor interactivo de estrellas */
+
 .stars-interactive {
-  font-size: 1.5rem; /* Tamaño de las estrellas */
-  color: orange; /* Color de las estrellas */
+  font-size: 1.5rem;
+  color: orange; 
   display: flex;
   gap: 2px;
 }
 
-/* Estrellas individuales */
 .star-item {
   transition: transform 0.1s ease-in-out;
 }
 
-/* Cursor y efecto al ser interactivas */
 .stars-interactive .clickable {
   cursor: pointer;
 }
 
 .stars-interactive .clickable:hover {
-  transform: scale(1.1); /* Efecto sutil al pasar el ratón */
+  transform: scale(1.1);
 }
 
-/* Estado de cargando */
 .stars-interactive.disabled .star-item {
   cursor: not-allowed;
   opacity: 0.6;
@@ -421,7 +418,7 @@
 .rating-loading {
   margin-top: 5px;
   font-size: 0.9em;
-  color: #007bff; /* Un color de acento para la carga */
+  color: #007bff;
 }
 
 .rating-login-prompt {
@@ -430,9 +427,9 @@
   color: #6c757d;
 }
 
-/* Opcional: Para diferenciar el rating global del interactivo */
+
 .recipe-global-rating .stars {
-  color: gold; /* Color de las estrellas de promedio */
+  color: gold;
   font-size: 1.2rem;
 }
 
