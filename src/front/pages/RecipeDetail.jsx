@@ -3,6 +3,8 @@ import { Link, useParams } from 'react-router-dom';
 import '../styles/recipeDetail.css';
 import BannerRecetas from "../assets/img/BannerRecetas.png";
 import useGlobalReducer from "../hooks/useGlobalReducer.jsx";
+import Comment from './Comment';
+
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
@@ -395,6 +397,9 @@ export const RecipeDetail = () => {
           </div>
         </div>
       )}
+
+      <Comment recipeId={recipeId} />
+
     </div>
   );
 };
