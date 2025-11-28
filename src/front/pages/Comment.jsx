@@ -22,6 +22,26 @@ const Comment = ({ recipeId }) => {
 
     const currentUserId = getUserIdFromToken();
 
+    const timeAgo = (dateString) => {
+        const date = new Date(dateString);
+        const seconds = Math.floor((new Date() - date) / 1000);
+        const intervals = [
+            { label: "año", seconds: 31536000 },
+            { label: "mes", seconds: 2592000 },
+            { label: "día", seconds: 86400 },
+            { label: "hora", seconds: 3600 },
+            { label: "minuto", seconds: 60 }
+        ];
+
+        for (const interval of intervals) {
+            const count = Math.floor(seconds / interval.seconds);
+            if (count >= 1) {
+                return `hace ${count} ${interval.label}${count > 1 ? "s" : ""}`;
+            }
+        }
+        return "hace unos segundos";
+    };
+
     const fetchComments = async () => {
         try {
             const response = await fetch(`${URL_BASE}/recipes/${recipeId}/comments`);
@@ -35,6 +55,7 @@ const Comment = ({ recipeId }) => {
     useEffect(() => {
         fetchComments();
     }, [recipeId]);
+
     const handleSubmit = async (event) => {
         event.preventDefault();
         if (!newComment.trim()) return;
@@ -114,23 +135,35 @@ const Comment = ({ recipeId }) => {
                 />
                 <button className="btn btn-primary" type="submit">Enviar</button>
             </form>
+
             <div className="form-control">
                 {comments.length === 0 ? (
                     <p>Sé el primero en comentar!</p>
                 ) : (
                     comments.map((comment) => (
-                        <div key={comment.id} className="form-control border-0">
-                            <div className="d-flex justify-content-between">
-                                <div>
-                                    <strong>{comment.user?.username || "Usuario"}</strong>
+                        <div key={comment.id} className="form-control border-0 py-3">
+                            <div className="d-flex gap-3">
+                                <img
+                                    src={comment.user.image}
+                                    alt={comment.user.username}
+                                    className="w-10 h-10 rounded-full object-cover"
+                                />
+
+
+                                <div className="w-100">
+
+                                    <div className="d-flex align-items-center gap-2">
+                                        <strong>{comment.user?.username || "Usuario"}</strong>
+                                        <span className="text-muted" style={{ fontSize: "0.85rem" }}>
+                                            {timeAgo(comment.created_at)}
+                                        </span>
+                                    </div>
 
                                     {editingCommentId === comment.id ? (
                                         <div className="d-flex mt-2 gap-2">
                                             <input
                                                 value={editingContent}
-                                                onChange={(e) =>
-                                                    setEditingContent(e.target.value)
-                                                }
+                                                onChange={(e) => setEditingContent(e.target.value)}
                                                 className="form-control"
                                             />
                                             <button
@@ -147,27 +180,27 @@ const Comment = ({ recipeId }) => {
                                             </button>
                                         </div>
                                     ) : (
-                                        <p>{comment.content}</p>
+                                        <p className="mt-1">{comment.content}</p>
                                     )}
-                                </div>
-                                {(Number(currentUserId) === Number(comment.user?.id ?? comment.user_id)) &&
-                                    editingCommentId !== comment.id && (
-                                        <div className="d-flex flex-column gap-1">
-                                            <button
-                                                className="btn btn-outline-primary btn-sm"
-                                                onClick={() => handleEdit(comment)}
-                                            >
-                                                Editar
-                                            </button>
+                                    {(Number(currentUserId) === Number(comment.user?.id ?? comment.user_id)) &&
+                                        editingCommentId !== comment.id && (
+                                            <div className="d-flex gap-2 mt-1">
+                                                <button
+                                                    className="btn btn-outline-primary btn-sm"
+                                                    onClick={() => handleEdit(comment)}
+                                                >
+                                                    Editar
+                                                </button>
 
-                                            <button
-                                                className="btn btn-outline-danger btn-sm"
-                                                onClick={() => deleteComment(comment.id)}
-                                            >
-                                                Eliminar
-                                            </button>
-                                        </div>
-                                    )}
+                                                <button
+                                                    className="btn btn-outline-danger btn-sm"
+                                                    onClick={() => deleteComment(comment.id)}
+                                                >
+                                                    Eliminar
+                                                </button>
+                                            </div>
+                                        )}
+                                </div>
                             </div>
                         </div>
                     ))
