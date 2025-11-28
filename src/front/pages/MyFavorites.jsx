@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 const MyFavorites = () => {
