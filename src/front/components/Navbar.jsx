@@ -25,7 +25,7 @@ export const Navbar = () => {
     const isAdmin = userRole === "admin";
 
     return (
-        <nav className={`container navbar navbar-expand-lg p-0 ${navbarThemeClass}`} data-bs-theme={theme}>
+        <nav className={`navbar navbar-expand-lg p-0 w-100 ${navbarThemeClass}`} data-bs-theme={theme}>
             <div className="container-fluid">
                 <Link className="navbar-brand m-0" to="/">Food</Link>
 
