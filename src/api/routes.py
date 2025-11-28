@@ -13,11 +13,12 @@ from datetime import timedelta, datetime, timezone
 from functools import wraps
 import json
 from .cloudinary_service import cloudinary_service
-from sqlalchemy import select
+from sqlalchemy import select, func
 from .admin_decorator import admin_required
 import cloudinary
 import cloudinary.uploader
 from datetime import datetime, timezone
+
 
 api = Blueprint('api', __name__)
 
@@ -639,8 +640,8 @@ def get_recipe_detail(recipe_id):
                 current_user_id = None
 
         recipe = Recipe.query.filter_by(
-            id_recipe=recipe_id,
-            state_recipe=stateRecipeEnum.PUBLISHED
+            id_recipe=recipe_id
+            # state_recipe=stateRecipeEnum.PUBLISHED
         ).first()
 
         if recipe is None:
@@ -648,18 +649,10 @@ def get_recipe_detail(recipe_id):
 
         recipe_data = recipe.serialize()
 
-        ratings = recipe.ratings
-
-        if ratings:
-            total_votes = len(ratings)
-            avg = sum(r.value for r in ratings) / total_votes
-        else:
-            total_votes = 0
-            avg = None
-
-        comments = [r.serialize() for r in ratings if r.comment]
-
+        user_rating = None
+        user_rating_object = None
         is_favorite = False
+
         if current_user_id is not None:
             fav = RecipeFavorite.query.filter_by(
                 user_id=current_user_id,
@@ -667,9 +660,22 @@ def get_recipe_detail(recipe_id):
             ).first()
             is_favorite = fav is not None
 
+        if current_user_id is not None:
+            user_rating_object = RecipeRating.query.filter_by(
+                user_id=current_user_id,
+                recipe_id=recipe.id_recipe
+            ).first()
+
+            if user_rating_object:
+                user_rating = user_rating_object.value
+
+        ratings = recipe.ratings
+        comments = [r.serialize() for r in ratings if r.comment]
+
         recipe_data.update({
-            "avg_rating": avg,
-            "vote_count": total_votes,
+            "avg_rating": recipe.avg_rating,
+            "vote_count": recipe.vote_count,
+            "user_rating": user_rating,
             "comments": comments,
             "is_favorite": is_favorite
         })
@@ -1172,6 +1178,7 @@ def get_recipes_by_category(category_id):
 # ENDPOINT DE BÚSQUEDA DE RECETAS
 # Permite buscar recetas por título para el componente SearchResults
 
+
 @api.route("/recipes/search", methods=["GET"])
 def search_recipes():
     """
@@ -1180,13 +1187,13 @@ def search_recipes():
     """
     try:
         query = request.args.get('q', '').strip()
-        
+
         if not query or len(query) < 2:
             return jsonify({
                 "message": "Search term must be at least 2 characters",
                 "recipes": []
             }), 400
-        
+
         # Buscar recetas publicadas que coincidan con el término
         recipes = (
             db.session.query(Recipe)
@@ -1198,7 +1205,7 @@ def search_recipes():
             .limit(50)
             .all()
         )
-        
+
         recipes_list = [
             {
                 "id": recipe.id_recipe,
@@ -1212,13 +1219,13 @@ def search_recipes():
             }
             for recipe in recipes
         ]
-        
+
         return jsonify({
             "message": "Search completed successfully",
             "recipes": recipes_list,
             "total": len(recipes_list)
         }), 200
-        
+
     except Exception as error:
         print(f"Error searching recipes: {error}")
         return jsonify({
@@ -1226,6 +1233,7 @@ def search_recipes():
             "details": str(error),
             "recipes": []
         }), 500
+
 
 @api.route("/admin/users", methods=["GET"])
 @admin_required()
@@ -1361,4 +1369,55 @@ def get_my_recipes():
         return jsonify({"message": "Internal Server Error"}), 500
 
 
+@api.route("/recipe/<int:recipe_id>/rate", methods=["POST"])
+@jwt_required()
+def rate_recipes(recipe_id):
+    user_id = int(get_jwt_identity())
+    data = request.get_json()
+    rating_value = data.get("rating")
 
+    if rating_value is None or not 1 <= rating_value <= 5:
+        return jsonify({"message": "The grade must be a whole number between 1 and 5."}), 400
+
+    recipe = db.session.get(Recipe, recipe_id)
+    if recipe is None or recipe.state_recipe != stateRecipeEnum.PUBLISHED:
+        return jsonify({"message": "Recipe not found or not published."}), 404
+
+    existing_rating = RecipeRating.query.filter_by(
+        user_id=user_id,
+        recipe_id=recipe_id
+    ).one_or_none()
+
+    if existing_rating:
+        old_value = existing_rating.value
+        existing_rating.value = rating_value
+        action_msg = "Rating successfully updated."
+        db.session.add(existing_rating)
+    else:
+        new_rating = RecipeRating(
+            user_id=user_id,
+            recipe_id=recipe_id,
+            value=rating_value,
+        )
+        db.session.add(new_rating)
+        action_msg = "Recipe successfully rated."
+
+    rating_summary = db.session.query(
+        func.sum(RecipeRating.value).label('total_sum'),
+        func.count(RecipeRating.id_rating).label('total_count')
+    ).filter(RecipeRating.recipe_id == recipe_id).first()
+
+    total_sum = rating_summary.total_sum
+    total_count = rating_summary.total_count
+
+    recipe.vote_count = total_count
+
+    if total_count > 0:
+        recipe.avg_rating = total_sum / total_count
+    else:
+        recipe.avg_rating = None
+
+    db.session.add(recipe)
+    db.session.commit()
+
+    return jsonify({"message": action_msg, "avg_rating": recipe.avg_rating, "vote_count": recipe.vote_count}), 200

@@ -40,21 +40,14 @@
 
 /* ===== HERO SECTION (Fondo degradado) ===== */
 .recipe-hero {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 50px;
-    align-items: start;
-    margin-bottom: 60px;
-    padding: 40px;
-    /* Usamos el degradado del botón primario */
-    background: linear-gradient(135deg, var(--color-btn-secondary) 0%, var(--color-background-tag) 100%);
-    border-radius: 24px;
-    transition: background 0.4s ease;
-}
-
-/* Ajuste del degradado en modo oscuro */
-.dark-mode .recipe-hero {
-    background: linear-gradient(135deg, var(--color-background-card) 0%, var(--color-background-section) 100%);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 50px;
+  align-items: start;
+  margin-bottom: 60px;
+  padding: 40px;
+  background: linear-gradient(135deg, var(--color-cream) 0%, var(--color-peach) 100%);
+  border-radius: 24px;
 }
 
 .recipe-detail-title {
@@ -320,64 +313,174 @@
 
 /* ===== RESPONSIVE ===== */
 @media (max-width: 992px) {
-    .recipe-hero {
-        grid-template-columns: 1fr;
-        gap: 30px;
-    }
-    
-    .recipe-hero-image {
-        height: 350px;
-    }
-    
-    .recipe-content {
-        grid-template-columns: 1fr;
-    }
-    
-    .ingredients-section {
-        position: relative;
-        top: 0;
-    }
+  .recipe-hero {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+  
+  .recipe-hero-image {
+    height: 350px;
+  }
+  
+  .recipe-content {
+    grid-template-columns: 1fr;
+  }
+  
+  .ingredients-section {
+    position: relative;
+    top: 0;
+  }
 }
 
 @media (max-width: 768px) {
-    .recipe-detail-title {
-        font-size: 2rem;
-    }
-    
-    .recipe-hero {
-        padding: 30px 20px;
-    }
-    
-    .section-title {
-        font-size: 1.5rem;
-    }
+  .recipe-detail-title {
+    font-size: 2rem;
+  }
+  
+  .recipe-hero {
+    padding: 30px 20px;
+  }
+  
+  .section-title {
+    font-size: 1.5rem;
+  }
 }
 
 @media (max-width: 576px) {
-    .recipe-detail-container {
-        padding: 20px 15px;
-    }
-    
-    .recipe-detail-title {
-        font-size: 1.6rem;
-    }
-    
-    .recipe-badges {
-        gap: 8px;
-    }
-    
-    .badge-item {
-        font-size: 0.85rem;
-        padding: 8px 14px;
-    }
-    
-    .ingredient-item {
-        grid-template-columns: 15px 1fr auto;
-        padding: 10px;
-    }
-    
-    .step-number {
-        width: 35px;
-        height: 35px;
-    }
+  .recipe-detail-container {
+    padding: 20px 15px;
+  }
+  
+  .recipe-detail-title {
+    font-size: 1.6rem;
+  }
+  
+  .recipe-badges {
+    gap: 8px;
+  }
+  
+  .badge-item {
+    font-size: 0.85rem;
+    padding: 8px 14px;
+  }
+  
+  .ingredient-item {
+    grid-template-columns: 15px 1fr auto;
+    padding: 10px;
+  }
+  
+  .step-number {
+    width: 35px;
+    height: 35px;
+  }
+}
+
+.user-rating-interaction {
+  margin-top: 15px;
+  padding-top: 10px;
+  border-top: 1px solid #eee; /* Separador */
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.rating-label {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+
+/* Contenedor interactivo de estrellas */
+.stars-interactive {
+  font-size: 1.5rem; /* Tamaño de las estrellas */
+  color: orange; /* Color de las estrellas */
+  display: flex;
+  gap: 2px;
+}
+
+/* Estrellas individuales */
+.star-item {
+  transition: transform 0.1s ease-in-out;
+}
+
+/* Cursor y efecto al ser interactivas */
+.stars-interactive .clickable {
+  cursor: pointer;
+}
+
+.stars-interactive .clickable:hover {
+  transform: scale(1.1); /* Efecto sutil al pasar el ratón */
+}
+
+/* Estado de cargando */
+.stars-interactive.disabled .star-item {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.rating-loading {
+  margin-top: 5px;
+  font-size: 0.9em;
+  color: #007bff; /* Un color de acento para la carga */
+}
+
+.rating-login-prompt {
+  margin-top: 5px;
+  font-size: 0.8em;
+  color: #6c757d;
+}
+
+/* Opcional: Para diferenciar el rating global del interactivo */
+.recipe-global-rating .stars {
+  color: gold; /* Color de las estrellas de promedio */
+  font-size: 1.2rem;
+}
+
+
+.info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 80vh;
+  text-align: center;
+  padding: 20px;
+}
+
+.positions {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+}
+
+.image-sesion {
+  width: 100%;
+  max-width: 400px;
+  height: auto;
+  border-radius: 20px;
+  margin-bottom: 30px;
+}
+
+.title-sesion {
+  color: rgb(235, 235, 49);
+  margin-bottom: 15px;
+}
+
+.comment-sesion {
+  font-size: 1.2em;
+  max-width: 600px;
+  margin-bottom: 30px;
+}
+
+.btn-sesion {
+  padding: 10px;
+  margin: 0 10px;
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.cursor-not-allowed {
+    cursor: not-allowed;
 }

@@ -32,7 +32,7 @@ const UserCardRecipe = ({ recipe, onDelete }) => {
                         <i className="fa-solid fa-layer-group me-1"></i> {recipe.category_name || "Categoría"}
                     </p>
                     <div className="mt-auto d-flex justify-content-around align-items-center pt-3 border-top border-white">
-                        <Link to={`/recipes/${recipe.id}`} title="Ver Receta">
+                        <Link to={`/recipe/${recipe.id}`} title="Ver Receta">
                             <i className="fa-solid fa-eye fa-lg text-primary cursor-pointer"></i>
                         </Link>
                         {recipe.status === 'pending' && (
