@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import "../styles/home.css";
 import BannerRecetas from "../assets/img/BannerRecetas.png";
+import Comment from './Comment';
+
 
 const getApiUrl = () => {
   return import.meta.env.VITE_BACKEND_URL || '';

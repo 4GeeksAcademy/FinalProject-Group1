@@ -37,6 +37,8 @@ class User(db.Model):
     favorites: Mapped[List["RecipeFavorite"]] = relationship(
         back_populates="user", cascade="all, delete-orphan")
 
+    comments: Mapped[List["Comment"]] = relationship("Comment", back_populates="user", cascade="all, delete-orphan")
+
     def __repr__(self):
         return f'<User {self.username}>'
 
@@ -144,6 +146,10 @@ class Recipe(db.Model):
     category_recipe: Mapped["Category"] = relationship(
         back_populates="recipe_category")
 
+    comments: Mapped[List["Comment"]] = relationship(
+        "Comment", back_populates="recipe", cascade="all, delete-orphan"
+    )
+
     def __repr__(self):
         return f'<Recipe {self.title}>'
 
@@ -179,6 +185,38 @@ class Recipe(db.Model):
             "ingredients": ingredients_list,
             "created_at": self.created_at.isoformat(),
     }
+
+
+class Comment(db.Model):
+    __tablename__ = "comments"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    content: Mapped[str] = mapped_column(Text, nullable=False)
+
+    user_id: Mapped[int] = mapped_column(
+        db.ForeignKey("user.id_user"), nullable=False)
+    recipe_id: Mapped[int] = mapped_column(
+        db.ForeignKey("recipe.id_recipe"), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
+
+    recipe: Mapped["Recipe"] = relationship("Recipe", back_populates="comments")
+    user: Mapped["User"] = relationship("User",back_populates="comments")
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "content": self.content,
+            "recipe_id": self.recipe_id,
+            "user_id": self.user_id,
+            "created_at": self.created_at.isoformat(),
+            "user": {
+                "id": self.user.id_user,
+                "username": self.user.username,
+                "image": self.user.profile or f"https://ui-avatars.com/api/?name={self.user.username}&size=128&background=random&rounded=true"
+            }
+        }
+
+
 
 
 # Clase ingrediente (el catálogo)
