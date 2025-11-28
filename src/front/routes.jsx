@@ -19,6 +19,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import { CategoryView } from "./pages/CategoryView";
 import { CategoriesListView } from './pages/CategoriesListView';
 import { RecipeDetail } from "./pages/RecipeDetail";
+import { MyFavorites } from "./pages/MyFavorites";
 
 import AdminUsuarios from "./pages/AdminUsuarios";
 import UserDashboard from "./pages/UserDashboard";
@@ -92,6 +93,11 @@ export const router = createBrowserRouter(
         <AdminProtectedRoute>
           <AdminUsuarios />
         </AdminProtectedRoute>
+      } />
+      <Route path="/misfavoritos" element={
+        <ProtectedRoute>
+           <MyFavorites />
+        </ProtectedRoute>
       } />
 
       <Route path="/user/status" element={<ProtectedRoute><UserDashboard /></ProtectedRoute>} />

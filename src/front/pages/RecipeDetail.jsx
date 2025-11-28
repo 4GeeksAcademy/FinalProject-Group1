@@ -282,3 +282,4 @@ export const RecipeDetail = () => {
     </div>
   );
 };
+

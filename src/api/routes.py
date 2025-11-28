@@ -730,6 +730,26 @@ def toggle_favorite(recipe_id):
         }), 500
 
 
+@api.route("/favoritos", methods=["GET"])
+@jwt_required()
+def get_user_favorites():
+    current_user_id = int(get_jwt_identity())
+
+    favorites = (
+        db.session.query(Recipe)
+        .join(RecipeFavorite, Recipe.id_recipe == RecipeFavorite.recipe_id)
+        .filter(RecipeFavorite.user_id == current_user_id)
+        .all()
+    )
+
+    recipes_data = [r.serialize() for r in favorites]
+
+    return jsonify({
+        "message": "Favoritos obtenidos correctamente",
+        "recipes": recipes_data
+    }), 200
+
+
 @api.route("/recetas/<int:recipe_id>/calificar", methods=["POST"])
 @jwt_required()
 def rate_recipe(recipe_id):
