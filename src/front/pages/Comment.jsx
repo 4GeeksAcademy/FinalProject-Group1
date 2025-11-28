@@ -146,7 +146,8 @@ const Comment = ({ recipeId }) => {
                                 <img
                                     src={comment.user.image}
                                     alt={comment.user.username}
-                                    className="w-10 h-10 rounded-full object-cover"
+                                    className="img-fluid rounded-circle"
+                                    id="imagen-com"
                                 />
 
 

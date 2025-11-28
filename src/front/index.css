@@ -368,3 +368,9 @@ body {
     font-size: 1.4rem;
   }
 }
+
+/* estilo de imagen comentarios */
+#imagen-com{
+    width: 2rem;
+    height: 2rem;
+}
