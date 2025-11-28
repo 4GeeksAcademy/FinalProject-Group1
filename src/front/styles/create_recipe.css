@@ -1,17 +1,46 @@
-.prevew-image {
-  max-width: 150px;
-  max-height: 150 px;
-  object-fit: cover;
+.preview-image {
+    max-width: 150px;
+    max-height: 150px;
+    object-fit: cover;
 }
 
 .bg-fondo {
-  background-color: #fefae0;
+    /* Fondo principal de la sección/página */
+    background-color: var(--color-background-page);
+    transition: background-color 0.4s ease;
 }
 
 .bg-formulario {
-  background-color: #e9edc9;
+    /* Fondo del formulario o tarjeta principal */
+    background-color: var(--color-background-card);
+    transition: background-color 0.4s ease;
 }
 
 .bg-titulo {
-  background-color: #ccd5ae;
+    /* Fondo de títulos o secciones */
+    background-color: var(--color-background-pill);
+    transition: background-color 0.4s ease;
+}
+
+/* --- ESTILOS MODO OSCURO (Asegurando la consistencia y el contraste) --- */
+
+.dark-mode .bg-fondo {
+    background-color: var(--color-background-page);
+    color: var(--color-text-main);
+}
+
+.dark-mode .bg-formulario {
+    background-color: var(--color-background-section); /* Usamos un tono más oscuro para el formulario */
+    color: var(--color-text-main);
+}
+
+.dark-mode .bg-titulo {
+    background-color: var(--color-background-pill);
+    color: var(--color-text-title);
+}
+
+/* --- ESTILOS DE ELEMENTOS ESPECÍFICOS --- */
+
+.dark-mode .recipe-form-label { 
+    color: var(--color-text-main);
 }
