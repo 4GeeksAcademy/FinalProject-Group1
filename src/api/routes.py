@@ -934,60 +934,62 @@ def upload_profile_image():
 
 
 @api.route("/recipes/<int:recipe_id>/comments", methods=["GET"])
-def get_comments(recipe_id):
+def get_recipe_comments(recipe_id):
     recipe = Recipe.query.get(recipe_id)
-    if not recipe:
-        return jsonify({"msg": "Receta no encontrada"}), 404
-    
-    return jsonify([comments.serialize() for comments in recipe.comments]), 200
+    if not recipe or recipe.state_recipe != stateRecipeEnum.PUBLISHED:
+        return jsonify({"message": "Receta no encontrada"}), 404
+
+    comments = Comment.query.filter_by(recipe_id=recipe_id).order_by(Comment.created_at.desc()).all()
+    return jsonify([comment.serialize() for comment in comments]), 200
 
 
-@api.route('/recipes/<int:recipe_id>/comments', methods=['POST'])
+
+
+@api.route("/recipes/<int:recipe_id>/comments", methods=["POST"])
 @jwt_required()
 def create_comment(recipe_id):
-    comment_data = request.get_json()
-    comment_text = comment_data.get("text", "").trim()
-
-    if not comment_text:
-        return jsonify({"error": "El comentario no puede estar vacío."}), 400
+    current_user_id = int(get_jwt_identity())
 
     recipe = Recipe.query.get(recipe_id)
-    if not recipe:
-        return jsonify({"error": "Receta no encontrada."}), 404
+    if not recipe or recipe.state_recipe != stateRecipeEnum.PUBLISHED:
+        return jsonify({"message": "Receta no encontrada"}), 404
 
-    user_id = get_jwt_identity()
+    data = request.get_json()
+    content = data.get("content", "").strip()
+
+    if not content:
+        return jsonify({"message": "El comentario no puede estar vacío"}), 400
 
     new_comment = Comment(
-        text=comment_text,
-        user_id=user_id,
+        content=content,
+        user_id=current_user_id,
         recipe_id=recipe_id
     )
 
     db.session.add(new_comment)
-    db.session.commit()
+    try:
+        db.session.commit()
+        return jsonify({
+            "message": "Comentario creado",
+            "comment": new_comment.serialize()
+        }), 201
+    except Exception as error:
+        db.session.rollback()
+        return jsonify({"message": "Error al crear comentario", "details": str(error)}), 500
 
-    return jsonify({
-        "message": "Comentario creado",
-        "comment": {
-            "id": new_comment.id,
-            "text": new_comment.text,
-            "user_id": new_comment.user_id,
-            "recipe_id": new_comment.recipe_id,
-            "created_at": new_comment.created_at
-        }
-    }), 201
+
 
 
 @api.route('/comments/<int:comment_id>', methods=['PUT'])
 @jwt_required()
 def update_comment(comment_id):
     update_data = request.get_json()
-    updated_text = update_data.get("text", "").strip()
+    updated_text = update_data.get("content", "").strip()
 
     if not updated_text:
         return jsonify({"error": "El comentario no puede estar vacío."}), 400
 
-    user_id = get_jwt_identity()
+    user_id = int(get_jwt_identity())
 
     existing_comment = Comment.query.get(comment_id)
     if not existing_comment:
@@ -996,55 +998,38 @@ def update_comment(comment_id):
     if existing_comment.user_id != user_id:
         return jsonify({"error": "No tienes permiso para editar este comentario."}), 403
 
-    existing_comment.text = updated_text
+    existing_comment.content = updated_text 
     db.session.commit()
 
     return jsonify({
         "message": "Comentario actualizado",
-        "comment": {
-            "id": existing_comment.id,
-            "text": existing_comment.text
-        }
+        "comment": existing_comment.serialize()
     }), 200
 
 
-@api.route('/comments/<int:comment_id>', methods=['DELETE'])
+
+@api.route("/comments/<int:comment_id>", methods=["DELETE"])
 @jwt_required()
 def delete_comment(comment_id):
-    user_id = get_jwt_identity()
+    current_user_id = int(get_jwt_identity())
+    claims = get_jwt()
+    is_admin = claims.get("rol") == "admin"
 
-    comment_to_delete = Comment.query.get(comment_id)
-    if not comment_to_delete:
-        return jsonify({"error": "Comentario no encontrado."}), 404
+    comment = Comment.query.get(comment_id)
+    if not comment:
+        return jsonify({"message": "Comentario no encontrado"}), 404
 
-    if comment_to_delete.user_id != user_id:
-        return jsonify({"error": "No tienes permiso para eliminar este comentario."}), 403
+    if comment.user_id != current_user_id and not is_admin:
+        return jsonify({"message": "No autorizado"}), 403
 
-    db.session.delete(comment_to_delete)
-    db.session.commit()
+    try:
+        db.session.delete(comment)
+        db.session.commit()
+        return jsonify({"message": "Comentario eliminado"}), 200
+    except Exception as error:
+        db.session.rollback()
+        return jsonify({"message": "Error al eliminar comentario", "details": str(error)}), 500
 
-    return jsonify({"message": "Comentario eliminado"}), 200
-
-
-@api.route('/recipes/<int:recipe_id>/comments', methods=['GET'])
-def get_recipe_comments(recipe_id):
-    recipe = Recipe.query.get(recipe_id)
-    if not recipe:
-        return jsonify({"error": "Receta no encontrada"}), 404
-
-    comments = Comment.query.filter_by(recipe_id=recipe_id).order_by(Comment.created_at.desc()).all()
-
-    formatted_comments = [
-        {
-            "id": comment.id,
-            "text": comment.text,
-            "user_id": comment.user_id,
-            "created_at": comment.created_at
-        }
-        for comment in comments
-    ]
-
-    return jsonify(formatted_comments), 200
 # RUTAS PARA HOME Y CATEGORÍAS
 
 

@@ -202,6 +202,21 @@ class Comment(db.Model):
     recipe: Mapped["Recipe"] = relationship("Recipe", back_populates="comments")
     user: Mapped["User"] = relationship("User",back_populates="comments")
 
+    def serialize(self):
+        return {
+            "id": self.id,
+            "content": self.content,
+            "recipe_id": self.recipe_id,
+            "user_id": self.user_id,
+            "created_at": self.created_at.isoformat(),
+            "user": {
+                "id": self.user.id_user,
+                "username": self.user.username,
+                "image": self.user.profile or f"https://ui-avatars.com/api/?name={self.user.username}&size=128&background=random&rounded=true"
+            }
+        }
+
+
 
 
 # Clase ingrediente (el catálogo)
