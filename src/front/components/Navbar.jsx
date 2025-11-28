@@ -48,10 +48,7 @@ export const Navbar = () => {
                                 </NavLink>
                             </li>
                         )}
-                        <form className="d-flex" role="search">
-                            <input className={`form-control me-2 pt-0 ${theme === 'dark' ? 'form-control-dark' : ''}`} type="search" placeholder="Search" />
-                            <button className="btn btn-outline-success py-0" type="submit">Search</button>
-                        </form>
+                        
                         
                         {isAdmin && (
                             <div className="d-flex">
