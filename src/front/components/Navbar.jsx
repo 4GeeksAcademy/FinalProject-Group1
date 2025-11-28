@@ -15,6 +15,7 @@ export const Navbar = () => {
         localStorage.removeItem("user")
     }
 
+
     const navbarThemeClass = theme === 'dark' ? 'bg-dark navbar-dark' : 'bg-body-tertiary';
     const icon = theme === 'light' ? '🌙' : '☀️';
     const buttonLabel = theme === 'light' ? 'Cambiar a modo oscuro' : 'Cambiar a modo claro';
@@ -70,6 +71,15 @@ export const Navbar = () => {
                                 </li>
                             </div>
                         )}
+                            <li className="nav-item d-flex align-items-center me-2">
+                                        <button
+                                            className={`btn btn-outline-secondary py-1 px-3 ${buttonTextClass} theme-toggle-button`}
+                                            onClick={toggleTheme}
+                                            aria-label={buttonLabel}
+                                        >
+                                            {icon}
+                                        </button>
+                                    </li>
 
                         <li className="nav-item d-flex align-items-center">
                             {!store.token ? (
@@ -80,17 +90,7 @@ export const Navbar = () => {
                                     Iniciar Sesión
                                 </NavLink>
                             ) : (
-                                <>
-                                    <li className="nav-item d-flex align-items-center me-2">
-                                        <button
-                                            className={`btn btn-outline-secondary py-1 px-3 ${buttonTextClass} theme-toggle-button`}
-                                            onClick={toggleTheme}
-                                            aria-label={buttonLabel}
-                                        >
-                                            {icon}
-                                        </button>
-                                    </li>
-                                    
+                                <>                                  
                                     <div className="dropdown ms-3">
                                         <a
                                             className="nav-link dropdown-toggle p-0"
