@@ -6,11 +6,11 @@ export const Footer = () => {
 
 	useEffect(() => {
 		setSocialMedia([
-			{ id: 1, platform: 'Facebook', url: 'https://www.facebook.com/tuusuario', active: true },
-			{ id: 2, platform: 'Instagram', url: 'https://www.instagram.com/tuusuario', active: true },
+			{ id: 1, platform: 'Facebook', url: 'https://www.facebook.com', active: true },
+			{ id: 2, platform: 'Instagram', url: 'https://www.instagram.com', active: true },
 			{ id: 3, platform: 'WhatsApp', url: 'https://wa.me/1234567890', active: true },
-			{ id: 4, platform: 'LinkedIn', url: 'https://www.linkedin.com/in/tuusuario', active: true },
-			{ id: 5, platform: 'GitHub', url: 'https://github.com/tuusuario', active: true }
+			{ id: 4, platform: 'LinkedIn', url: 'https://www.linkedin.com/feed/', active: true },
+			{ id: 5, platform: 'GitHub', url: 'https://github.com', active: true }
 		])
 	}, [])
 
@@ -62,3 +62,4 @@ export const Footer = () => {
 		</footer>
 	)
 }
+export default Footer;

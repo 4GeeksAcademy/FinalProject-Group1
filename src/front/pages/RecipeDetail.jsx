@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import '../styles/recipeDetail.css';
+import Comment from './Comment';
+
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
@@ -279,6 +281,9 @@ export const RecipeDetail = () => {
           </div>
         </div>
       )}
+
+      <Comment recipeId={recipeId} />
+
     </div>
   );
 };

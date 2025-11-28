@@ -2,7 +2,7 @@
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
 from flask import Flask, request, jsonify, url_for, Blueprint
-from api.models import db, User, Recipe, Ingredient, RecipeIngredient, difficultyEnum, stateRecipeEnum, UnitEnum, Category, RecipeFavorite, RecipeRating
+from api.models import db, User, Recipe, Ingredient, RecipeIngredient, difficultyEnum, stateRecipeEnum, UnitEnum, Category, RecipeFavorite, RecipeRating, Comment
 from api.utils import generate_sitemap, APIException,  val_email, val_password
 from flask_cors import CORS
 import os
@@ -951,6 +951,105 @@ def upload_profile_image():
         "image": user.profile,
         "user": user.serialize()
     }), 200
+
+
+@api.route("/recipes/<int:recipe_id>/comments", methods=["GET"])
+def get_recipe_comments(recipe_id):
+    recipe = Recipe.query.get(recipe_id)
+    if not recipe or recipe.state_recipe != stateRecipeEnum.PUBLISHED:
+        return jsonify({"message": "Receta no encontrada"}), 404
+
+    comments = Comment.query.filter_by(recipe_id=recipe_id).order_by(Comment.created_at.desc()).all()
+    return jsonify([comment.serialize() for comment in comments]), 200
+
+
+
+
+@api.route("/recipes/<int:recipe_id>/comments", methods=["POST"])
+@jwt_required()
+def create_comment(recipe_id):
+    current_user_id = int(get_jwt_identity())
+
+    recipe = Recipe.query.get(recipe_id)
+    if not recipe or recipe.state_recipe != stateRecipeEnum.PUBLISHED:
+        return jsonify({"message": "Receta no encontrada"}), 404
+
+    data = request.get_json()
+    content = data.get("content", "").strip()
+
+    if not content:
+        return jsonify({"message": "El comentario no puede estar vacío"}), 400
+
+    new_comment = Comment(
+        content=content,
+        user_id=current_user_id,
+        recipe_id=recipe_id
+    )
+
+    db.session.add(new_comment)
+    try:
+        db.session.commit()
+        return jsonify({
+            "message": "Comentario creado",
+            "comment": new_comment.serialize()
+        }), 201
+    except Exception as error:
+        db.session.rollback()
+        return jsonify({"message": "Error al crear comentario", "details": str(error)}), 500
+
+
+
+
+@api.route('/comments/<int:comment_id>', methods=['PUT'])
+@jwt_required()
+def update_comment(comment_id):
+    update_data = request.get_json()
+    updated_text = update_data.get("content", "").strip()
+
+    if not updated_text:
+        return jsonify({"error": "El comentario no puede estar vacío."}), 400
+
+    user_id = int(get_jwt_identity())
+
+    existing_comment = Comment.query.get(comment_id)
+    if not existing_comment:
+        return jsonify({"error": "Comentario no encontrado."}), 404
+
+    if existing_comment.user_id != user_id:
+        return jsonify({"error": "No tienes permiso para editar este comentario."}), 403
+
+    existing_comment.content = updated_text 
+    db.session.commit()
+
+    return jsonify({
+        "message": "Comentario actualizado",
+        "comment": existing_comment.serialize()
+    }), 200
+
+
+
+@api.route("/comments/<int:comment_id>", methods=["DELETE"])
+@jwt_required()
+def delete_comment(comment_id):
+    current_user_id = int(get_jwt_identity())
+    claims = get_jwt()
+    is_admin = claims.get("rol") == "admin"
+
+    comment = Comment.query.get(comment_id)
+    if not comment:
+        return jsonify({"message": "Comentario no encontrado"}), 404
+
+    if comment.user_id != current_user_id and not is_admin:
+        return jsonify({"message": "No autorizado"}), 403
+
+    try:
+        db.session.delete(comment)
+        db.session.commit()
+        return jsonify({"message": "Comentario eliminado"}), 200
+    except Exception as error:
+        db.session.rollback()
+        return jsonify({"message": "Error al eliminar comentario", "details": str(error)}), 500
+
 # RUTAS PARA HOME Y CATEGORÍAS
 
 
@@ -1070,6 +1169,63 @@ def get_recipes_by_category(category_id):
             "details": str(error)
         }), 500
 
+# ENDPOINT DE BÚSQUEDA DE RECETAS
+# Permite buscar recetas por título para el componente SearchResults
+
+@api.route("/recipes/search", methods=["GET"])
+def search_recipes():
+    """
+    Busca recetas por título
+    Query param: q (término de búsqueda)
+    """
+    try:
+        query = request.args.get('q', '').strip()
+        
+        if not query or len(query) < 2:
+            return jsonify({
+                "message": "Search term must be at least 2 characters",
+                "recipes": []
+            }), 400
+        
+        # Buscar recetas publicadas que coincidan con el término
+        recipes = (
+            db.session.query(Recipe)
+            .filter(
+                Recipe.title.ilike(f'%{query}%'),
+                Recipe.state_recipe == stateRecipeEnum.PUBLISHED
+            )
+            .order_by(Recipe.created_at.desc())
+            .limit(50)
+            .all()
+        )
+        
+        recipes_list = [
+            {
+                "id": recipe.id_recipe,
+                "title": recipe.title,
+                "image": recipe.image,
+                "portions": recipe.portions,
+                "prep_time_min": recipe.preparation_time_min,
+                "difficulty": recipe.difficulty.value,
+                "avg_rating": recipe.avg_rating,
+                "vote_count": recipe.vote_count
+            }
+            for recipe in recipes
+        ]
+        
+        return jsonify({
+            "message": "Search completed successfully",
+            "recipes": recipes_list,
+            "total": len(recipes_list)
+        }), 200
+        
+    except Exception as error:
+        print(f"Error searching recipes: {error}")
+        return jsonify({
+            "message": "Error performing search",
+            "details": str(error),
+            "recipes": []
+        }), 500
 
 @api.route("/admin/users", methods=["GET"])
 @admin_required()
