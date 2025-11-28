@@ -374,3 +374,15 @@ body {
     width: 2rem;
     height: 2rem;
 }
+
+/* botón de reportar */
+.comment-menu-container {
+    position: relative;
+}
+
+.comment-dropdown {
+    position: absolute;
+    right: 0;
+    top: 100%;
+    z-index: 10;
+}

@@ -5,6 +5,8 @@ const Comment = ({ recipeId }) => {
     const [newComment, setNewComment] = useState("");
     const [editingCommentId, setEditingCommentId] = useState(null);
     const [editingContent, setEditingContent] = useState("");
+    const [openMenuId, setOpenMenuId] = useState(null);
+
 
     const URL_BASE = import.meta.env.VITE_BACKEND_URL;
 
@@ -123,6 +125,18 @@ const Comment = ({ recipeId }) => {
         }
     };
 
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (!event.target.closest(".comment-menu")) {
+                setOpenMenuId(null);
+            }
+        };
+
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+
+
     return (
         <div className="form-control">
             <h2>Comentarios</h2>
@@ -185,20 +199,40 @@ const Comment = ({ recipeId }) => {
                                     )}
                                     {(Number(currentUserId) === Number(comment.user?.id ?? comment.user_id)) &&
                                         editingCommentId !== comment.id && (
-                                            <div className="d-flex gap-2 mt-1">
-                                                <button
-                                                    className="btn btn-outline-primary btn-sm"
-                                                    onClick={() => handleEdit(comment)}
-                                                >
-                                                    Editar
-                                                </button>
+                                            <div className="d-flex gap-2 mt-1 justify-content-between">
+                                                <div>
+                                                    <button
+                                                        className="btn btn-outline-primary btn-sm mx-2"
+                                                        onClick={() => handleEdit(comment)}
+                                                    >
+                                                        Editar
+                                                    </button>
 
-                                                <button
-                                                    className="btn btn-outline-danger btn-sm"
-                                                    onClick={() => deleteComment(comment.id)}
-                                                >
-                                                    Eliminar
-                                                </button>
+                                                    <button
+                                                        className="btn btn-outline-danger btn-sm"
+                                                        onClick={() => deleteComment(comment.id)}
+                                                    >
+                                                        Eliminar
+                                                    </button>
+                                                </div>
+                                                <div className="comment-menu-container">
+                                                    <button
+                                                        className="btn"
+                                                        onClick={() => setOpenMenuId(openMenuId === comment.id ? null : comment.id)}
+                                                    >
+                                                        <i className="fa-solid fa-ellipsis-vertical"></i>
+                                                    </button>
+
+                                                    {openMenuId === comment.id && (
+                                                        <div className="comment-dropdown bg-white border rounded shadow-sm p-1">
+                                                            <button className="btn btn-sm w-100 text-start">
+                                                                Denunciar
+                                                            </button>
+                                                        </div>
+                                                    )}
+                                                </div>
+
+
                                             </div>
                                         )}
                                 </div>
