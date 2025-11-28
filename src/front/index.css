@@ -364,6 +364,19 @@ body {
         padding: 18px 14px 22px;
     }
 
+    .admin-title {
+        font-size: 1.4rem;
+    }
+}
+.dark-mode .btn-outline-success {
+    color: var(--color-text-highlight);
+    border-color: var(--color-text-highlight);
+}
+
+.dark-mode .btn-outline-success:hover {
+    background-color: var(--color-background-tag); 
+    color: var(--color-text-title); 
+    border-color: var(--color-text-highlight);
   .admin-title {
     font-size: 1.4rem;
   }
