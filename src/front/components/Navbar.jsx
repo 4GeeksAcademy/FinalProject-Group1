@@ -1,4 +1,4 @@
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import useGlobalReducer from "../hooks/useGlobalReducer.jsx";
 import useTheme from '../hooks/useTheme.jsx';
 import "../styles/navbar.css"
@@ -7,19 +7,21 @@ import "../styles/navbar.css"
 export const Navbar = () => {
     const { store, dispatch } = useGlobalReducer();
     const { theme, toggleTheme } = useTheme();
+    const navigate = useNavigate();
 
     const logout = () => {
         dispatch({ type: "SET_TOKEN", payload: null })
         dispatch({ type: "SET_USER", payload: null })
         localStorage.removeItem("access_token")
         localStorage.removeItem("user")
+        navigate("/");
     }
 
     const navbarThemeClass = theme === 'dark' ? 'bg-dark navbar-dark' : 'bg-body-tertiary';
     const icon = theme === 'light' ? '🌙' : '☀️';
     const buttonLabel = theme === 'light' ? 'Cambiar a modo oscuro' : 'Cambiar a modo claro';
     const buttonTextClass = theme === 'dark' ? 'text-white' : 'text-black';
-    
+
     const userRole = store.user ? store.user.rol : null;
     const isAdmin = userRole === "admin";
 
@@ -51,7 +53,7 @@ export const Navbar = () => {
                             <input className={`form-control me-2 pt-0 ${theme === 'dark' ? 'form-control-dark' : ''}`} type="search" placeholder="Search" />
                             <button className="btn btn-outline-success py-0" type="submit">Search</button>
                         </form>
-                        
+
                         {isAdmin && (
                             <div className="d-flex">
                                 <li className="menus me-4 mt-2">
@@ -81,7 +83,7 @@ export const Navbar = () => {
                                 </NavLink>
                             ) : (
                                 <>
-                                    <li className="nav-item d-flex align-items-center me-2">
+                                    <span className="nav-item d-flex align-items-center me-2">
                                         <button
                                             className={`btn btn-outline-secondary py-1 px-3 ${buttonTextClass} theme-toggle-button`}
                                             onClick={toggleTheme}
@@ -89,8 +91,8 @@ export const Navbar = () => {
                                         >
                                             {icon}
                                         </button>
-                                    </li>
-                                    
+                                    </span>
+
                                     <div className="dropdown ms-3">
                                         <a
                                             className="nav-link dropdown-toggle p-0"
