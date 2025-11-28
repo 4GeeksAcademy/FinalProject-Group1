@@ -1,11 +1,34 @@
 .bg-verdes {
-  background-color: #e9edc9;
+    /* Fondo del formulario/sección principal */
+    background-color: var(--color-background-card);
+    transition: background-color 0.4s ease;
 }
 
 .bg-fondo {
-  background-color: #faedcd;
+    /* Fondo que podría ser de la página o un contenedor interno */
+    background-color: var(--color-background-tag);
+    transition: background-color 0.4s ease;
 }
 
 .bg-my-tittle {
-  background-color: #ccd5ae;
+    /* Fondo de un título o encabezado destacado */
+    background-color: var(--color-background-pill);
+    transition: background-color 0.4s ease;
+}
+
+/* --- ESTILOS MODO OSCURO (Asegurando la consistencia y el contraste) --- */
+
+.dark-mode .bg-verdes {
+    background-color: var(--color-background-section);
+    color: var(--color-text-title);
+}
+
+.dark-mode .bg-fondo {
+    background-color: var(--color-background-card);
+    color: var(--color-text-main);
+}
+
+.dark-mode .bg-my-tittle {
+    background-color: var(--color-background-pill);
+    color: var(--color-text-title);
 }
