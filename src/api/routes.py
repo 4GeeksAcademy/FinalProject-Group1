@@ -2,7 +2,7 @@
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
 from flask import Flask, request, jsonify, url_for, Blueprint
-from api.models import db, User, Recipe, Ingredient, RecipeIngredient, difficultyEnum, stateRecipeEnum, UnitEnum, Category, RecipeFavorite, RecipeRating, Comment
+from api.models import db, User, Recipe, Ingredient, RecipeIngredient, difficultyEnum, stateRecipeEnum, UnitEnum, Category, RecipeFavorite, RecipeRating
 from api.utils import generate_sitemap, APIException,  val_email, val_password
 from flask_cors import CORS
 import os
@@ -13,12 +13,11 @@ from datetime import timedelta, datetime, timezone
 from functools import wraps
 import json
 from .cloudinary_service import cloudinary_service
-from sqlalchemy import select, func
+from sqlalchemy import select
 from .admin_decorator import admin_required
 import cloudinary
 import cloudinary.uploader
 from datetime import datetime, timezone
-
 
 api = Blueprint('api', __name__)
 
@@ -166,7 +165,7 @@ def get_categories():
 @jwt_required()
 def create_category():
     claims = get_jwt()
-    if not claims.get("is_administrator"):
+    if claims.get("rol") != "admin":
         return jsonify({"message": "Admin role required"}), 403
     data = request.get_json(silent=True)
 
@@ -212,7 +211,7 @@ def create_category():
 @jwt_required()
 def edit_category(id):
     claims = get_jwt()
-    if not claims.get("is_administrator"):
+    if claims.get("rol") != "admin":
         return jsonify({"message": "Admin role required"}), 403
     data = request.get_json(silent=True)
 
@@ -256,12 +255,20 @@ def edit_category(id):
 @jwt_required()
 def delete_category(id):
     claims = get_jwt()
-    if not claims.get("is_administrator"):
+    if claims.get("rol") != "admin":
         return jsonify({"message": "Admin role required"}), 403
 
     category = Category.query.get(id)
     if category is None:
         return jsonify({"message": "Category not found"}), 404
+
+    recipes_count = Recipe.query.filter_by(category_id=category.id_category).count()
+
+    if recipes_count > 0:
+        return jsonify({
+            "message": "Category cannot be deleted because it has related recipes",
+            "recipes_count": recipes_count
+        }), 400
 
     try:
         db.session.delete(category)
@@ -271,9 +278,10 @@ def delete_category(id):
         }), 200
     except Exception as error:
         db.session.rollback()
+        print("error al eliminar", repr(error))
         return jsonify({
             "message": "Error deleting category",
-            "error": f"{error.args}"
+            "error": str(error)
         }), 500
 
 
@@ -640,8 +648,8 @@ def get_recipe_detail(recipe_id):
                 current_user_id = None
 
         recipe = Recipe.query.filter_by(
-            id_recipe=recipe_id
-            # state_recipe=stateRecipeEnum.PUBLISHED
+            id_recipe=recipe_id,
+            state_recipe=stateRecipeEnum.PUBLISHED
         ).first()
 
         if recipe is None:
@@ -649,10 +657,18 @@ def get_recipe_detail(recipe_id):
 
         recipe_data = recipe.serialize()
 
-        user_rating = None
-        user_rating_object = None
-        is_favorite = False
+        ratings = recipe.ratings
 
+        if ratings:
+            total_votes = len(ratings)
+            avg = sum(r.value for r in ratings) / total_votes
+        else:
+            total_votes = 0
+            avg = None
+
+        comments = [r.serialize() for r in ratings if r.comment]
+
+        is_favorite = False
         if current_user_id is not None:
             fav = RecipeFavorite.query.filter_by(
                 user_id=current_user_id,
@@ -660,22 +676,9 @@ def get_recipe_detail(recipe_id):
             ).first()
             is_favorite = fav is not None
 
-        if current_user_id is not None:
-            user_rating_object = RecipeRating.query.filter_by(
-                user_id=current_user_id,
-                recipe_id=recipe.id_recipe
-            ).first()
-
-            if user_rating_object:
-                user_rating = user_rating_object.value
-
-        ratings = recipe.ratings
-        comments = [r.serialize() for r in ratings if r.comment]
-
         recipe_data.update({
-            "avg_rating": recipe.avg_rating,
-            "vote_count": recipe.vote_count,
-            "user_rating": user_rating,
+            "avg_rating": avg,
+            "vote_count": total_votes,
             "comments": comments,
             "is_favorite": is_favorite
         })
@@ -957,105 +960,6 @@ def upload_profile_image():
         "image": user.profile,
         "user": user.serialize()
     }), 200
-
-
-@api.route("/recipes/<int:recipe_id>/comments", methods=["GET"])
-def get_recipe_comments(recipe_id):
-    recipe = Recipe.query.get(recipe_id)
-    if not recipe or recipe.state_recipe != stateRecipeEnum.PUBLISHED:
-        return jsonify({"message": "Receta no encontrada"}), 404
-
-    comments = Comment.query.filter_by(recipe_id=recipe_id).order_by(Comment.created_at.desc()).all()
-    return jsonify([comment.serialize() for comment in comments]), 200
-
-
-
-
-@api.route("/recipes/<int:recipe_id>/comments", methods=["POST"])
-@jwt_required()
-def create_comment(recipe_id):
-    current_user_id = int(get_jwt_identity())
-
-    recipe = Recipe.query.get(recipe_id)
-    if not recipe or recipe.state_recipe != stateRecipeEnum.PUBLISHED:
-        return jsonify({"message": "Receta no encontrada"}), 404
-
-    data = request.get_json()
-    content = data.get("content", "").strip()
-
-    if not content:
-        return jsonify({"message": "El comentario no puede estar vacío"}), 400
-
-    new_comment = Comment(
-        content=content,
-        user_id=current_user_id,
-        recipe_id=recipe_id
-    )
-
-    db.session.add(new_comment)
-    try:
-        db.session.commit()
-        return jsonify({
-            "message": "Comentario creado",
-            "comment": new_comment.serialize()
-        }), 201
-    except Exception as error:
-        db.session.rollback()
-        return jsonify({"message": "Error al crear comentario", "details": str(error)}), 500
-
-
-
-
-@api.route('/comments/<int:comment_id>', methods=['PUT'])
-@jwt_required()
-def update_comment(comment_id):
-    update_data = request.get_json()
-    updated_text = update_data.get("content", "").strip()
-
-    if not updated_text:
-        return jsonify({"error": "El comentario no puede estar vacío."}), 400
-
-    user_id = int(get_jwt_identity())
-
-    existing_comment = Comment.query.get(comment_id)
-    if not existing_comment:
-        return jsonify({"error": "Comentario no encontrado."}), 404
-
-    if existing_comment.user_id != user_id:
-        return jsonify({"error": "No tienes permiso para editar este comentario."}), 403
-
-    existing_comment.content = updated_text 
-    db.session.commit()
-
-    return jsonify({
-        "message": "Comentario actualizado",
-        "comment": existing_comment.serialize()
-    }), 200
-
-
-
-@api.route("/comments/<int:comment_id>", methods=["DELETE"])
-@jwt_required()
-def delete_comment(comment_id):
-    current_user_id = int(get_jwt_identity())
-    claims = get_jwt()
-    is_admin = claims.get("rol") == "admin"
-
-    comment = Comment.query.get(comment_id)
-    if not comment:
-        return jsonify({"message": "Comentario no encontrado"}), 404
-
-    if comment.user_id != current_user_id and not is_admin:
-        return jsonify({"message": "No autorizado"}), 403
-
-    try:
-        db.session.delete(comment)
-        db.session.commit()
-        return jsonify({"message": "Comentario eliminado"}), 200
-    except Exception as error:
-        db.session.rollback()
-        return jsonify({"message": "Error al eliminar comentario", "details": str(error)}), 500
-
 # RUTAS PARA HOME Y CATEGORÍAS
 
 
@@ -1173,65 +1077,6 @@ def get_recipes_by_category(category_id):
         return jsonify({
             "message": "Error retrieving recipes",
             "details": str(error)
-        }), 500
-
-# ENDPOINT DE BÚSQUEDA DE RECETAS
-# Permite buscar recetas por título para el componente SearchResults
-
-
-@api.route("/recipes/search", methods=["GET"])
-def search_recipes():
-    """
-    Busca recetas por título
-    Query param: q (término de búsqueda)
-    """
-    try:
-        query = request.args.get('q', '').strip()
-
-        if not query or len(query) < 2:
-            return jsonify({
-                "message": "Search term must be at least 2 characters",
-                "recipes": []
-            }), 400
-
-        # Buscar recetas publicadas que coincidan con el término
-        recipes = (
-            db.session.query(Recipe)
-            .filter(
-                Recipe.title.ilike(f'%{query}%'),
-                Recipe.state_recipe == stateRecipeEnum.PUBLISHED
-            )
-            .order_by(Recipe.created_at.desc())
-            .limit(50)
-            .all()
-        )
-
-        recipes_list = [
-            {
-                "id": recipe.id_recipe,
-                "title": recipe.title,
-                "image": recipe.image,
-                "portions": recipe.portions,
-                "prep_time_min": recipe.preparation_time_min,
-                "difficulty": recipe.difficulty.value,
-                "avg_rating": recipe.avg_rating,
-                "vote_count": recipe.vote_count
-            }
-            for recipe in recipes
-        ]
-
-        return jsonify({
-            "message": "Search completed successfully",
-            "recipes": recipes_list,
-            "total": len(recipes_list)
-        }), 200
-
-    except Exception as error:
-        print(f"Error searching recipes: {error}")
-        return jsonify({
-            "message": "Error performing search",
-            "details": str(error),
-            "recipes": []
         }), 500
 
 
@@ -1369,55 +1214,4 @@ def get_my_recipes():
         return jsonify({"message": "Internal Server Error"}), 500
 
 
-@api.route("/recipe/<int:recipe_id>/rate", methods=["POST"])
-@jwt_required()
-def rate_recipes(recipe_id):
-    user_id = int(get_jwt_identity())
-    data = request.get_json()
-    rating_value = data.get("rating")
 
-    if rating_value is None or not 1 <= rating_value <= 5:
-        return jsonify({"message": "The grade must be a whole number between 1 and 5."}), 400
-
-    recipe = db.session.get(Recipe, recipe_id)
-    if recipe is None or recipe.state_recipe != stateRecipeEnum.PUBLISHED:
-        return jsonify({"message": "Recipe not found or not published."}), 404
-
-    existing_rating = RecipeRating.query.filter_by(
-        user_id=user_id,
-        recipe_id=recipe_id
-    ).one_or_none()
-
-    if existing_rating:
-        old_value = existing_rating.value
-        existing_rating.value = rating_value
-        action_msg = "Rating successfully updated."
-        db.session.add(existing_rating)
-    else:
-        new_rating = RecipeRating(
-            user_id=user_id,
-            recipe_id=recipe_id,
-            value=rating_value,
-        )
-        db.session.add(new_rating)
-        action_msg = "Recipe successfully rated."
-
-    rating_summary = db.session.query(
-        func.sum(RecipeRating.value).label('total_sum'),
-        func.count(RecipeRating.id_rating).label('total_count')
-    ).filter(RecipeRating.recipe_id == recipe_id).first()
-
-    total_sum = rating_summary.total_sum
-    total_count = rating_summary.total_count
-
-    recipe.vote_count = total_count
-
-    if total_count > 0:
-        recipe.avg_rating = total_sum / total_count
-    else:
-        recipe.avg_rating = None
-
-    db.session.add(recipe)
-    db.session.commit()
-
-    return jsonify({"message": action_msg, "avg_rating": recipe.avg_rating, "vote_count": recipe.vote_count}), 200
