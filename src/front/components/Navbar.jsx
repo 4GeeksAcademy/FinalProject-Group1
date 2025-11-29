@@ -80,7 +80,7 @@ export const Navbar = () => {
                             </button>
                         </li>
 
-                        {/* FAVORITOS ANTES DEL PERFIL */}
+                        {/* FAVORITOS */}
                         {store.token && (
                             <li className="nav-item d-flex align-items-center me-2">
                                 <NavLink

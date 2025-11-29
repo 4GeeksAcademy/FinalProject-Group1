@@ -99,7 +99,7 @@ export const router = createBrowserRouter(
           <AdminUsuarios />
         </AdminProtectedRoute>
       } />
-      <Route path="/misfavoritos" element={
+      <Route path="/favoritos" element={
         <ProtectedRoute>
            <MyFavorites />
         </ProtectedRoute>

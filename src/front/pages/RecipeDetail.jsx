@@ -307,7 +307,7 @@ export const RecipeDetail = () => {
             <div className={`stars ${token ? 'stars-interactive' : ''} ${isRatingLoading ? 'disabled' : ''}`}>
               {[...Array(5)].map((_, i) => {
                 const starValue = i + 1;
-                const displayValue = hoverRating 
+                const displayValue = hoverRating
                   || userRating
                   || (token ? 0 : (recipe.avg_rating || 0));
                 return (
@@ -316,7 +316,7 @@ export const RecipeDetail = () => {
                     className={`bi ${starValue <= displayValue
                       ? 'bi-star-fill'
                       : 'bi-star'
-                      } ${token ? 'clickable star-item' : ''}`} 
+                      } ${token ? 'clickable star-item' : ''}`}
                     onMouseEnter={() => token && setHoverRating(starValue)}
                     onClick={() => token && handleRate(starValue)}
                   ></i>
@@ -336,10 +336,14 @@ export const RecipeDetail = () => {
               style={{ cursor: token ? 'pointer' : 'not-allowed' }}
             >
               <i
-                className={
-                  isFavorite ? 'bi bi-star-fill' : 'bi bi-star'
-                }
-              ></i>
+                className={`
+                  bi 
+                  ${isFavorite ? "bi-heart-fill" : "bi-heart"} 
+                  favorite-icon 
+                  ${isFavorite ? "active" : ""}
+                  `.trim()}
+              />
+
               {isFavorite
                 ? ' Quitar de favoritos'
                 : ' Añadir a favoritos'}

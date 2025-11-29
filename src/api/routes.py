@@ -742,21 +742,38 @@ def toggle_favorite(recipe_id):
 @api.route("/favoritos", methods=["GET"])
 @jwt_required()
 def get_user_favorites():
-    current_user_id = int(get_jwt_identity())
+    try:
+        current_user_id = get_jwt_identity()
+        try:
+            current_user_id = int(current_user_id)
+        except (TypeError, ValueError):
+            return jsonify({"message": "Invalid user identity"}), 401
 
-    favorites = (
-        db.session.query(Recipe)
-        .join(RecipeFavorite, Recipe.id_recipe == RecipeFavorite.recipe_id)
-        .filter(RecipeFavorite.user_id == current_user_id)
-        .all()
-    )
+        favorites = (
+            db.session.query(RecipeFavorite)
+            .join(Recipe, RecipeFavorite.recipe_id == Recipe.id_recipe)
+            .filter(
+                RecipeFavorite.user_id == current_user_id,
+                Recipe.state_recipe == stateRecipeEnum.PUBLISHED
+            )
+            .all()
+        )
 
-    recipes_data = [r.serialize() for r in favorites]
+        favorite_recipes = [
+            fav.recipe.serialize() for fav in favorites
+        ]
 
-    return jsonify({
-        "message": "Favoritos obtenidos correctamente",
-        "recipes": recipes_data
-    }), 200
+        return jsonify({
+            "favorites": favorite_recipes,
+            "count": len(favorite_recipes)
+        }), 200
+
+    except Exception as e:
+        print("Error en get_user_favorites:", e)
+        return jsonify({
+            "message": "Error interno al obtener los favoritos",
+            "details": str(e)
+        }), 500
 
 
 @api.route("/recetas/<int:recipe_id>/calificar", methods=["POST"])

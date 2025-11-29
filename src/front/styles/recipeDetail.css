@@ -481,3 +481,16 @@
 .cursor-not-allowed {
     cursor: not-allowed;
 }
+
+.favorite-icon {
+  font-size: 1.2rem;
+  margin-right: 6px;
+  transition: transform 0.2s ease, color 0.2s ease;
+  color: #999;
+}
+
+.favorite-icon.active {
+  color: #e63946;
+  transform: scale(1.1);
+}
+
