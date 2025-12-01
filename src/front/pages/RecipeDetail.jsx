@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import '../styles/recipeDetail.css';
-import Comment from './Comment';
-
 import BannerRecetas from "../assets/img/BannerRecetas.png";
 import useGlobalReducer from "../hooks/useGlobalReducer.jsx";
+import Comment from './Comment';
+import BannerRecetas from "../assets/img/BannerRecetas.png";
+import useGlobalReducer from "../hooks/useGlobalReducer.jsx";
+import { NutritionalData } from './NutritionalData';
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
@@ -18,6 +20,8 @@ export const RecipeDetail = () => {
   const [isFavorite, setIsFavorite] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const [recipeLoaded, setRecipeLoaded] = useState(false);
 
   const [userRating, setUserRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
@@ -47,7 +51,6 @@ export const RecipeDetail = () => {
         </p>
 
         <div className="action-buttons">
-          {/* Botón para ir a Iniciar Sesión */}
           <Link
             to="/login"
             className="btn btn-warning btn-sesion"
@@ -76,6 +79,7 @@ export const RecipeDetail = () => {
     const fetchRecipe = async () => {
       setLoading(true);
       setError(null);
+      setRecipeLoaded(false);
 
       if (!recipeId) {
         console.error("Error: recipeId es indefinido. No se puede cargar la receta.");
@@ -116,6 +120,8 @@ export const RecipeDetail = () => {
         setRecipe(data);
         setIsFavorite(Boolean(data.is_favorite));
         setUserRating(data.user_rating || 0);
+        setRecipeLoaded(true);
+
       } catch (err) {
         console.error('Error en fetchRecipe:', err);
         setError(err.message || 'Error al conectar con el servidor');
@@ -135,8 +141,8 @@ export const RecipeDetail = () => {
       alert('Debes iniciar sesión para calificar.');
       return;
     }
-    if (isRatingLoading) return; // Evita clics dobles
 
+    if (isRatingLoading) return;
     setIsRatingLoading(true);
 
     try {
@@ -270,7 +276,8 @@ export const RecipeDetail = () => {
     image,
     ingredients = [],
     steps,
-    nutritional_data,
+    is_published = false, 
+    comments = [],        
   } = recipe;
 
   const stepsList = steps
@@ -390,19 +397,17 @@ export const RecipeDetail = () => {
           </div>
         </div>
       </div>
-
-      {nutritional_data && (
-        <div className="nutritional-section">
-          <h2 className="section-title">
-            <i className="bi bi-heart-pulse"></i> Información Nutricional
-          </h2>
-          <div className="nutritional-content">
-            <p>{nutritional_data}</p>
-          </div>
-        </div>
+      {is_published && (
+        <NutritionalData recipeId={recipeId} token={token} />
       )}
 
-      <Comment recipeId={recipeId} />
+      {is_published && (
+        <Comment
+          recipeId={recipeId}
+          initialComments={comments}
+          isPublished={is_published}
+        />
+      )}
 
     </div>
   );
