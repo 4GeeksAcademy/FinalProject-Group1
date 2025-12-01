@@ -14,6 +14,8 @@ export const CategoryView = () => {
     const [loading, setLoading] = useState(true);
     const [currentPage, setCurrentPage] = useState(1);
     const [searchTerm, setSearchTerm] = useState('');
+    const [selectedDifficulties, setSelectedDifficulties] = useState([]);
+    const difficulties = ['fácil', 'medio', 'difícil'];
 
     useEffect(() => {
         fetchRecipesByCategory(currentPage);
@@ -45,10 +47,23 @@ export const CategoryView = () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-    // Filtrar recetas según búsqueda
-    const filteredRecipes = recipes.filter(recipe =>
-        recipe.title.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const handleDifficultyToggle = (difficulty) => {
+        setSelectedDifficulties(prev => {
+            if (prev.includes(difficulty)) {
+                return prev.filter(d => d !== difficulty);
+            } else {
+                return [...prev, difficulty];
+            }
+        });
+    };
+
+    // Filtrar recetas según búsqueda y dificultad
+    const filteredRecipes = recipes.filter(recipe => {
+        const matchesSearch = recipe.title.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesDifficulty = selectedDifficulties.length === 0 || 
+            selectedDifficulties.includes(recipe.difficulty.toLowerCase());
+        return matchesSearch && matchesDifficulty;
+    });
 
     if (loading) {
         return (
@@ -110,6 +125,46 @@ export const CategoryView = () => {
                         )}
                     </div>
                 </div>
+
+                {/* Filtro de Dificultad */}
+                <div className="difficulty-filter">
+                    <div className="filter-label">
+                        <i className="fa-solid fa-filter filter-icon"></i>
+                        <span>Filtrar por dificultad:</span>
+                    </div>
+                    <div className="checkbox-group">
+                        {difficulties.map((difficulty) => (
+                            <label 
+                                key={difficulty} 
+                                className={`checkbox-label ${selectedDifficulties.includes(difficulty) ? 'active' : ''}`}
+                            >
+                                <input
+                                    type="checkbox"
+                                    className="checkbox-input"
+                                    checked={selectedDifficulties.includes(difficulty)}
+                                    onChange={() => handleDifficultyToggle(difficulty)}
+                                />
+                                <span className="checkbox-custom">
+                                    {selectedDifficulties.includes(difficulty) && (
+                                        <i className="fa-solid fa-check check-icon"></i>
+                                    )}
+                                </span>
+                                <span className="difficulty-text">
+                                    {difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}
+                                </span>
+                            </label>
+                        ))}
+                    </div>
+                    {selectedDifficulties.length > 0 && (
+                        <button 
+                            className="clear-filters-btn"
+                            onClick={() => setSelectedDifficulties([])}
+                        >
+                            <i className="fa-solid fa-times-circle"></i>
+                            Limpiar filtros
+                        </button>
+                    )}
+                </div>
             </div>
 
             {/* Recipes Grid */}
@@ -118,22 +173,25 @@ export const CategoryView = () => {
                     <div className="empty-state-category">
                         <i className="fa-solid fa-inbox"></i>
                         <h3>
-                            {searchTerm 
-                                ? 'No se encontraron recetas con ese criterio' 
+                            {searchTerm || selectedDifficulties.length > 0
+                                ? 'No se encontraron recetas con esos criterios' 
                                 : 'No hay recetas en esta categoría'}
                         </h3>
                         <p>
-                            {searchTerm 
-                                ? 'Intenta con otro término de búsqueda' 
+                            {searchTerm || selectedDifficulties.length > 0
+                                ? 'Intenta con otros términos de búsqueda o filtros' 
                                 : 'Explora otras categorías para encontrar deliciosas recetas'}
                         </p>
-                        {searchTerm ? (
+                        {(searchTerm || selectedDifficulties.length > 0) ? (
                             <button 
-                                onClick={() => setSearchTerm('')}
+                                onClick={() => {
+                                    setSearchTerm('');
+                                    setSelectedDifficulties([]);
+                                }}
                                 className="btn-back-home"
                             >
                                 <i className="fa-solid fa-rotate-left"></i>
-                                Limpiar búsqueda
+                                Limpiar búsqueda y filtros
                             </button>
                         ) : (
                             <Link to="/" className="btn-back-home">
@@ -195,7 +253,7 @@ export const CategoryView = () => {
                     </div>
 
                     {/* Pagination */}
-                    {!searchTerm && pagination.pages > 1 && (
+                    {!searchTerm && selectedDifficulties.length === 0 && pagination.pages > 1 && (
                         <div className="pagination-modern">
                             <button
                                 className="pagination-btn"

@@ -566,7 +566,7 @@
 
 .category-pills {
     display: flex;
-    flex-wrap: wrap;
+    white-space: nowrap;
     gap: 13.5px;
     justify-content: center;
 }
