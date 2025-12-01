@@ -646,7 +646,7 @@ def get_recipe_detail(recipe_id):
         ).first()
 
         if recipe is None:
-            return jsonify({"message": "Receta no encontrada"}), 404
+            return jsonify({"message": "Recipe Not Found"}), 404
 
         recipe_data = recipe.serialize()
 
@@ -678,24 +678,37 @@ def get_recipe_detail(recipe_id):
             if user_rating_object:
                 user_rating = user_rating_object.value
 
-        ratings = recipe.ratings
-        comments = [r.serialize() for r in ratings if r.comment]
+        is_published = recipe.state_recipe == stateRecipeEnum.PUBLISHED
+
+        if is_published:
+            ratings = recipe.ratings
+            comments = [r.serialize() for r in ratings if r.comment]
+            avg_rating = recipe.avg_rating
+            vote_count = recipe.vote_count
+        else:
+            comments = []
+            avg_rating = None
+            vote_count = 0
+
+        if not is_published:
+            recipe_data['nutritional_data'] = None
 
         recipe_data.update({
-            "avg_rating": recipe.avg_rating,
-            "vote_count": recipe.vote_count,
+            "avg_rating": avg_rating,
+            "vote_count": vote_count,
             "user_rating": user_rating,
             "comments": comments,
-            "is_favorite": is_favorite
+            "is_favorite": is_favorite,
+            "is_published": is_published
         })
 
         return jsonify(recipe_data), 200
 
-    except Exception as e:
+    except Exception as error:
         print("Error en get_recipe_detail:", e)
         return jsonify({
-            "message": "Error interno al obtener el detalle de la receta",
-            "details": str(e)
+            "message": "Internal error retrieving recipe details",
+            "details": str(error)
         }), 500
 
 
@@ -1437,7 +1450,7 @@ def calculate_and_save_nutrition(recipe_id):
     usda_detail_base_url = "https://api.nal.usda.gov/fdc/v1/food/"
 
     if not api_key:
-        print("Error: USDA_API_KEY no encontrada.")
+        print("Error: USDA_API_KEY not found.")
         return None
 
     for ri in recipe.recipe_ingredients_details:
@@ -1479,8 +1492,8 @@ def calculate_and_save_nutrition(recipe_id):
                 total_nutrition["fat"] += fat_per_100 * quantity_factor
                 total_nutrition["carbs"] += carbs_per_100 * quantity_factor
 
-        except requests.exceptions.RequestException as err:
-            print(f"Error de API para {ingredient_name}: {str(err)}")
+        except requests.exceptions.RequestException as error:
+            print(f"Error de API para {ingredient_name}: {str(error)}")
             continue
 
     final_nutrition_data = {"total_nutrition": {
@@ -1504,7 +1517,7 @@ def get_recipe_nutrition(recipe_id):
     try:
         recipe = Recipe.query.filter_by(id_recipe=recipe_id).first()
         if recipe is None:
-            return jsonify({"message": "Receta no encontrada"}), 404
+            return jsonify({"message": "Recipe not found"}), 404
 
         if recipe.nutritional_data:
             data = json.loads(recipe.nutritional_data)
@@ -1517,8 +1530,8 @@ def get_recipe_nutrition(recipe_id):
             data = json.loads(recipe.nutritional_data)
             return jsonify(data), 200
         else:
-            return jsonify({"message": "Cálculo nutricional fallido o no disponible"}), 404
+            return jsonify({"message": "Nutritional calculation failed or unavailable"}), 404
 
-    except Exception as e:
-        print("Error en get_recipe_nutrition:", e)
-        return jsonify({"message": "Error interno al obtener nutrición"}), 500
+    except Exception as error:
+        print("Error en get_recipe_nutrition:", error)
+        return jsonify({"message": "Internal error in obtaining nutrition"}), 500

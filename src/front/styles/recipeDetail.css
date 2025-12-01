@@ -46,7 +46,6 @@
   align-items: start;
   margin-bottom: 60px;
   padding: 40px;
-  /* Usamos el degradado del botón primario */
   background: linear-gradient(
     135deg,
     var(--color-btn-secondary) 0%,
@@ -131,14 +130,12 @@
 }
 
 .stars i {
-  /* Color de estrella ajustado a Highlight */
   color: var(--color-text-highlight);
   font-size: 1.3rem;
 }
 
 .rating-text {
   font-weight: 600;
-  /* Color de texto meta/secundario */
   color: var(--color-text-meta);
   transition: color 0.4s ease;
 }
@@ -150,7 +147,6 @@
   height: 450px;
 }
 
-/* Ajuste de sombra en modo oscuro */
 .dark-mode .recipe-hero-image {
   box-shadow: 0 20px 60px rgba(255, 255, 255, 0.1);
 }
@@ -315,7 +311,7 @@
 .nutrition-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 15px 30px; 
+  gap: 15px 30px;
   margin-top: 20px;
 }
 
@@ -326,7 +322,7 @@
   font-weight: 500;
   border-bottom: 1px dashed var(--color-background-pill);
   color: var(--color-text-main);
-  display: flex; 
+  display: flex;
   justify-content: space-between;
 }
 

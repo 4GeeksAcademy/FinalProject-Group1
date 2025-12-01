@@ -6,7 +6,6 @@ import useGlobalReducer from "../hooks/useGlobalReducer.jsx";
 import Comment from './Comment';
 import { NutritionalData } from './NutritionalData';
 
-
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 export const RecipeDetail = () => {
@@ -274,6 +273,8 @@ export const RecipeDetail = () => {
     image,
     ingredients = [],
     steps,
+    is_published = false, 
+    comments = [],        
   } = recipe;
 
   const stepsList = steps
@@ -389,8 +390,17 @@ export const RecipeDetail = () => {
           </div>
         </div>
       </div>
-      <NutritionalData recipeId={recipeId} token={token} />
-      <Comment recipeId={recipeId} />
+      {is_published && (
+        <NutritionalData recipeId={recipeId} token={token} />
+      )}
+
+      {is_published && (
+        <Comment
+          recipeId={recipeId}
+          initialComments={comments}
+          isPublished={is_published}
+        />
+      )}
 
     </div>
   );
