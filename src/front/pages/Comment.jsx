@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
-const Comment = ({ recipeId }) => {
-    const [comments, setComments] = useState([]);
+const Comment = ({ recipeId, initialComments, isPublished }) => {
+    const [comments, setComments] = useState(initialComments || []);
     const [newComment, setNewComment] = useState("");
     const [editingCommentId, setEditingCommentId] = useState(null);
     const [editingContent, setEditingContent] = useState("");
@@ -48,9 +48,15 @@ const Comment = ({ recipeId }) => {
         try {
             const response = await fetch(`${URL_BASE}/recipes/${recipeId}/comments`);
             const data = await response.json();
-            setComments(data);
+            if (Array.isArray(data)) {
+                setComments(data);
+            } else {
+                console.error("La respuesta de comentarios no es un array:", data);
+                setComments([]);
+            }
         } catch (error) {
-            console.log("Error cargando comentarios", error);
+            console.error("Error cargando comentarios", error);
+            setComments([]);
         }
     };
 
@@ -76,7 +82,7 @@ const Comment = ({ recipeId }) => {
             });
 
             setNewComment("");
-            fetchComments();
+            await fetchComments();
         } catch (error) {
             console.error("Error enviando comentario:", error);
         }
@@ -119,7 +125,7 @@ const Comment = ({ recipeId }) => {
 
             setEditingCommentId(null);
             setEditingContent("");
-            fetchComments();
+            await fetchComments();
         } catch (error) {
             console.error("Error editando comentario:", error);
         }
@@ -137,6 +143,10 @@ const Comment = ({ recipeId }) => {
     }, []);
 
 
+    if (!isPublished) {
+        return <p className="text-muted">Los comentarios solo están disponibles para recetas publicadas.</p>
+    }
+
     return (
         <div className="form-control">
             <h2>Comentarios</h2>
@@ -151,10 +161,10 @@ const Comment = ({ recipeId }) => {
             </form>
 
             <div className="form-control">
-                {comments.length === 0 ? (
+                {(!comments || comments.length === 0) ? (
                     <p>Sé el primero en comentar!</p>
                 ) : (
-                    comments.map((comment) => (
+                    Array.isArray(comments) && comments.map((comment) => (
                         <div key={comment.id} className="form-control border-0 py-3">
                             <div className="d-flex gap-3">
                                 <img

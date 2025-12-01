@@ -37,7 +37,8 @@ class User(db.Model):
     favorites: Mapped[List["RecipeFavorite"]] = relationship(
         back_populates="user", cascade="all, delete-orphan")
 
-    comments: Mapped[List["Comment"]] = relationship("Comment", back_populates="user", cascade="all, delete-orphan")
+    comments: Mapped[List["Comment"]] = relationship(
+        "Comment", back_populates="user", cascade="all, delete-orphan")
 
     def __repr__(self):
         return f'<User {self.username}>'
@@ -80,7 +81,7 @@ class Category(db.Model):
             "name_category": self.name_category,
         }
 
- 
+
 class difficultyEnum(enum.Enum):
     EASY = "fácil"
     MEDIUM = "medio"
@@ -101,8 +102,8 @@ class UnitEnum(enum.Enum):
     LITERS = "l"
     MILLILITERS = "ml"
     CUPS = "tazas"
-    TABLESPOONS = "cucharadas_sopera"
-    TEASPOONS = "cucharaditas"
+    TABLESPOONS = "tbsp"
+    TEASPOONS = "tsp"
     UNITS = "unidades"
     PINCH = "pizca"
 
@@ -165,7 +166,8 @@ class Recipe(db.Model):
             else self.state_recipe
         )
 
-        ingredients_list = [item.serialize() for item in self.recipe_ingredients_details]
+        ingredients_list = [item.serialize()
+                            for item in self.recipe_ingredients_details]
         creator_display_name = self.user_recipe.fullname if self.user_recipe.fullname else self.user_recipe.username
         return {
             "id": self.id_recipe,
@@ -185,7 +187,7 @@ class Recipe(db.Model):
             "category_name": self.category_recipe.name_category,
             "ingredients": ingredients_list,
             "created_at": self.created_at.isoformat(),
-    }
+        }
 
 
 class Comment(db.Model):
@@ -200,8 +202,9 @@ class Comment(db.Model):
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
 
-    recipe: Mapped["Recipe"] = relationship("Recipe", back_populates="comments")
-    user: Mapped["User"] = relationship("User",back_populates="comments")
+    recipe: Mapped["Recipe"] = relationship(
+        "Recipe", back_populates="comments")
+    user: Mapped["User"] = relationship("User", back_populates="comments")
 
     def serialize(self):
         return {
@@ -216,8 +219,6 @@ class Comment(db.Model):
                 "image": self.user.profile or f"https://ui-avatars.com/api/?name={self.user.username}&size=128&background=random&rounded=true"
             }
         }
-
-
 
 
 # Clase ingrediente (el catálogo)
