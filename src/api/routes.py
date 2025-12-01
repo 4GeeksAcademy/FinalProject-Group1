@@ -18,6 +18,7 @@ from .admin_decorator import admin_required
 import cloudinary
 import cloudinary.uploader
 from datetime import datetime, timezone
+import requests
 
 
 api = Blueprint('api', __name__)
@@ -647,7 +648,24 @@ def get_recipe_detail(recipe_id):
         if recipe is None:
             return jsonify({"message": "Receta no encontrada"}), 404
 
+        needs_refresh = False
+        if not recipe.nutritional_data:
+            calculated_data = calculate_and_save_nutrition(recipe_id)
+            if calculated_data:
+                needs_refresh = True
+
+        if needs_refresh:
+            db.session.refresh(recipe)
+
         recipe_data = recipe.serialize()
+
+        if 'nutritional_data' in recipe_data and isinstance(recipe_data['nutritional_data'], str):
+            try:
+                recipe_data['nutritional_data'] = json.loads(
+                    recipe_data['nutritional_data'])
+            except json.JSONDecodeError as e:
+                print(f"Error al decodificar nutritional_data: {e}")
+                recipe_data['nutritional_data'] = None
 
         user_rating = None
         user_rating_object = None
@@ -689,6 +707,93 @@ def get_recipe_detail(recipe_id):
             "details": str(e)
         }), 500
 
+
+CALORIAS_ID = 1008
+PROTEIN_ID = 1003
+FAT_ID = 1004
+CARBS_ID = 1005
+
+
+def get_nutrient_value(detail_data, nutrient_id):
+    for nutrient in detail_data.get("foodNutrients", []):
+        if str(nutrient.get("nutrient", {}).get("id")) == str(nutrient_id):
+            return nutrient.get("amount", 0)
+    return 0
+
+
+def calculate_and_save_nutrition(recipe_id):
+    recipe = Recipe.query.get(recipe_id)
+    if recipe is None or recipe.state_recipe != stateRecipeEnum.PUBLISHED:
+        return None
+    total_nutrition = {
+        "calories": 0.0,
+        "protein": 0.0,
+        "fat": 0.0,
+        "carbs": 0.0
+    }
+
+    api_key = os.getenv("USDA_API_KEY")
+    usda_search_url = "https://api.nal.usda.gov/fdc/v1/foods/search"
+    usda_detail_base_url = "https://api.nal.usda.gov/fdc/v1/food/"
+    
+    if not api_key:
+        print("Error: USDA_API_KEY no encontrada.")
+        return None
+
+    for ri in recipe.recipe_ingredients_details:
+        ingredient_name = ri.ingredient_catalog.name if ri.ingredient_catalog else "unknown ingredient"
+        
+        params = {
+            "api_key": api_key,
+            "query": ingredient_name,
+            "pageSize": 1
+            }
+    
+        try:
+            response = requests.get(usda_search_url, params=params)
+            response.raise_for_status()
+            search_data = response.json()
+
+            if search_data.get("foods"):
+                best_match = search_data["foods"][0]
+                fdc_id_found = best_match["fdcId"]
+
+                detail_url = f"{usda_detail_base_url}{fdc_id_found}"
+                detail_params = {"api_key": api_key}
+
+                detail_response = requests.get(detail_url, params=detail_params)
+                detail_response.raise_for_status()
+                detail_data = detail_response.json()
+
+                calories_per_100 = get_nutrient_value(detail_data, CALORIAS_ID)
+                protein_per_100 = get_nutrient_value(detail_data, PROTEIN_ID)
+                fat_per_100 = get_nutrient_value(detail_data, FAT_ID)
+                carbs_per_100 = get_nutrient_value(detail_data, CARBS_ID)
+
+                quantity_factor = ri.quantity / 100.0 if ri.quantity else 0.0
+
+                total_nutrition["calories"] += calories_per_100 * quantity_factor
+                total_nutrition["protein"] += protein_per_100 * quantity_factor
+                total_nutrition["fat"] += fat_per_100 * quantity_factor
+                total_nutrition["carbs"] += carbs_per_100 * quantity_factor
+
+        except requests.exceptions.RequestException as err:
+            print(f"Error de API para {ingredient_name}: {str(err)}")
+            continue
+
+    final_nutrition_data = {"total_nutrition": {k: round(v, 2) for k, v in total_nutrition.items()},}
+
+    try:
+        json_to_save = json.dumps(final_nutrition_data)
+        recipe.nutritional_data = json_to_save
+        db.session.add(recipe)
+        db.session.commit()
+        return final_nutrition_data["total_nutrition"] 
+    except Exception as db_error:
+        db.session.rollback()
+        print(f"Error al guardar en BD: {db_error}")
+        return None
+  
 
 @api.route("/recetas/<int:recipe_id>/favorito", methods=["POST"])
 @jwt_required()
@@ -945,10 +1050,9 @@ def get_recipe_comments(recipe_id):
     if not recipe or recipe.state_recipe != stateRecipeEnum.PUBLISHED:
         return jsonify({"message": "Receta no encontrada"}), 404
 
-    comments = Comment.query.filter_by(recipe_id=recipe_id).order_by(Comment.created_at.desc()).all()
+    comments = Comment.query.filter_by(recipe_id=recipe_id).order_by(
+        Comment.created_at.desc()).all()
     return jsonify([comment.serialize() for comment in comments]), 200
-
-
 
 
 @api.route("/recipes/<int:recipe_id>/comments", methods=["POST"])
@@ -984,8 +1088,6 @@ def create_comment(recipe_id):
         return jsonify({"message": "Error al crear comentario", "details": str(error)}), 500
 
 
-
-
 @api.route('/comments/<int:comment_id>', methods=['PUT'])
 @jwt_required()
 def update_comment(comment_id):
@@ -1004,14 +1106,13 @@ def update_comment(comment_id):
     if existing_comment.user_id != user_id:
         return jsonify({"error": "No tienes permiso para editar este comentario."}), 403
 
-    existing_comment.content = updated_text 
+    existing_comment.content = updated_text
     db.session.commit()
 
     return jsonify({
         "message": "Comentario actualizado",
         "comment": existing_comment.serialize()
     }), 200
-
 
 
 @api.route("/comments/<int:comment_id>", methods=["DELETE"])
