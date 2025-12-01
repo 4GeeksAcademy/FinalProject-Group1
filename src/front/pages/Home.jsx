@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import "../styles/home.css";
 import BannerRecetas from "../assets/img/BannerRecetas.png";
 import Comment from './Comment';
+import { RecipeCardMini } from "../components/RecipeCardMini";
 
 
 const getApiUrl = () => {
@@ -47,17 +48,17 @@ export const Home = () => {
 
   // Cerrar dropdown al hacer clic fuera
   useEffect(() => {
-  const handleClickOutside = (event) => {
-    if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-      setShowDropdown(false);
-      setSearchTerm(''); 
-      setSearchResults({ recipes: [], categories: [] }); 
-    }
-  };
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setShowDropdown(false);
+        setSearchTerm('');
+        setSearchResults({ recipes: [], categories: [] });
+      }
+    };
 
-  document.addEventListener('mousedown', handleClickOutside);
-  return () => document.removeEventListener('mousedown', handleClickOutside);
-}, []);
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
 
   // Buscar mientras escribe
@@ -474,39 +475,7 @@ export const Home = () => {
                   id={`carousel-${categoryData.category_id}`}
                 >
                   {categoryData.recipes.slice(0, 12).map((recipe) => (
-                    <div key={recipe.id} className="recipe-card-modern">
-                      <div className="card-image-wrapper">
-                        <Link to={`/recipe/${recipe.id}`} onClick={() => window.scrollTo(0, 0)}>
-                          <img src={recipe.image} alt={recipe.title} />
-                          <div className="image-overlay">
-                            <span className="difficulty-tag">{recipe.difficulty}</span>
-                          </div>
-                        </Link>
-                      </div>
-
-                      <div className="card-content-modern">
-                        <h3 className="card-title-modern">{recipe.title}</h3>
-                        <div className="card-meta-modern">
-                          <div className="meta-badge">
-                            <i className="fa-solid fa-clock"></i>
-                            <span>{recipe.prep_time_min} min</span>
-                          </div>
-                          <div className="meta-badge">
-                            <i className="fa-solid fa-users"></i>
-                            <span>{recipe.portions} porciones</span>
-                          </div>
-                        </div>
-
-                        <Link
-                          to={`/recipe/${recipe.id}`}
-                          className="view-recipe-btn"
-                          onClick={() => window.scrollTo(0, 0)}
-                        >
-                          <span>Ver receta completa</span>
-                          <i className="fa-solid fa-arrow-right-circle"></i>
-                        </Link>
-                      </div>
-                    </div>
+                    <RecipeCardMini key={recipe.id} recipe={recipe} />
                   ))}
                 </div>
 

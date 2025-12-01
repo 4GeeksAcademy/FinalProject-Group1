@@ -167,7 +167,7 @@ def get_categories():
 @jwt_required()
 def create_category():
     claims = get_jwt()
-    if not claims.get("is_administrator"):
+    if claims.get("rol") != "admin":
         return jsonify({"message": "Admin role required"}), 403
     data = request.get_json(silent=True)
 
@@ -213,7 +213,7 @@ def create_category():
 @jwt_required()
 def edit_category(id):
     claims = get_jwt()
-    if not claims.get("is_administrator"):
+    if claims.get("rol") != "admin":
         return jsonify({"message": "Admin role required"}), 403
     data = request.get_json(silent=True)
 
@@ -257,12 +257,20 @@ def edit_category(id):
 @jwt_required()
 def delete_category(id):
     claims = get_jwt()
-    if not claims.get("is_administrator"):
+    if claims.get("rol") != "admin":
         return jsonify({"message": "Admin role required"}), 403
 
     category = Category.query.get(id)
     if category is None:
         return jsonify({"message": "Category not found"}), 404
+
+    recipes_count = Recipe.query.filter_by(category_id=category.id_category).count()
+
+    if recipes_count > 0:
+        return jsonify({
+            "message": "Category cannot be deleted because it has related recipes",
+            "recipes_count": recipes_count
+        }), 400
 
     try:
         db.session.delete(category)
@@ -272,9 +280,10 @@ def delete_category(id):
         }), 200
     except Exception as error:
         db.session.rollback()
+        print("error al eliminar", repr(error))
         return jsonify({
             "message": "Error deleting category",
-            "error": f"{error.args}"
+            "error": str(error)
         }), 500
 
 
@@ -755,6 +764,43 @@ def toggle_favorite(recipe_id):
         return jsonify({
             "message": "Error al actualizar favorito",
             "details": str(error)
+        }), 500
+
+
+@api.route("/favoritos", methods=["GET"])
+@jwt_required()
+def get_user_favorites():
+    try:
+        current_user_id = get_jwt_identity()
+        try:
+            current_user_id = int(current_user_id)
+        except (TypeError, ValueError):
+            return jsonify({"message": "Invalid user identity"}), 401
+
+        favorites = (
+            db.session.query(RecipeFavorite)
+            .join(Recipe, RecipeFavorite.recipe_id == Recipe.id_recipe)
+            .filter(
+                RecipeFavorite.user_id == current_user_id,
+                Recipe.state_recipe == stateRecipeEnum.PUBLISHED
+            )
+            .all()
+        )
+
+        favorite_recipes = [
+            fav.recipe.serialize() for fav in favorites
+        ]
+
+        return jsonify({
+            "favorites": favorite_recipes,
+            "count": len(favorite_recipes)
+        }), 200
+
+    except Exception as e:
+        print("Error en get_user_favorites:", e)
+        return jsonify({
+            "message": "Error interno al obtener los favoritos",
+            "details": str(e)
         }), 500
 
 

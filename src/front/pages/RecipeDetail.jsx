@@ -139,6 +139,7 @@ export const RecipeDetail = () => {
       alert('Debes iniciar sesión para calificar.');
       return;
     }
+
     if (isRatingLoading) return;
     setIsRatingLoading(true);
 
@@ -340,10 +341,14 @@ export const RecipeDetail = () => {
               style={{ cursor: token ? 'pointer' : 'not-allowed' }}
             >
               <i
-                className={
-                  isFavorite ? 'bi bi-star-fill' : 'bi bi-star'
-                }
-              ></i>
+                className={`
+                  bi 
+                  ${isFavorite ? "bi-heart-fill" : "bi-heart"} 
+                  favorite-icon 
+                  ${isFavorite ? "active" : ""}
+                  `.trim()}
+              />
+
               {isFavorite
                 ? ' Quitar de favoritos'
                 : ' Añadir a favoritos'}
@@ -405,3 +410,4 @@ export const RecipeDetail = () => {
     </div>
   );
 };
+
