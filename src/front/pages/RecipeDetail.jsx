@@ -4,6 +4,7 @@ import '../styles/recipeDetail.css';
 import BannerRecetas from "../assets/img/BannerRecetas.png";
 import useGlobalReducer from "../hooks/useGlobalReducer.jsx";
 import Comment from './Comment';
+import { NutritionalData } from './NutritionalData';
 
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
@@ -20,8 +21,6 @@ export const RecipeDetail = () => {
   const [error, setError] = useState(null);
 
   const [recipeLoaded, setRecipeLoaded] = useState(false);
-  // const [nutritionData, setNutritionData] = useState(null);
-  // const [nutritionError, setNutritionError] = useState(null);
 
   const [userRating, setUserRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
@@ -122,17 +121,6 @@ export const RecipeDetail = () => {
         setUserRating(data.user_rating || 0);
         setRecipeLoaded(true);
 
-        if (!data.nutritional_data) {
-          console.log("Datos nutricionales vacíos. Programando recarga...");
-          // Usamos un pequeño retraso para darle tiempo al backend para terminar el cálculo
-          // y para que el usuario pueda ver la receta rápidamente.
-          setTimeout(() => {
-            // Llamamos a la función de recarga, pero sin poner el estado de 'loading'
-            // general a true, para no bloquear la pantalla.
-            fetchUpdatedNutrition();
-          }, 1000); // 1 segundo de espera
-        }
-
       } catch (err) {
         console.error('Error en fetchRecipe:', err);
         setError(err.message || 'Error al conectar con el servidor');
@@ -141,39 +129,11 @@ export const RecipeDetail = () => {
       }
     };
 
-    const fetchUpdatedNutrition = async () => {
-      try {
-        const res = await fetch(`${BACKEND_URL}/recetas/${recipeId}`, {
-          headers: {
-            ...(token ? { Authorization: `Bearer ${token}` } : {}),
-          },
-        });
-        const data = await res.json();
-
-        if (res.ok) {
-          // Solo actualizamos el estado de la receta si los datos nutricionales ya existen
-          // (es decir, el backend ya los calculó y guardó)
-          if (data.nutritional_data) {
-            setRecipe(data); // Esto actualizará el estado con los nuevos datos
-            console.log("Datos nutricionales actualizados correctamente.");
-          } else {
-            // Si después de la segunda llamada sigue vacío, volvemos a intentar
-            // o asumimos que tomará más tiempo (dependiendo de la complejidad).
-            console.log("El cálculo nutricional aún no está listo. Reintentando...");
-            setTimeout(fetchUpdatedNutrition, 2000); // Reintenta 2 segundos después
-          }
-        }
-      } catch (err) {
-        console.log("Error al recargar nutrición, no es crítico:", err);
-        // El error no es crítico, pues la receta principal ya está visible.
-      }
-    };
-
     if (token && recipeId) {
       fetchRecipe();
     }
   }, [recipeId, token]);
-  
+
 
   const handleRate = async (ratingValue) => {
     if (!token) {
@@ -314,7 +274,6 @@ export const RecipeDetail = () => {
     image,
     ingredients = [],
     steps,
-    nutritional_data,
   } = recipe;
 
   const stepsList = steps
@@ -430,54 +389,7 @@ export const RecipeDetail = () => {
           </div>
         </div>
       </div>
-      {nutritional_data && nutritional_data.total_nutrition && (
-        <div className="summary-nutritional-section mt-5 p-4 border rounded shadow-sm">
-          <h2 className="section-title text-center text-primary mb-4">
-            <i className="bi bi-heart-pulse me-2"></i> Información Nutricional (por porción)
-          </h2>
-          <div className="row text-center">
-            {/* Las calorías son clave */}
-            <div className="col-6 col-md-3 mb-3">
-              <div className="data-box p-2 bg-light rounded">
-                <h4 className="fw-bold mb-0">
-                  {nutritional_data.total_nutrition.calories.toFixed(2)}
-                </h4>
-                <p className="text-muted small mb-0">Calorías (Kcal)</p>
-              </div>
-            </div>
-            {/* Carbohidratos */}
-            <div className="col-6 col-md-3 mb-3">
-              <div className="data-box p-2 bg-light rounded">
-                <h4 className="fw-bold mb-0">
-                  {nutritional_data.total_nutrition.carbs.toFixed(2)}g
-                </h4>
-                <p className="text-muted small mb-0">Carbohidratos</p>
-              </div>
-            </div>
-            {/* Grasas */}
-            <div className="col-6 col-md-3 mb-3">
-              <div className="data-box p-2 bg-light rounded">
-                <h4 className="fw-bold mb-0">
-                  {nutritional_data.total_nutrition.fat.toFixed(2)}g
-                </h4>
-                <p className="text-muted small mb-0">Grasas</p>
-              </div>
-            </div>
-            {/* Proteínas */}
-            <div className="col-6 col-md-3 mb-3">
-              <div className="data-box p-2 bg-light rounded">
-                <h4 className="fw-bold mb-0">
-                  {nutritional_data.total_nutrition.protein.toFixed(2)}g
-                </h4>
-                <p className="text-muted small mb-0">Proteínas</p>
-              </div>
-            </div>
-          </div>
-          <p className='text-center text-secondary small mt-3'>
-            *Cálculos basados en {nutritional_data.source || 'USDA'}
-          </p>
-        </div>
-      )}
+      <NutritionalData recipeId={recipeId} token={token} />
       <Comment recipeId={recipeId} />
 
     </div>

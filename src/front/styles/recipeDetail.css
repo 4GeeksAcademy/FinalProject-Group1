@@ -294,7 +294,6 @@
 
 /* ===== NUTRITIONAL SECTION ===== */
 .nutritional-section {
-  /* Fondo de la sección/tarjeta */
   background: var(--color-background-section);
   padding: 30px;
   border-radius: 16px;
@@ -315,9 +314,8 @@
 
 .nutrition-grid {
   display: grid;
-  /* Dos columnas, cada una ocupando el mismo espacio */
   grid-template-columns: 1fr 1fr;
-  gap: 15px 30px; /* Espacio vertical y horizontal */
+  gap: 15px 30px; 
   margin-top: 20px;
 }
 
@@ -326,28 +324,24 @@
   padding: 8px 0;
   font-size: 1rem;
   font-weight: 500;
-  /* Separador sutil entre filas */
   border-bottom: 1px dashed var(--color-background-pill);
   color: var(--color-text-main);
-  display: flex; /* Para alinear el texto y el valor */
+  display: flex; 
   justify-content: space-between;
 }
 
-/* El último elemento no necesita el borde inferior */
 .nutrition-grid p:last-child {
   border-bottom: none;
 }
 
 .nutrition-grid .fw-bold {
-  /* Estilo específico para resaltar las calorías */
   font-weight: 700;
 }
 
 @media (max-width: 768px) {
   .nutrition-grid {
-    /* En pantallas más pequeñas, volvemos a una sola columna */
     grid-template-columns: 1fr;
-    gap: 0; /* Menos espacio entre elementos */
+    gap: 0;
   }
 }
 
