@@ -1431,8 +1431,7 @@ def report_comment(comment_id):
         return jsonify({"message": "Comentario reportado con éxito. Gracias por tu colaboración."}), 201
     except Exception as e:
         db.session.rollback()
-        # Puedes añadir una verificación de integridad aquí, pero asumiremos que el error
-        # es general para simplificar
+        
         return jsonify({"message": "Error al procesar el reporte.", "error": str(e)}), 500
 @api.route('/admin/reportes', methods=['GET'])
 @admin_required()
@@ -1513,8 +1512,6 @@ def hide_comment(comment_id):
         db.session.rollback()
         return jsonify({"message": "Error al ocultar el comentario.", "error": str(e)}), 500
 
-
-### PUT: Marcar como Revisado (Acción de administrador)
 @api.route('/admin/reportes/revisado/<int:comment_id>', methods=['PUT'])
 @admin_required()
 def mark_reports_as_reviewed(comment_id):
@@ -1539,7 +1536,7 @@ def mark_reports_as_reviewed(comment_id):
             db.session.commit()
             return jsonify({"message": f"Reportes para el comentario ID {comment_id} marcados como revisados y comentario **VISIBLE**."}), 200
         else:
-             # Si no hay reportes, solo asegura que está visible
+             
              db.session.commit()
              return jsonify({"message": f"No se encontraron reportes pendientes. Comentario ID {comment_id} visible."}), 200
              
