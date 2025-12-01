@@ -1,6 +1,4 @@
-"""
-This module takes care of starting the API Server, Loading the DB and Adding the endpoints
-"""
+
 from flask import Flask, request, jsonify, url_for, Blueprint
 from api.models import db, User, Recipe, Ingredient, RecipeIngredient, difficultyEnum, stateRecipeEnum, UnitEnum, Category, RecipeFavorite, RecipeRating, Comment
 from api.utils import generate_sitemap, APIException,  val_email, val_password
@@ -18,6 +16,7 @@ from .admin_decorator import admin_required
 import cloudinary
 import cloudinary.uploader
 from datetime import datetime, timezone
+from .models import db, Reporte, Comment, User, Recipe
 
 
 api = Blueprint('api', __name__)
@@ -1401,3 +1400,149 @@ def rate_recipes(recipe_id):
     db.session.commit()
 
     return jsonify({"message": action_msg, "avg_rating": recipe.avg_rating, "vote_count": recipe.vote_count}), 200
+@api.route('/comentarios/reportar/<int:comment_id>', methods=['POST'])
+@jwt_required()
+def report_comment(comment_id):
+    
+    user_id = get_jwt_identity() 
+    
+    
+    comment = db.session.get(Comment, comment_id)
+    if not comment:
+        return jsonify({"message": "Comentario no encontrado."}), 404
+
+    data = request.get_json(silent=True)
+    if data is None:
+        return jsonify({"message": "JSON inválido o no enviado."}), 400
+        
+    razon = data.get("razon", "").strip()
+    
+    if not razon:
+        return jsonify({"message": "La razón del reporte es requerida."}), 400
+
+    new_report = Reporte(
+        comentario_id=comment_id,
+        razon=razon
+    )
+
+    try:
+        db.session.add(new_report)
+        db.session.commit()
+        return jsonify({"message": "Comentario reportado con éxito. Gracias por tu colaboración."}), 201
+    except Exception as e:
+        db.session.rollback()
+        # Puedes añadir una verificación de integridad aquí, pero asumiremos que el error
+        # es general para simplificar
+        return jsonify({"message": "Error al procesar el reporte.", "error": str(e)}), 500
+@api.route('/admin/reportes', methods=['GET'])
+@admin_required()
+def get_reported_comments():
+    reported_comment_ids = db.session.scalars(
+        db.select(Reporte.comentario_id)
+        .filter(Reporte.fecha_revision == None) 
+        .group_by(Reporte.comentario_id)
+    ).all()
+    
+    if not reported_comment_ids:
+        return jsonify({"message": "No hay comentarios reportados pendientes de revisión."}), 200
+
+    reported_comments = db.session.scalars(
+        db.select(Comment)
+        .filter(Comment.id.in_(reported_comment_ids))
+        .options(
+            db.joinedload(Comment.user),
+            db.joinedload(Comment.recipe).joinedload(Recipe.user_recipe)
+        )
+    ).all()
+
+    result = []
+    for comment in reported_comments:
+        report_count = db.session.scalar(
+            db.select(func.count(Reporte.id))
+            .filter(Reporte.comentario_id == comment.id, Reporte.fecha_revision == None)
+        )
+        
+
+        top_reasons = db.session.scalars(
+            db.select(Reporte.razon)
+            .filter(Reporte.comentario_id == comment.id, Reporte.fecha_revision == None)
+            .limit(3) 
+        ).all()
+        
+        result.append({
+            "id": comment.id,
+            "content": comment.content,
+            "is_hidden": comment.is_hidden,
+            "num_reportes_pendientes": report_count,
+            "razones": top_reasons,
+            "usuario": comment.user.serialize(),
+            "receta": {
+                "id": comment.recipe.id_recipe,
+                "title": comment.recipe.title,
+                "creator_name": comment.recipe.user_recipe.username 
+            }
+        })
+
+    return jsonify(result), 200
+
+### PUT: Ocultar Comentario (Acción de administrador)
+@api.route('/admin/comentarios/ocultar/<int:comment_id>', methods=['PUT'])
+@admin_required()
+def hide_comment(comment_id):
+    admin_id = get_jwt_identity()
+    
+    comment_to_hide = db.session.get(Comment, comment_id)
+
+    if not comment_to_hide:
+        return jsonify({"message": "Comentario no encontrado."}), 404
+    
+    try:
+        comment_to_hide.is_hidden = True
+        reports_to_update = db.session.scalars(
+            db.select(Reporte).filter(Reporte.comentario_id == comment_id)
+        ).all()
+        
+        for report in reports_to_update:
+            if report.fecha_revision is None:
+                report.administrador_id = admin_id
+                report.fecha_revision = datetime.now(timezone.utc)
+
+        db.session.commit()
+        return jsonify({"message": f"Comentario ID {comment_id} ha sido **OCULTADO** y sus reportes registrados."}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"message": "Error al ocultar el comentario.", "error": str(e)}), 500
+
+
+### PUT: Marcar como Revisado (Acción de administrador)
+@api.route('/admin/reportes/revisado/<int:comment_id>', methods=['PUT'])
+@admin_required()
+def mark_reports_as_reviewed(comment_id):
+    admin_id = get_jwt_identity()
+    
+    comment = db.session.get(Comment, comment_id)
+    if not comment:
+        return jsonify({"message": "Comentario no encontrado."}), 404
+
+    try:
+        comment.is_hidden = False
+        reports_to_update = db.session.scalars(
+            db.select(Reporte).filter(Reporte.comentario_id == comment_id)
+        ).all()
+        
+        if reports_to_update:
+            for report in reports_to_update:
+                if report.fecha_revision is None:
+                    report.administrador_id = admin_id
+                    report.fecha_revision = datetime.now(timezone.utc)
+            
+            db.session.commit()
+            return jsonify({"message": f"Reportes para el comentario ID {comment_id} marcados como revisados y comentario **VISIBLE**."}), 200
+        else:
+             # Si no hay reportes, solo asegura que está visible
+             db.session.commit()
+             return jsonify({"message": f"No se encontraron reportes pendientes. Comentario ID {comment_id} visible."}), 200
+             
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"message": "Error al marcar los reportes como revisados.", "error": str(e)}), 500

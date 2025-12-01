@@ -80,7 +80,6 @@ class Category(db.Model):
             "name_category": self.name_category,
         }
 
- 
 class difficultyEnum(enum.Enum):
     EASY = "fácil"
     MEDIUM = "medio"
@@ -185,13 +184,57 @@ class Recipe(db.Model):
             "category_name": self.category_recipe.name_category,
             "ingredients": ingredients_list,
             "created_at": self.created_at.isoformat(),
-    }
+        }
+
+# =========================================================================
+# CLASE REPORTE - MOVIDA AQUÍ PARA EVITAR ERRORES DE MAPEO CON COMMENT
+# =========================================================================
+class Reporte(db.Model):
+    __tablename__ = "reportes"
+    
+    id: Mapped[int] = mapped_column(primary_key=True)
+    comentario_id: Mapped[int] = mapped_column(
+        db.ForeignKey("comments.id", ondelete='CASCADE'), 
+        nullable=False
+    )
+    razon: Mapped[str] = mapped_column(String(255), nullable=False) 
+    fecha: Mapped[datetime] = mapped_column(DateTime(
+        timezone=True), default=lambda: datetime.now(timezone.utc), nullable=False)
+        
+    administrador_id: Mapped[Optional[int]] = mapped_column(
+        db.ForeignKey("user.id_user"), nullable=True) 
+    fecha_revision: Mapped[Optional[datetime]] = mapped_column(
+        DateTime(timezone=True), nullable=True)
+
+    # Relación: Apunta a la clase Comment (definida más adelante)
+    comentario: Mapped["Comment"] = relationship("Comment", back_populates="reportes")
+    administrador: Mapped["User"] = relationship("User", foreign_keys=[administrador_id])
+
+    def __repr__(self):
+        return f'<Reporte ID={self.id} Comentario ID={self.comentario_id}>'
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "comentario_id": self.comentario_id,
+            "razon": self.razon,
+            "fecha": self.fecha.isoformat(),
+            "administrador_id": self.administrador_id,
+            "fecha_revision": self.fecha_revision.isoformat() if self.fecha_revision else None,
+        }
+# =========================================================================
 
 
+# =========================================================================
+# CLASE COMMENT - CORREGIDA Y ACTUALIZADA
+# =========================================================================
 class Comment(db.Model):
     __tablename__ = "comments"
     id: Mapped[int] = mapped_column(primary_key=True)
     content: Mapped[str] = mapped_column(Text, nullable=False)
+    
+    # NUEVO CAMPO: Para ocultar el comentario
+    is_hidden: Mapped[bool] = mapped_column(Boolean(), nullable=False, default=False) 
 
     user_id: Mapped[int] = mapped_column(
         db.ForeignKey("user.id_user"), nullable=False)
@@ -202,11 +245,19 @@ class Comment(db.Model):
 
     recipe: Mapped["Recipe"] = relationship("Recipe", back_populates="comments")
     user: Mapped["User"] = relationship("User",back_populates="comments")
+    
+    # NUEVA RELACIÓN: Los reportes de este comentario (back_populates="comentario")
+    reportes: Mapped[List["Reporte"]] = relationship(
+        "Reporte", 
+        back_populates="comentario", 
+        cascade="all, delete-orphan"
+    ) 
 
     def serialize(self):
         return {
             "id": self.id,
             "content": self.content,
+            "is_hidden": self.is_hidden, # Incluido el nuevo estado
             "recipe_id": self.recipe_id,
             "user_id": self.user_id,
             "created_at": self.created_at.isoformat(),
@@ -216,8 +267,7 @@ class Comment(db.Model):
                 "image": self.user.profile or f"https://ui-avatars.com/api/?name={self.user.username}&size=128&background=random&rounded=true"
             }
         }
-
-
+# =========================================================================
 
 
 # Clase ingrediente (el catálogo)
@@ -228,7 +278,7 @@ class Ingredient(db.Model):
     name: Mapped[str] = mapped_column(String(100), unique=True, nullable=False)
     # lo coloco por si nos da tiempo de hacer lo de las conversiones
     volume_to_mass_factor: Mapped[Optional[float]
-                                  ] = mapped_column(Float, nullable=True)
+                                 ] = mapped_column(Float, nullable=True)
     unit_to_mass_factor: Mapped[Optional[float]
                                 ] = mapped_column(Float, nullable=True)
     # Para valores nutricionales por 100g/ml
