@@ -30,28 +30,22 @@ class UnitConverter:
         UNCONVERTIBLE_BASES = ["none"] 
         MASA_BASES = ["g"]
         VOLUMEN_BASES = ["ml"]
-
-        if base_from in VOLUMEN_BASES and base_to in MASA_BASES and ingredient_model and ingredient_model.volume_to_mass_factor:
-            factor_density = ingredient_model.volume_to_mass_factor
-            quantity_in_base = quantity * info_from["factor"]
-            quantity_converted = (quantity_in_base * factor_density) / info_to["factor"]
-            return quantity_converted, unit_to 
-        
-        if base_from in MASA_BASES and base_to in VOLUMEN_BASES and ingredient_model and ingredient_model.volume_to_mass_factor:
-            factor_density = ingredient_model.volume_to_mass_factor
-            quantity_in_base = quantity * info_from["factor"]
-            quantity_converted = (quantity_in_base / factor_density) / info_to["factor"]
-            return quantity_converted, unit_to 
         
         if base_from != base_to:
             return quantity, unit_from 
         
         if base_from in UNCONVERTIBLE_BASES:
+
             return quantity, unit_from 
+        if base_from in VOLUMEN_BASES:
+            return quantity, unit_from
         
-        quantity_in_base = quantity * info_from["factor"]
-        quantity_converted = quantity_in_base / info_to["factor"]
-        return quantity_converted, unit_to
+        if base_from in MASA_BASES:
+            quantity_in_base = quantity * info_from["factor"]
+            quantity_converted = quantity_in_base / info_to["factor"]
+            return quantity_converted, unit_to
+        else:
+            return quantity, unit_from
 
 
 converter = UnitConverter(CONVERSION_FACTORS)
