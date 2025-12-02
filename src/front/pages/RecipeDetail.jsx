@@ -6,6 +6,14 @@ import useGlobalReducer from "../hooks/useGlobalReducer.jsx";
 import Comment from './Comment';
 import { NutritionalData } from './NutritionalData';
 
+const ALL_CONVERSION_UNITS = [
+  { label: "Unidades Originales", value: "original" },
+  { label: "Gramos (g)", value: "g" },
+  { label: "Kilogramos (kg)", value: "kg" },
+  { label: "Libras (lb)", value: "lb" },
+  { label: "Onzas (oz)", value: "oz" },
+];
+
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 export const RecipeDetail = () => {
@@ -18,6 +26,7 @@ export const RecipeDetail = () => {
   const [isFavorite, setIsFavorite] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [conversionUnit, setConversionUnit] = useState("original");
 
   const [recipeLoaded, setRecipeLoaded] = useState(false);
 
@@ -84,8 +93,11 @@ export const RecipeDetail = () => {
         setLoading(false);
         return; // Detiene la ejecución del fetch
       }
+
+      const url = `${BACKEND_URL}/recetas/${recipeId}?unit=${conversionUnit}`;
+
       try {
-        const res = await fetch(`${BACKEND_URL}/recetas/${recipeId}`, {
+        const res = await fetch(url, {
           headers: {
             ...(token ? { Authorization: `Bearer ${token}` } : {}),
           },
@@ -131,7 +143,7 @@ export const RecipeDetail = () => {
     if (token && recipeId) {
       fetchRecipe();
     }
-  }, [recipeId, token]);
+  }, [recipeId, token, conversionUnit]);
 
 
   const handleRate = async (ratingValue) => {
@@ -274,8 +286,8 @@ export const RecipeDetail = () => {
     image,
     ingredients = [],
     steps,
-    is_published = false, 
-    comments = [],        
+    is_published = false,
+    comments = [],
   } = recipe;
 
   const stepsList = steps
@@ -366,6 +378,26 @@ export const RecipeDetail = () => {
           <h2 className="section-title">
             <i className="bi bi-basket"></i> Ingredientes
           </h2>
+
+          <div className="unit-converter-selector mb-4">
+            <label htmlFor="unitSelect" className="form-label d-block fw-bold text-success">
+              Mostrar unidades de MASA en:
+            </label>
+            <select
+              id="unitSelect"
+              className="form-select form-select-sm w-auto d-inline-block"
+              value={conversionUnit}
+              onChange={(e) => setConversionUnit(e.target.value)}
+              disabled={loading}
+            >
+              {ALL_CONVERSION_UNITS.map(unit => (
+                <option key={unit.value} value={unit.value}>
+                  {unit.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
           <div className="ingredients-list">
             {ingredients.map((ingredient) => (
               <div key={ingredient.id} className="ingredient-item">

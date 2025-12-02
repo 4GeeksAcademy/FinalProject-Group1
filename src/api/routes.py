@@ -19,7 +19,7 @@ import cloudinary
 import cloudinary.uploader
 from datetime import datetime, timezone
 import requests
-
+from .unit_converter import converter
 
 api = Blueprint('api', __name__)
 
@@ -656,8 +656,34 @@ def get_recipe_detail(recipe_id):
 
         if recipe is None:
             return jsonify({"message": "Recipe Not Found"}), 404
+        
+        unit_to_convert = request.args.get("unit", None)
 
         recipe_data = recipe.serialize()
+
+        if unit_to_convert and unit_to_convert != "original": 
+            converted_ingredients = []
+            for ingredient_item in recipe_data['ingredients']:
+                ingredient_model = Ingredient.query.get(ingredient_item["ingredient_id"])
+                
+                original_unit = ingredient_item["unit_measure"]
+                original_quantity = ingredient_item["quantity"]
+                converted_quantity, final_unit = converter.convert_ingredient( 
+                    quantity=original_quantity,
+                    unit_from=original_unit,
+                    unit_to=unit_to_convert,
+                    ingredient_model=ingredient_model
+                    )
+                
+                converted_item = ingredient_item.copy()
+                converted_item['original_quantity'] = original_quantity
+                converted_item['original_unit'] = original_unit
+                converted_item['quantity'] = round(converted_quantity, 2)
+                converted_item['unit_measure'] = final_unit 
+                converted_ingredients.append(converted_item)
+            
+            recipe_data['ingredients'] = converted_ingredients
+            recipe_data['conversion_applied'] = unit_to_convert
 
         if 'nutritional_data' in recipe_data and isinstance(recipe_data['nutritional_data'], str):
             try:
