@@ -579,6 +579,125 @@ html.dark-mode .category-view-modern .circle-6 {
     min-height: 60vh;
 }
 
+/* ===== FILTRO DE DIFICULTAD ===== */
+.difficulty-filter {
+    max-width: 700px;
+    margin: 20px auto 30px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+    justify-content: center;
+    position: relative;
+    z-index: 1;
+}
+
+.filter-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--color-text-title);
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: color 0.4s ease;
+}
+
+.filter-icon {
+    color: var(--color-text-highlight);
+    font-size: 1rem;
+}
+
+.checkbox-group {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 20px;
+    border:none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+    font-weight: 600;
+    
+    user-select: none;
+}
+
+.checkbox-label:hover {
+    transform: translateY(-2.7px);
+    box-shadow: 0 7.2px 22.5px rgba(0, 0, 0, 0.12);
+    background: var(--color-background-tag);
+}
+
+.checkbox-label.active {
+    background: linear-gradient(135deg, var(--color-btn-primary), var(--color-btn-primary-hover));
+    border-color: var(--color-btn-primary);
+    color: white;
+    box-shadow: 0 4px 15px rgba(212, 163, 115, 0.35);
+}
+
+.checkbox-input {
+    display: none;
+}
+
+.checkbox-custom {
+    width: 18px;
+    height: 18px;
+    border-radius: 4px;
+    border: 2px solid currentColor;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    background: transparent;
+}
+
+.checkbox-label.active .checkbox-custom {
+    background: rgba(255, 255, 255, 0.3);
+    border-color: white;
+}
+
+.check-icon {
+    font-size: 0.7rem;
+    color: white;
+}
+
+.difficulty-text {
+    font-size: 0.9rem;
+}
+
+.clear-filters-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    background: var(--color-background-tag);
+    color: var(--color-text-title);
+    border:none;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.clear-filters-btn:hover {
+    background: #fee2e2;
+    color: #dc2626;
+    border-color: #dc2626;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(220, 38, 38, 0.2);
+}
+
+.clear-filters-btn i {
+    font-size: 0.9rem;
+}
+
 /* ===== RESPONSIVE ===== */
 @media (max-width: 992px) {
     .recipes-grid-modern {
@@ -662,5 +781,51 @@ html.dark-mode .category-view-modern .circle-6 {
     .view-all-categories-link {
         font-size: 0.855rem;
         padding: 9px 14.4px;
+    }
+}
+@media (max-width: 768px) {
+    .difficulty-filter {
+        padding: 0 10px;
+        gap: 12px;
+    }
+    
+    .filter-label {
+        width: 100%;
+        justify-content: center;
+        margin-bottom: 5px;
+        font-size: 0.9rem;
+    }
+    
+    .checkbox-group {
+        justify-content: center;
+        width: 100%;
+        gap: 8px;
+    }
+    
+    .checkbox-label {
+        font-size: 0.85rem;
+        padding: 7px 13px;
+    }
+
+    .clear-filters-btn {
+        font-size: 0.8rem;
+        padding: 7px 12px;
+    }
+}
+
+@media (max-width: 576px) {
+    .difficulty-filter {
+        gap: 10px;
+        margin: 15px auto 25px;
+    }
+
+    .checkbox-label {
+        font-size: 0.8rem;
+        padding: 6px 12px;
+    }
+
+    .checkbox-custom {
+        width: 16px;
+        height: 16px;
     }
 }

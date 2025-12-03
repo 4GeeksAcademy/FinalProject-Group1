@@ -21,6 +21,7 @@ flask = "*"
 flask-jwt-extended = "*"
 cloudinary = "*"
 sendgrid = "*"
+requests = "*"
 
 [requires]
 python_version = "3.13"
