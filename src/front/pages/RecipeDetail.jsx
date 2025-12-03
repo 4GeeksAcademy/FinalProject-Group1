@@ -35,11 +35,10 @@ export const RecipeDetail = () => {
   const [hoverRating, setHoverRating] = useState(0);
   const [isRatingLoading, setIsRatingLoading] = useState(false);
 
-
   if (!token) {
     return (
       <div className='info'>
-        <Link to="/" className="back-button positions">
+        <Link to={-1} className="back-button positions">
           <i className="bi bi-arrow-left"></i> Volver
         </Link>
 
@@ -74,7 +73,7 @@ export const RecipeDetail = () => {
   if (!recipeId) {
     return (
       <div className="recipe-detail-container">
-        <Link to="/" className="back-button">
+        <Link to={-1} className="back-button">
           <i className="bi bi-arrow-left"></i> Volver
         </Link>
         <p>Esperando ID de la receta...</p>
@@ -286,28 +285,28 @@ export const RecipeDetail = () => {
       );
     }
 
-    if (error) {
-      return (
-        <div className="recipe-detail-container">
-          <Link to="/" className="back-button">
-            <i className="bi bi-arrow-left"></i> Volver
-          </Link>
-          <div className="error-container">
-            <h2>Ups, algo salió mal</h2>
-            <p className="text-muted">{error}</p>
-            <Link to="/" className="btn btn-warning">
-              Volver al inicio
-            </Link>
-          </div>
-        </div>
-      );
-    }
+  if (loading) {
+    return (
+      <div className="recipe-detail-container">
+        <Link to={-1} className="back-button">
+          <i className="bi bi-arrow-left"></i> Volver
+        </Link>
+        <p>Cargando receta...</p>
+      </div>
+    );
+  }
 
-    if (!recipe) {
-      return (
-        <div className="recipe-detail-container">
-          <Link to="/" className="back-button">
-            <i className="bi bi-arrow-left"></i> Volver
+  if (error) {
+    return (
+      <div className="recipe-detail-container">
+        <Link to={-1} className="back-button">
+          <i className="bi bi-arrow-left"></i> Volver
+        </Link>
+        <div className="error-container">
+          <h2>Ups, algo salió mal</h2>
+          <p className="text-muted">{error}</p>
+          <Link to="/" className="btn btn-warning">
+            Volver al inicio
           </Link>
           <div className="error-container">
             <h2>Receta no encontrada</h2>
@@ -343,28 +342,53 @@ export const RecipeDetail = () => {
 
     return (
       <div className="recipe-detail-container">
-        <Link to="/" className="back-button">
+        <Link to={-1} className="back-button">
           <i className="bi bi-arrow-left"></i> Volver
         </Link>
 
-        <div className="recipe-hero">
-          <div className="recipe-hero-content">
-            <h1 className="recipe-detail-title">{title}</h1>
+  const {
+    title,
+    difficulty,
+    prep_time_min,
+    portions,
+    category_name,
+    avg_rating,
+    vote_count,
+    image,
+    ingredients = [],
+    steps,
+    is_published = false, 
+    comments = [],        
+  } = recipe;
 
-            <div className="recipe-badges">
-              <span className="badge-item difficulty">
-                <i className="bi bi-speedometer2"></i> {difficulty}
-              </span>
-              <span className="badge-item">
-                <i className="bi bi-clock"></i> {prep_time_min} min
-              </span>
-              <span className="badge-item">
-                <i className="bi bi-people"></i> {portions} porciones
-              </span>
-              <span className="badge-item category">
-                <i className="bi bi-tag"></i> {category_name}
-              </span>
-            </div>
+  const stepsList = steps
+    ? steps.split('\n').filter((step) => step.trim())
+    : [];
+
+  return (
+    <div className="recipe-detail-container">
+      <Link to={-1} className="back-button">
+        <i className="bi bi-arrow-left"></i> Volver
+      </Link>
+
+      <div className="recipe-hero">
+        <div className="recipe-hero-content">
+          <h1 className="recipe-detail-title">{title}</h1>
+
+          <div className="recipe-badges">
+            <span className="badge-item difficulty">
+              <i className="bi bi-speedometer2"></i> {difficulty}
+            </span>
+            <span className="badge-item">
+              <i className="bi bi-clock"></i> {prep_time_min} min
+            </span>
+            <span className="badge-item">
+              <i className="bi bi-people"></i> {portions} porciones
+            </span>
+            <span className="badge-item category">
+              <i className="bi bi-tag"></i> {category_name}
+            </span>
+          </div>
 
             <div className="recipe-detail-rating recipe-global-rating"
               onMouseLeave={() => token && setHoverRating(0)}>
@@ -486,7 +510,6 @@ export const RecipeDetail = () => {
           />
         )}
 
-      </div>
-    );
-  };
-
+    </div>
+  );
+};

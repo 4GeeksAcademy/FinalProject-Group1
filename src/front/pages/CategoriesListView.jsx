@@ -71,10 +71,17 @@ export const CategoriesListView = () => {
 
             {/* Header Section */}
             <div className="category-header-modern">
-                <Link to="/" className="back-link-modern">
-                    <i className="fa-solid fa-arrow-left"></i>
-                    <span>Volver al inicio</span>
-                </Link>
+                <div className="header-navigation">
+                    <Link to="/" className="back-link-modern">
+                        <i className="fa-solid fa-arrow-left"></i>
+                        <span>Volver al inicio</span>
+                    </Link>
+                    
+                    <Link to="/favorites" className="view-all-categories-link">
+                        <span>Ver mejor valoradas</span>
+                        <i className="fa-solid fa-star"></i>
+                    </Link>
+                </div>
 
                 <div className="category-title-section">
                     <h1 className="category-title-modern">Todas las Categorías</h1>
