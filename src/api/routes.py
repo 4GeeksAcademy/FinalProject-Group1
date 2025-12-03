@@ -168,16 +168,16 @@ def get_categories():
 def create_category():
     claims = get_jwt()
     if claims.get("rol") != "admin":
-        return jsonify({"message": "Admin role required"}), 403
+        return jsonify({"message": "Admin rol requerido"}), 403
     data = request.get_json(silent=True)
 
     if data is None:
-        return jsonify({"message": "Data not provided"}), 400
+        return jsonify({"message": "Data no proveida"}), 400
 
     name_category = data.get("name_category")
 
     if not name_category or not name_category.strip():
-        return jsonify({"message": "Category name is required"}), 400
+        return jsonify({"message": "Nombre de categoría es requerido"}), 400
 
     name_category = name_category.strip()
 
@@ -186,7 +186,7 @@ def create_category():
     ).first()
 
     if existing_category:
-        return jsonify({"message": "Category already exists"}), 409
+        return jsonify({"message": "Categoría ya existe"}), 409
 
     new_category = Category(
         name_category=name_category,
@@ -198,13 +198,13 @@ def create_category():
     try:
         db.session.commit()
         return jsonify({
-            "message": "Category created successfully",
+            "message": "Categoría creada exitosamente",
             "category": new_category.serialize()
         }), 201
     except Exception as error:
         db.session.rollback()
         return jsonify({
-            "message": "Error creating category",
+            "message": "Error creando categoría",
             "error": f"{error.args}"
         }), 500
 
@@ -214,28 +214,26 @@ def create_category():
 def edit_category(id):
     claims = get_jwt()
     if claims.get("rol") != "admin":
-        return jsonify({"message": "Admin role required"}), 403
+        return jsonify({"message": "Admin rol requerido"}), 403
     data = request.get_json(silent=True)
 
     if data is None:
-        return jsonify({"message": "Data not provided"}), 400
-
+        return jsonify({"message": "Data no proveida"}), 400
     new_name = data.get("name_category")
 
     if not new_name or not new_name.strip():
-        return jsonify({"message": "Category name cannot be empty"}), 400
-
+        return jsonify({"message": "Nombre de categoría no puede estar vacío"}), 400
     new_name = new_name.strip()
 
     category = Category.query.get(id)
 
     if category is None:
-        return jsonify({"message": "Category not found"}), 404
+        return jsonify({"message": "Categoría no encontrada"}), 404
 
     if new_name != category.name_category:
         existing = Category.query.filter_by(name_category=new_name).first()
         if existing:
-            return jsonify({"message": "Category name already exists"}), 409
+            return jsonify({"message": "Nombre de categoría ya existe"}), 409
 
     category.name_category = new_name
 
@@ -258,18 +256,17 @@ def edit_category(id):
 def delete_category(id):
     claims = get_jwt()
     if claims.get("rol") != "admin":
-        return jsonify({"message": "Admin role required"}), 403
+        return jsonify({"message": "Admin rol requerido"}), 403
 
     category = Category.query.get(id)
     if category is None:
-        return jsonify({"message": "Category not found"}), 404
-
+        return jsonify({"message": "Categoría no encontrada"}), 404
     recipes_count = Recipe.query.filter_by(
         category_id=category.id_category).count()
 
     if recipes_count > 0:
         return jsonify({
-            "message": "Category cannot be deleted because it has related recipes",
+            "message": "Categoría no puede ser eliminada porque tiene recetas relacionadas",
             "recipes_count": recipes_count
         }), 400
 
@@ -277,13 +274,13 @@ def delete_category(id):
         db.session.delete(category)
         db.session.commit()
         return jsonify({
-            "message": "Category deleted successfully",
+            "message": "Categoría eliminada exitosamente",
         }), 200
     except Exception as error:
         db.session.rollback()
         print("error al eliminar", repr(error))
         return jsonify({
-            "message": "Error deleting category",
+            "message": "Error eliminando categoría",
             "error": str(error)
         }), 500
 
@@ -295,28 +292,27 @@ def change_password():
     user = User.query.get(current_user_id)
 
     if not user:
-        return jsonify({"message": "User not found"}), 404
+        return jsonify({"message": "Usuario no encontrado"}), 404
 
     data = request.get_json(silent=True)
     if data is None:
-        return jsonify({"message": "Invalid JSON"}), 400
-
+        return jsonify({"message": "JSON inválido"}), 400
     current_password = data.get("current_password")
     new_password = data.get("new_password")
 
     if not current_password or not new_password:
-        return jsonify({"message": "Current and new password are required"}), 400
+        return jsonify({"message": "Actual y nueva contraseña son requeridas"}), 400
 
     # Verificar que la contraseña actual sea correcta
     is_valid = check_password_hash(
         user.password, f"{current_password}{user.salt}")
     if not is_valid:
-        return jsonify({"message": "Current password is incorrect"}), 401
+        return jsonify({"message": "Contraseña actual incorrecta"}), 401
 
     # validar nueva contraseña
     from api.utils import val_password
     if not val_password(new_password):
-        return jsonify({"message": "New password does not meet requirements"}), 400
+        return jsonify({"message": "Nueva contraseña no cumple con los requisitos"}), 400
 
     # generar nuevo salt
     import secrets
@@ -336,7 +332,7 @@ def change_password():
         user.id_user), additional_claims=additional_claims)
 
     return jsonify({
-        "message": "Password updated successfully",
+        "message": "Contraseña actualizada exitosamente",
         "token": new_token,
         "user": user.serialize()
     }), 200
@@ -349,12 +345,12 @@ def login_user():
     password = data.get("password").strip()
 
     if not username or not password:
-        return jsonify({"message": "Username and password are required"}), 400
+        return jsonify({"message": "Usuario y contraseña son requeridos"}), 400
     user = User.query.filter_by(username=username).one_or_none()
     if user is None:
-        return jsonify({"message": "Invalid username"}), 401
+        return jsonify({"message": "Usuario inválido"}), 401
     if not check_password_hash(user.password, f"{password}{user.salt}"):
-        return jsonify({"message": "Invalid credentials"}), 401
+        return jsonify({"message": "Credenciales inválidas"}), 401
 
     # Para bloquear el acceso si no está activo el usuario.
     if not user.is_active:
@@ -1290,7 +1286,7 @@ def get_recipes_by_category(category_id):
         # Verificar que la categoría existe
         category = Category.query.get(category_id)
         if not category:
-            return jsonify({"message": "Category not found"}), 404
+            return jsonify({"message": "Categoría no encontrada"}), 404
 
         # Query con paginación
         pagination = (
