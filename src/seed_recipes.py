@@ -143,7 +143,7 @@ RECIPES_DATA = [
         "difficulty": difficultyEnum.MEDIUM, "prep_time": 40, "portions": 4, "ingredients": [("Pollo", 600, "g"), ("Limón", 2, "unidades"), ("Romero", 10, "g")],"auto_rating": 3, "rating_count": 13, "make_favorite": False},
     
     {"category_index": 3, "title": "Pollo Teriyaki", "steps": "1. Cortar pollo en cubos\n2. Marinar en salsa teriyaki\n3. Saltear con vegetales\n4. Servir con arroz", "image": "https://images.unsplash.com/photo-1609183480237-ccbb2d7c5772?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D?w=600&q=80",
-        "difficulty": difficultyEnum.EASY, "prep_time": 30, "portions": 4, "ingredients": [("Pollo", 500, "g"), ("Salsa teriyaki", 120, "ml"), ("Brócoli", 200, "g")],"auto_rating": 3, "rating_count": 40, "make_favorite": True},
+        "difficulty": difficultyEnum.EASY, "prep_time": 30, "portions": 4, "ingredients": [("Pollo", 500, "g"), ("Salsa teriyaki", 120, "ml"), ("Brócoli", 200, "g")],"auto_rating": 4, "rating_count": 40, "make_favorite": True},
     
     {"category_index": 3, "title": "Pollo Tikka Masala", "steps": "1. Marinar pollo con yogurt\n2. Asar el pollo\n3. Preparar salsa masala\n4. Cocinar a fuego lento", "image": "https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=600&q=80",
         "difficulty": difficultyEnum.DIFFICULT, "prep_time": 55, "portions": 4, "ingredients": [("Pollo", 600, "g"), ("Yogurt", 200, "ml"), ("Garam masala", 30, "g")],"auto_rating": 3, "rating_count": 13, "make_favorite": False},
@@ -266,7 +266,7 @@ RECIPES_DATA = [
         "difficulty": difficultyEnum.MEDIUM, "prep_time": 50, "portions": 6, "ingredients": [("Pulpo", 1000, "g"), ("Pimentón", 20, "g"), ("Aceite de oliva", 80, "ml")],"auto_rating": 3, "rating_count": 13, "make_favorite": False},
     
     {"category_index": 6, "title": "Brochetas de Camarón", "steps": "1. Marinar camarones\n2. Ensartar en palillos con vegetales\n3. Asar a la parrilla\n4. Servir con limón", "image": "https://plus.unsplash.com/premium_photo-1693221705442-3bb06c114aff?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D?w=600&q=80",
-        "difficulty": difficultyEnum.EASY, "prep_time": 25, "portions": 4, "ingredients": [("Camarón", 600, "g"), ("Pimiento", 2, "unidades"), ("Cebolla", 1, "unidades")],"auto_rating": 3, "rating_count": 13, "make_favorite": True},
+        "difficulty": difficultyEnum.EASY, "prep_time": 25, "portions": 4, "ingredients": [("Camarón", 600, "g"), ("Pimiento", 2, "unidades"), ("Cebolla", 1, "unidades")],"auto_rating": 4, "rating_count": 13, "make_favorite": True},
     
     {"category_index": 6, "title": "Bacalao al Pil Pil", "steps": "1. Desalar bacalao 24 horas\n2. Confitar en aceite y ajo\n3. Emulsionar moviendo sartén\n4. Servir caliente", "image":"https://www.cocina-ecuatoriana.com/base/stock/Recipe/bacalao-frito/bacalao-frito_web.jpg.webp?w=600&q=80",
         "difficulty": difficultyEnum.DIFFICULT, "prep_time": 40, "portions": 4, "ingredients": [("Bacalao", 600, "g"), ("Ajo", 8, "unidades"), ("Aceite de oliva", 250, "ml")],"auto_rating": 4, "rating_count": 26, "make_favorite": True},
@@ -481,31 +481,65 @@ RECIPES_DATA = [
 
 ]
 
+"""
+Script para crear recetas de prueba.
+Ejecutar con: cd src y pipenv run python seed_recipes.py
+"""
+
+from api.models import db, Recipe, Ingredient, RecipeIngredient, Category, User, RecipeRating, RecipeFavorite, difficultyEnum, stateRecipeEnum, UnitEnum
+from app import app
+import random
+
 
 def get_or_create_ingredient(name):
+    """Obtiene un ingrediente existente o crea uno nuevo"""
     ingredient = Ingredient.query.filter_by(name=name).first()
     if not ingredient:
-        ingredient = Ingredient(name=name, calories_per_100=50,
-                                protein_per_100=2, carbs_per_100=10, fat_per_100=1)
+        ingredient = Ingredient(
+            name=name,
+            calories_per_100=50,
+            protein_per_100=2,
+            carbs_per_100=10,
+            fat_per_100=1
+        )
         db.session.add(ingredient)
         db.session.flush()
     return ingredient
 
 
 def map_unit(unit_str):
-    unit_map = {"g": UnitEnum.GRAMS, "ml": UnitEnum.MILLILITERS,
-                "unidades": UnitEnum.UNITS, "kg": UnitEnum.KILOGRAMS, "l": UnitEnum.LITERS}
+    """Mapea strings de unidades a enums"""
+    unit_map = {
+        "g": UnitEnum.GRAMS,
+        "ml": UnitEnum.MILLILITERS,
+        "unidades": UnitEnum.UNITS,
+        "kg": UnitEnum.KILOGRAMS,
+        "l": UnitEnum.LITERS,
+        "rebanadas": UnitEnum.UNITS
+    }
     return unit_map.get(unit_str, UnitEnum.GRAMS)
 
 
 def create_auto_ratings(recipe, rating_value, count, main_user_id):
     """Crea calificaciones automáticas para una receta"""
-    # Obtener todos los usuarios excepto el principal
-    all_users = User.query.filter(User.id_user != main_user_id).limit(count).all()
+    # Obtener TODOS los usuarios excepto el principal
+    all_users = User.query.filter(User.id_user != main_user_id).all()
     
-    for i, user in enumerate(all_users):
-        # Variar un poco la calificación (entre rating_value y rating_value-1)
-        varied_rating = rating_value if i % 2 == 0 else max(rating_value - 1, 4)
+    if len(all_users) < count:
+        print(f"Solo hay {len(all_users)} usuarios disponibles para calificar (se necesitan {count})")
+        count = len(all_users)
+    
+    if count == 0:
+        print("No hay usuarios disponibles para crear calificaciones")
+        return
+    
+    # Seleccionar usuarios aleatorios
+    selected_users = random.sample(all_users, min(count, len(all_users)))
+    
+    for user in selected_users:
+        # Variar la calificación alrededor del valor base
+        variation = random.choice([-1, 0, 0, 1])  # Más probabilidad de mantener el valor
+        varied_rating = max(1, min(5, rating_value + variation))
         
         rating = RecipeRating(
             value=varied_rating,
@@ -521,39 +555,55 @@ def create_auto_ratings(recipe, rating_value, count, main_user_id):
     all_ratings = RecipeRating.query.filter_by(recipe_id=recipe.id_recipe).all()
     if all_ratings:
         total = sum(r.value for r in all_ratings)
-        recipe.avg_rating = total / len(all_ratings)
+        recipe.avg_rating = round(total / len(all_ratings), 1)
         recipe.vote_count = len(all_ratings)
 
 
 def seed_recipes():
+    """Función principal para crear recetas de prueba"""
     with app.app_context():
+        # Verificar categorías
         categories = Category.query.all()
         if not categories:
-            print(" No hay categorías. Crea al menos una categoría primero.")
+            print("No hay categorías. Crea al menos una categoría primero.")
             return
 
+        # Verificar usuario principal
         main_user = User.query.first()
         if not main_user:
-            print(" No hay usuarios. Crea al menos un usuario primero.")
+            print("No hay usuarios. Crea al menos un usuario primero.")
             return
         
-        # Verificar que hay más usuarios para las calificaciones
+        # Verificar cantidad de usuarios para calificaciones
         user_count = User.query.count()
         if user_count < 5:
-            print("Se recomienda tener al menos 5 usuarios para calificaciones variadas")
+            print(f"⚠️  Se recomienda tener al menos 5 usuarios para calificaciones variadas (tienes {user_count})")
 
-        print(f"Usando usuario principal: {main_user.username}")
-        print(f" Categorías: {[c.name_category for c in categories]}")
+        print(f"\n Usando usuario principal: {main_user.username}")
+        print(f" Categorías disponibles: {[c.name_category for c in categories]}")
+        print(f" Total de usuarios: {user_count}\n")
 
         created_count = 0
+        skipped_count = 0
 
-        for i, recipe_data in enumerate(RECIPES_DATA):
+        # Aquí deberías tener tu RECIPES_DATA definido
+        # from .recipes_data import RECIPES_DATA  # O donde lo tengas
+
+        for recipe_data in RECIPES_DATA:
+            # Verificar si ya existe
             existing = Recipe.query.filter_by(title=recipe_data["title"]).first()
             if existing:
-                print(f"Saltando '{recipe_data['title']}' (ya existe)")
+                print(f" Saltando '{recipe_data['title']}' (ya existe)")
+                skipped_count += 1
                 continue
 
-            category = categories[recipe_data["category_index"]]
+            # Obtener categoría
+            try:
+                category = categories[recipe_data["category_index"]]
+            except IndexError:
+                print(f" Error: category_index {recipe_data['category_index']} no existe. Saltando receta.")
+                skipped_count += 1
+                continue
 
             # Crear receta
             recipe = Recipe(
@@ -581,16 +631,18 @@ def seed_recipes():
                 )
                 db.session.add(recipe_ingredient)
 
-            #  CREAR CALIFICACIONES AUTOMÁTICAS (si está definido)
+            # Crear calificaciones automáticas (si está definido)
             if "auto_rating" in recipe_data and recipe_data["auto_rating"]:
                 rating_value = recipe_data["auto_rating"]
                 rating_count = recipe_data.get("rating_count", 5)
                 
-                if user_count >= rating_count:
+                if user_count > 1:  # Necesitamos al menos un usuario además del principal
                     create_auto_ratings(recipe, rating_value, rating_count, main_user.id_user)
-                    print(f"Añadidas {rating_count} calificaciones (~{rating_value} estrellas)")
+                    print(f" Añadidas {min(rating_count, user_count - 1)} calificaciones (~{rating_value} estrellas)")
+                else:
+                    print(f" No hay suficientes usuarios para crear calificaciones")
 
-            #  CREAR FAVORITO AUTOMÁTICO (si está definido)
+            # Crear favorito automático (si está definido)
             if recipe_data.get("make_favorite", False):
                 favorite = RecipeFavorite(
                     user_id=main_user.id_user,
@@ -600,10 +652,18 @@ def seed_recipes():
                 print(f"  Marcada como favorita")
 
             created_count += 1
-            print(f"Creada: '{recipe_data['title']}' en '{category.name_category}'")
+            print(f" Creada: '{recipe_data['title']}' en '{category.name_category}'")
 
+        # Commit final
         db.session.commit()
-        print(f"\ ¡Listo! Se crearon {created_count} recetas nuevas.")
+        
+        # Resumen
+        print(f"\n{'='*60}")
+        print(f" ¡Proceso completado!")
+        print(f" Recetas creadas: {created_count}")
+        print(f" Recetas saltadas: {skipped_count}")
+        print(f" Total en base de datos: {Recipe.query.count()}")
+        print(f"{'='*60}\n")
 
 
 if __name__ == "__main__":
