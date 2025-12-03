@@ -19,7 +19,7 @@ import cloudinary
 import cloudinary.uploader
 from datetime import datetime, timezone
 import requests
-
+from .unit_converter import converter
 
 api = Blueprint('api', __name__)
 
@@ -264,7 +264,8 @@ def delete_category(id):
     if category is None:
         return jsonify({"message": "Category not found"}), 404
 
-    recipes_count = Recipe.query.filter_by(category_id=category.id_category).count()
+    recipes_count = Recipe.query.filter_by(
+        category_id=category.id_category).count()
 
     if recipes_count > 0:
         return jsonify({
@@ -711,6 +712,7 @@ def get_recipe_detail(recipe_id):
             "is_published": is_published
         })
 
+        recipe_data['conversion_applied'] = 'original'
         return jsonify(recipe_data), 200
 
     except Exception as error:
@@ -1698,3 +1700,50 @@ def get_recipe_nutrition(recipe_id):
     except Exception as error:
         print("Error en get_recipe_nutrition:", error)
         return jsonify({"message": "Internal error in obtaining nutrition"}), 500
+
+
+@api.route("/recetas/<int:recipe_id>/ingredientes", methods=["GET"])
+def get_converted_ingredients(recipe_id):
+    try:
+        unit_to_convert = request.args.get("unit", None)
+        if not unit_to_convert or unit_to_convert == "original":
+            return jsonify({"message": "No conversion unit specified"}), 400
+        recipe = Recipe.query.get(recipe_id)
+
+        if recipe is None:
+            return jsonify({"message": "Recipe Not Found"}), 404
+
+        recipe_ingredients = [ri.serialize()
+                              for ri in recipe.recipe_ingredients_details]
+
+        converted_ingredients = []
+
+        for ingredient_item in recipe_ingredients:
+            ingredient_model = Ingredient.query.get(
+                ingredient_item["ingredient_id"])
+
+            original_unit = ingredient_item["unit_measure"]
+            original_quantity = ingredient_item["quantity"]
+
+            converted_quantity, final_unit = converter.convert_ingredient(
+                quantity=original_quantity,
+                unit_from=original_unit,
+                unit_to=unit_to_convert,
+                ingredient_model=ingredient_model
+            )
+
+            converted_item = ingredient_item.copy()
+            converted_item['original_quantity'] = original_quantity
+            converted_item['original_unit'] = original_unit
+            converted_item['quantity'] = round(converted_quantity, 2)
+            converted_item['unit_measure'] = final_unit
+            converted_ingredients.append(converted_item)
+
+        return jsonify(converted_ingredients), 200
+
+    except Exception as e:
+        print("Error en get_converted_ingredients:", e)
+        return jsonify({
+            "message": "Internal error retrieving converted ingredients",
+            "details": str(e)
+        }), 500

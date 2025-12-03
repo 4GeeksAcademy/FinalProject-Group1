@@ -9,7 +9,7 @@ export const Login = () => {
     const [password, setPassword] = useState('');
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(false);
-
+    const [showPassword, setShowPassword] = useState(false);
     const { dispatch } = useGlobalReducer();
     const navigate = useNavigate();
 
@@ -61,6 +61,10 @@ export const Login = () => {
         }
     };
 
+    const togglePasswordVisibility = () => {
+        setShowPassword(prevShowPassword => !prevShowPassword);
+    };
+
     return (
         <div className="container mt-5">
             <div className="row justify-content-center">
@@ -73,7 +77,6 @@ export const Login = () => {
                             <form onSubmit={handleSubmit}>
                                 {error && <div className="alert alert-danger">{error}</div>}
 
-                               
                                 <div className="mb-3">
                                     <label htmlFor="username">Usuario</label>
                                     <input
@@ -85,24 +88,37 @@ export const Login = () => {
                                         required
                                     />
                                 </div>
-                                
+
                                 <div className="mb-3">
                                     <label htmlFor="password">Contraseña</label>
-                                    <input
-                                        type="password"
-                                        className="form-control"
-                                        id="password"
-                                        value={password}
-                                        onChange={(e) => setPassword(e.target.value)}
-                                        required
-                                    />
+                                    <div className="input-group">
+                                        <input
+                                            type={showPassword ? "text" : "password"}
+                                            className="form-control"
+                                            id="password"
+                                            value={password}
+                                            onChange={(e) => setPassword(e.target.value)}
+                                            required
+                                        />
+                                        <button
+                                            type="button"
+                                            className="btn btn-outline-secondary"
+                                            onClick={togglePasswordVisibility}
+                                        >
+                                            {showPassword ? (
+                                                <i className="fa-solid fa-eye-slash"></i>
+                                            ) : (
+                                                <i className="fa-solid fa-eye"></i>
+                                            )}
+                                        </button>
+                                    </div>
                                 </div>
                                 <button type="submit" className="btn btn-primary w-100" disabled={loading}>
                                     {loading ? 'Cargando...' : 'Ingresar'}
                                 </button>
                             </form>
 
-                           
+
                             <div className="mt-3 text-center">
                                 <Link to="/register" className="me-3">Registrarme</Link>
                                 <Link to="/forgot-password">Olvidé mi contraseña</Link>
