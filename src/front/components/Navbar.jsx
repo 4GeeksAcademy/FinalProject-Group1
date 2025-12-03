@@ -17,7 +17,6 @@ export const Navbar = () => {
         navigate("/");
     }
 
-
     const navbarThemeClass = theme === 'dark' ? 'bg-dark navbar-dark' : 'bg-body-tertiary';
     const icon = theme === 'light' ? '🌙' : '☀️';
     const buttonLabel = theme === 'light' ? 'Cambiar a modo oscuro' : 'Cambiar a modo claro';
@@ -29,7 +28,7 @@ export const Navbar = () => {
     return (
         <nav className={`navbar navbar-expand-lg p-0 w-100 ${navbarThemeClass}`} data-bs-theme={theme}>
             <div className="container-fluid">
-                <Link className="navbar-brand m-0" to="/">Food</Link>
+                <Link className="navbar-brand m-0" to="/">Saborify</Link>
 
                 <button
                     className="navbar-toggler"
@@ -50,8 +49,7 @@ export const Navbar = () => {
                                 </NavLink>
                             </li>
                         )}
-                        
-                        
+
                         {isAdmin && (
                             <div className="d-flex">
                                 <li className="menus me-4 mt-2">
@@ -70,16 +68,32 @@ export const Navbar = () => {
                                 </li>
                             </div>
                         )}
-                            <li className="nav-item d-flex align-items-center me-2">
-                                        <button
-                                            className={`btn btn-outline-secondary py-1 px-3 ${buttonTextClass} theme-toggle-button`}
-                                            onClick={toggleTheme}
-                                            aria-label={buttonLabel}
-                                        >
-                                            {icon}
-                                        </button>
-                                    </li>
 
+                        {/* BOTÓN MODO OSCURO */}
+                        <li className="nav-item d-flex align-items-center me-2">
+                            <button
+                                className={`btn btn-outline-secondary py-1 px-3 ${buttonTextClass} theme-toggle-button`}
+                                onClick={toggleTheme}
+                                aria-label={buttonLabel}
+                            >
+                                {icon}
+                            </button>
+                        </li>
+
+                        {/* FAVORITOS */}
+                        {store.token && (
+                            <li className="nav-item d-flex align-items-center me-2">
+                                <NavLink
+                                    to="/favoritos"
+                                    className="favorites-btn"
+                                    aria-label="Ver favoritos"
+                                >
+                                    <i className="fa-solid fa-heart"></i>
+                                </NavLink>
+                            </li>
+                        )}
+
+                        {/* PERFIL */}
                         <li className="nav-item d-flex align-items-center">
                             {!store.token ? (
                                 <NavLink
@@ -89,7 +103,7 @@ export const Navbar = () => {
                                     Iniciar Sesión
                                 </NavLink>
                             ) : (
-                                <>                                  
+                                <>
                                     <div className="dropdown ms-3">
                                         <a
                                             className="nav-link dropdown-toggle p-0"
@@ -126,10 +140,12 @@ export const Navbar = () => {
                                 </>
                             )}
                         </li>
+
                     </ul>
                 </div>
             </div>
         </nav >
     );
 };
-export default Navbar
+
+export default Navbar;

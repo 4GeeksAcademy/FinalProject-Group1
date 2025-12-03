@@ -1,10 +1,12 @@
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Integer, String, Boolean, DateTime, Text, Enum, ForeignKey, Float
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.dialects.postgresql import JSON
 from typing import List
 from datetime import datetime, timezone
 from typing import Optional
 import enum
+
 
 db = SQLAlchemy()
 
@@ -118,6 +120,8 @@ class Recipe(db.Model):
     portions: Mapped[int] = mapped_column(Integer, nullable=False)
     nutritional_data: Mapped[Optional[str]
                              ] = mapped_column(Text, nullable=True)
+    nutritional_data_json: Mapped[Optional[dict]
+                                  ] = mapped_column(JSON, nullable=True)
     state_recipe: Mapped[str] = mapped_column(
         Enum(stateRecipeEnum), nullable=False, default="pending")
     avg_rating: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
@@ -282,6 +286,8 @@ class Ingredient(db.Model):
     unit_to_mass_factor: Mapped[Optional[float]
                                 ] = mapped_column(Float, nullable=True)
     # Para valores nutricionales por 100g/ml
+    nutrition_base_json: Mapped[Optional[dict]
+                                ] = mapped_column(JSON, nullable=True)
     calories_per_100: Mapped[float] = mapped_column(
         Float, nullable=False, default=0)
     protein_per_100: Mapped[float] = mapped_column(
@@ -376,6 +382,10 @@ class RecipeRating(db.Model):
 
 class RecipeFavorite(db.Model):
     __tablename__ = "recipe_favorites"
+    __table_args__ = (
+        db.UniqueConstraint("user_id", "recipe_id",
+                            name="uq_user_recipe_favorite"),
+    )
 
     id_favorite: Mapped[int] = mapped_column(primary_key=True)
     user_id: Mapped[int] = mapped_column(

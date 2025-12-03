@@ -6,6 +6,14 @@ import useGlobalReducer from "../hooks/useGlobalReducer.jsx";
 import Comment from './Comment';
 import { NutritionalData } from './NutritionalData';
 
+const ALL_CONVERSION_UNITS = [
+  { label: "Unidades Originales", value: "original" },
+  { label: "Gramos (g)", value: "g" },
+  { label: "Kilogramos (kg)", value: "kg" },
+  { label: "Libras (lb)", value: "lb" },
+  { label: "Onzas (oz)", value: "oz" },
+];
+
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 export const RecipeDetail = () => {
@@ -18,6 +26,8 @@ export const RecipeDetail = () => {
   const [isFavorite, setIsFavorite] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [conversionUnit, setConversionUnit] = useState("original");
+  const [loadingIngredients, setLoadingIngredients] = useState(false);
 
   const [recipeLoaded, setRecipeLoaded] = useState(false);
 
@@ -29,7 +39,7 @@ export const RecipeDetail = () => {
   if (!token) {
     return (
       <div className='info'>
-        <Link to="/" className="back-button positions">
+        <Link to={-1} className="back-button positions">
           <i className="bi bi-arrow-left"></i> Volver
         </Link>
 
@@ -45,7 +55,7 @@ export const RecipeDetail = () => {
         </h1>
 
         <p className='comment-sesion'>
-          **Debes iniciar sesión para ver los detalles de la receta.**
+          *Debes iniciar sesión para ver los detalles de la receta.*
         </p>
 
         <div className="action-buttons">
@@ -64,7 +74,7 @@ export const RecipeDetail = () => {
   if (!recipeId) {
     return (
       <div className="recipe-detail-container">
-        <Link to="/" className="back-button">
+        <Link to={-1} className="back-button">
           <i className="bi bi-arrow-left"></i> Volver
         </Link>
         <p>Esperando ID de la receta...</p>
@@ -79,34 +89,22 @@ export const RecipeDetail = () => {
       setError(null);
       setRecipeLoaded(false);
 
-      if (!recipeId) {
-        console.error("Error: recipeId es indefinido. No se puede cargar la receta.");
+      if (!recipeId || !token) {
+        console.error("Error: recipeId o token es indefinido.");
         setLoading(false);
-        return; // Detiene la ejecución del fetch
+        return;
       }
+
+      const url = `${BACKEND_URL}/recetas/${recipeId}`;
+
       try {
-        const res = await fetch(`${BACKEND_URL}/recetas/${recipeId}`, {
+        const res = await fetch(url, {
           headers: {
             ...(token ? { Authorization: `Bearer ${token}` } : {}),
           },
         });
-
+ 
         const text = await res.text();
-
-        if (!res.ok) {
-          let message = 'Error al cargar la receta';
-          try {
-            const errData = JSON.parse(text);
-            if (errData?.message) message = errData.message;
-          } catch {
-          }
-
-          if (res.status === 404) {
-            message = 'Receta no encontrada';
-          }
-
-          throw new Error(message);
-        }
 
         let data;
         try {
@@ -115,7 +113,17 @@ export const RecipeDetail = () => {
           throw new Error('Respuesta inválida del servidor (no es JSON)');
         }
 
-        setRecipe(data);
+        if (!res.ok) {
+          let message = data?.message || 'Error al cargar la receta';
+          if (res.status === 404) {
+            message = 'Receta no encontrada';
+          }
+          throw new Error(message);
+        }
+
+        data.ingredients_original = data.ingredients; 
+        
+        setRecipe(data); 
         setIsFavorite(Boolean(data.is_favorite));
         setUserRating(data.user_rating || 0);
         setRecipeLoaded(true);
@@ -134,11 +142,62 @@ export const RecipeDetail = () => {
   }, [recipeId, token]);
 
 
+  useEffect(() => {
+    if (!recipe || !recipeId || !token) return;
+
+    if (conversionUnit === "original") {
+      setRecipe(prevRecipe => {
+        if (!prevRecipe.ingredients_original) return prevRecipe; 
+        return {
+          ...prevRecipe,
+          ingredients: prevRecipe.ingredients_original 
+        };
+      });
+      return;
+    }
+
+    const fetchConvertedIngredients = async () => {
+      setLoadingIngredients(true);
+
+      const url = `${BACKEND_URL}/recetas/${recipeId}/ingredientes?unit=${conversionUnit}`; 
+
+      try {
+        const res = await fetch(url, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const data = JSON.parse(await res.text());
+        if (!res.ok) throw new Error(data.message || 'Error al convertir ingredientes');
+
+        setRecipe(prevRecipe => {
+          const ingredientsOriginal = prevRecipe.ingredients_original || prevRecipe.ingredients;
+
+          return {
+            ...prevRecipe,
+            ingredients: data,
+            ingredients_original: ingredientsOriginal 
+          };
+        });
+      
+      } catch (err) {
+        console.error('Error en fetchConvertedIngredients:', err);
+      } finally {
+        setLoadingIngredients(false);
+      }
+    };
+
+    fetchConvertedIngredients();
+
+  }, [recipeId, token, conversionUnit]);
+
   const handleRate = async (ratingValue) => {
     if (!token) {
       alert('Debes iniciar sesión para calificar.');
       return;
     }
+
     if (isRatingLoading) return;
     setIsRatingLoading(true);
 
@@ -218,7 +277,7 @@ export const RecipeDetail = () => {
   if (loading) {
     return (
       <div className="recipe-detail-container">
-        <Link to="/" className="back-button">
+        <Link to={-1} className="back-button">
           <i className="bi bi-arrow-left"></i> Volver
         </Link>
         <p>Cargando receta...</p>
@@ -229,7 +288,7 @@ export const RecipeDetail = () => {
   if (error) {
     return (
       <div className="recipe-detail-container">
-        <Link to="/" className="back-button">
+        <Link to={-1} className="back-button">
           <i className="bi bi-arrow-left"></i> Volver
         </Link>
         <div className="error-container">
@@ -246,7 +305,7 @@ export const RecipeDetail = () => {
   if (!recipe) {
     return (
       <div className="recipe-detail-container">
-        <Link to="/" className="back-button">
+        <Link to={-1} className="back-button">
           <i className="bi bi-arrow-left"></i> Volver
         </Link>
         <div className="error-container">
@@ -273,8 +332,8 @@ export const RecipeDetail = () => {
     image,
     ingredients = [],
     steps,
-    is_published = false, 
-    comments = [],        
+    is_published = false,
+    comments = [],
   } = recipe;
 
   const stepsList = steps
@@ -283,7 +342,7 @@ export const RecipeDetail = () => {
 
   return (
     <div className="recipe-detail-container">
-      <Link to="/" className="back-button">
+      <Link to={-1} className="back-button">
         <i className="bi bi-arrow-left"></i> Volver
       </Link>
 
@@ -340,10 +399,14 @@ export const RecipeDetail = () => {
               style={{ cursor: token ? 'pointer' : 'not-allowed' }}
             >
               <i
-                className={
-                  isFavorite ? 'bi bi-star-fill' : 'bi bi-star'
-                }
-              ></i>
+                className={`
+                  bi 
+                  ${isFavorite ? "bi-heart-fill" : "bi-heart"} 
+                  favorite-icon 
+                  ${isFavorite ? "active" : ""}
+                  `.trim()}
+              />
+
               {isFavorite
                 ? ' Quitar de favoritos'
                 : ' Añadir a favoritos'}
@@ -361,6 +424,26 @@ export const RecipeDetail = () => {
           <h2 className="section-title">
             <i className="bi bi-basket"></i> Ingredientes
           </h2>
+
+          <div className="unit-converter-selector mb-4">
+            <label htmlFor="unitSelect" className="form-label d-block fw-bold text-success">
+              Mostrar unidades de MASA en:
+            </label>
+            <select
+              id="unitSelect"
+              className="form-select form-select-sm w-auto d-inline-block"
+              value={conversionUnit}
+              onChange={(e) => setConversionUnit(e.target.value)}
+              disabled={loading}
+            >
+              {ALL_CONVERSION_UNITS.map(unit => (
+                <option key={unit.value} value={unit.value}>
+                  {unit.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
           <div className="ingredients-list">
             {ingredients.map((ingredient) => (
               <div key={ingredient.id} className="ingredient-item">

@@ -3,7 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import "../styles/home.css";
 import BannerRecetas from "../assets/img/BannerRecetas.png";
 import Comment from './Comment';
-
+import { RecipeCardMini } from "../components/RecipeCardMini";
+import useGlobalReducer from "../hooks/useGlobalReducer.jsx";
 
 const getApiUrl = () => {
   return import.meta.env.VITE_BACKEND_URL || '';
@@ -11,15 +12,16 @@ const getApiUrl = () => {
 
 export const Home = () => {
   const navigate = useNavigate();
+  const { store } = useGlobalReducer();
+  const token = store.token;
   const [categories, setCategories] = useState({});
   const [allCategories, setAllCategories] = useState([]);
+  const [topRatedRecipes, setTopRatedRecipes] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-
-  // Estados para el dropdown
   const [searchResults, setSearchResults] = useState({ recipes: [], categories: [] });
   const [showDropdown, setShowDropdown] = useState(false);
   const [loadingSearch, setLoadingSearch] = useState(false);
@@ -28,6 +30,7 @@ export const Home = () => {
   useEffect(() => {
     fetchCategories();
     fetchRecipesSummary();
+    fetchTopRatedRecipes();
 
     const handleScroll = () => {
       if (window.scrollY > 400) {
@@ -43,24 +46,22 @@ export const Home = () => {
 
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
+  }, [token]);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setShowDropdown(false);
+        setSearchTerm('');
+        setSearchResults({ recipes: [], categories: [] });
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Cerrar dropdown al hacer clic fuera
-  useEffect(() => {
-  const handleClickOutside = (event) => {
-    if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-      setShowDropdown(false);
-      setSearchTerm(''); 
-      setSearchResults({ recipes: [], categories: [] }); 
-    }
-  };
-
-  document.addEventListener('mousedown', handleClickOutside);
-  return () => document.removeEventListener('mousedown', handleClickOutside);
-}, []);
-
-
-  // Buscar mientras escribe
+ 
   useEffect(() => {
     if (searchTerm.length >= 2) {
       setLoadingSearch(true);
@@ -101,6 +102,25 @@ export const Home = () => {
     }
   }, [searchTerm]);
 
+
+  const fetchTopRatedRecipes = async () => {
+    try {
+      const apiUrl = getApiUrl();
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+      
+      const response = await fetch(`${apiUrl}/recipes/top-rated`, {
+        headers: headers,
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setTopRatedRecipes(data.recipes || []);
+      }
+    } catch (error) {
+      console.error('Error fetching top rated recipes:', error);
+    }
+  };
+
   const fetchCategories = async () => {
     try {
       const apiUrl = getApiUrl();
@@ -118,7 +138,11 @@ export const Home = () => {
   const fetchRecipesSummary = async () => {
     try {
       const apiUrl = getApiUrl();
-      const response = await fetch(`${apiUrl}/recipes/resumen`);
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+      
+      const response = await fetch(`${apiUrl}/recipes/resumen`, {
+        headers: headers,
+      });
       const data = await response.json();
 
       if (response.ok) {
@@ -157,14 +181,16 @@ export const Home = () => {
     setSearchTerm('');
     if (type === 'recipe') {
       navigate(`/recipe/${id}`);
+    } else if (type === 'favorites') {
+      navigate(`/favorites`);
     } else {
       navigate(`/category/${id}`);
     }
     window.scrollTo(0, 0);
   };
 
-  const scrollCarousel = (categoryId, direction) => {
-    const container = document.getElementById(`carousel-${categoryId}`);
+  const scrollCarousel = (carouselId, direction) => {
+    const container = document.getElementById(`carousel-${carouselId}`);
     if (container) {
       const scrollAmount = 320;
       container.scrollBy({
@@ -177,7 +203,22 @@ export const Home = () => {
   const handleCategoryClick = (categoryId) => {
     setSelectedCategory(categoryId);
 
-    if (categoryId !== 'all') {
+    if (categoryId === 'favorites') {
+      setTimeout(() => {
+        const sectionElement = document.getElementById('favorites-section');
+        if (sectionElement) {
+          const navbar = document.querySelector('nav.navbar');
+          const navbarHeight = navbar ? navbar.offsetHeight : 48;
+          const elementPosition = sectionElement.getBoundingClientRect().top;
+          const offsetPosition = elementPosition + window.pageYOffset - navbarHeight - 20;
+
+          window.scrollTo({
+            top: offsetPosition,
+            behavior: 'smooth'
+          });
+        }
+      }, 100);
+    } else if (categoryId !== 'all') {
       setTimeout(() => {
         const sectionElement = document.getElementById(`category-section-${categoryId}`);
         if (sectionElement) {
@@ -408,7 +449,19 @@ export const Home = () => {
             <i className="fa-solid fa-border-all"></i>
             <span>Todos</span>
           </button>
-          {categoriesWithRecipes.slice(0, 10).map((category) => (
+          
+          {/* Botón de Favoritos - Siempre visible si hay recetas top rated */}
+          {topRatedRecipes.length > 0 && (
+            <button
+              className={`pill-btn ${selectedCategory === 'favorites' ? 'active' : ''}`}
+              onClick={() => handleCategoryClick('favorites')}
+            >
+              <i className="fa-solid fa-star"></i>
+              <span>Mejor Valoradas</span>
+            </button>
+          )}
+          
+          {categoriesWithRecipes.slice(0, 9).map((category) => (
             <button
               key={category.id}
               className={`pill-btn ${selectedCategory === category.id ? 'active' : ''}`}
@@ -417,7 +470,7 @@ export const Home = () => {
               <span>{category.name_category}</span>
             </button>
           ))}
-          {categoriesWithRecipes.length >= 10 && (
+          {categoriesWithRecipes.length >= 9 && (
             <Link to="/categories" className="pill-btn view-all-pill">
               <span>Ver todas</span>
               <i className="fa-solid fa-arrow-right"></i>
@@ -428,6 +481,61 @@ export const Home = () => {
 
       {/* Recipes Section */}
       <div className="recipes-section-modern">
+        {topRatedRecipes.length > 0 && (
+          <div
+            className="category-section-modern"
+            id="favorites-section"
+          >
+            <div className="section-header-modern">
+              <div className="title-with-icon">
+                <div className="icon-circle" style={{ background: 'linear-gradient(135deg, #ffd700 0%, #ffed4e 100%)' }}>
+                  <i className="fa-solid fa-star"></i>
+                </div>
+                <h2 className="section-title-modern">Mejor Valoradas</h2>
+              </div>
+              <Link
+                to="/favorites"
+                className="view-all-modern"
+                onClick={() => window.scrollTo(0, 0)}
+              >
+                Ver todas
+                <i className="fa-solid fa-arrow-right"></i>
+              </Link>
+            </div>
+
+            <div className="carousel-modern-wrapper">
+              <button
+                className="nav-arrow nav-left"
+                onClick={() => scrollCarousel('favorites', 'left')}
+                aria-label="Anterior"
+              >
+                <i className="fa-solid fa-chevron-left"></i>
+              </button>
+
+              <div
+                className="carousel-modern-container"
+                id="carousel-favorites"
+              >
+                {topRatedRecipes.slice(0, 12).map((recipe) => (
+                  <RecipeCardMini 
+                    key={recipe.id} 
+                    recipe={recipe}
+                    showOnlyStars={true}
+                  />
+                ))}
+              </div>
+
+              <button
+                className="nav-arrow nav-right"
+                onClick={() => scrollCarousel('favorites', 'right')}
+                aria-label="Siguiente"
+              >
+                <i className="fa-solid fa-chevron-right"></i>
+              </button>
+            </div>
+          </div>
+        )}
+
         {Object.keys(categories).length === 0 ? (
           <div className="no-recipes-modern">
             <div className="empty-state">
@@ -446,7 +554,7 @@ export const Home = () => {
               <div className="section-header-modern">
                 <div className="title-with-icon">
                   <div className="icon-circle">
-                    <i className="fa-solid fa-heart"></i>
+                    <i className="fa-solid fa-utensils"></i>
                   </div>
                   <h2 className="section-title-modern">{categoryName}</h2>
                 </div>
@@ -474,39 +582,12 @@ export const Home = () => {
                   id={`carousel-${categoryData.category_id}`}
                 >
                   {categoryData.recipes.slice(0, 12).map((recipe) => (
-                    <div key={recipe.id} className="recipe-card-modern">
-                      <div className="card-image-wrapper">
-                        <Link to={`/recipe/${recipe.id}`} onClick={() => window.scrollTo(0, 0)}>
-                          <img src={recipe.image} alt={recipe.title} />
-                          <div className="image-overlay">
-                            <span className="difficulty-tag">{recipe.difficulty}</span>
-                          </div>
-                        </Link>
-                      </div>
-
-                      <div className="card-content-modern">
-                        <h3 className="card-title-modern">{recipe.title}</h3>
-                        <div className="card-meta-modern">
-                          <div className="meta-badge">
-                            <i className="fa-solid fa-clock"></i>
-                            <span>{recipe.prep_time_min} min</span>
-                          </div>
-                          <div className="meta-badge">
-                            <i className="fa-solid fa-users"></i>
-                            <span>{recipe.portions} porciones</span>
-                          </div>
-                        </div>
-
-                        <Link
-                          to={`/recipe/${recipe.id}`}
-                          className="view-recipe-btn"
-                          onClick={() => window.scrollTo(0, 0)}
-                        >
-                          <span>Ver receta completa</span>
-                          <i className="fa-solid fa-arrow-right-circle"></i>
-                        </Link>
-                      </div>
-                    </div>
+                    <RecipeCardMini 
+                      key={recipe.id} 
+                      recipe={recipe}
+                      showOnlyStars={false}
+                      showHeartOnlyIfFavorite={true} 
+                    />
                   ))}
                 </div>
 
