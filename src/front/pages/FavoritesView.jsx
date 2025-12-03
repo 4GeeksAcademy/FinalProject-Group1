@@ -227,17 +227,10 @@ export const FavoritesView = () => {
                                     <span className="difficulty-tag-grid">{recipe.difficulty}</span>
                                 </div>
                                 
-                                {recipe.is_favorite && (
-                                    <div className="favorite-badge heart-badge">
-                                        <i className="fa-solid fa-heart"></i>
-                                    </div>
-                                )}
-                                
-                                {recipe.is_top_rated && (
-                                    <div className={`favorite-badge star-badge ${!recipe.is_favorite ? 'single-badge' : ''}`}>
-                                        <i className="fa-solid fa-star"></i>
-                                    </div>
-                                )}
+                                {/* Solo mostrar badge de estrella en mejor valoradas */}
+                                <div className="favorite-badge star-badge single-badge">
+                                    <i className="fa-solid fa-star"></i>
+                                </div>
                             </div>
                             
                             <div className="card-content-grid">
