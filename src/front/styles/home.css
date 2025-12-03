@@ -566,9 +566,9 @@
 
 .category-pills {
     display: flex;
-    white-space: nowrap;
     gap: 13.5px;
     justify-content: center;
+    flex-wrap: wrap;
 }
 
 .pill-btn {
@@ -831,6 +831,7 @@
   display: flex;
   gap: 9px;
   margin-bottom: 13.5px;
+  justify-content: center;
 }
 
 .meta-badge {
@@ -1112,4 +1113,80 @@
     width: 36px;
     height: 36px;
   }
+}
+
+/* RECIPE CARD MINI */
+
+.card-image-wrapper {
+    position: relative;
+    overflow: hidden;
+    border-radius: 12px;
+}
+
+.recipe-card-modern .favorite-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: rgba(255, 255, 255, 0.95);
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    z-index: 3;
+    transition: transform 0.3s ease;
+}
+
+.recipe-card-modern .favorite-badge:hover {
+    transform: scale(1.1);
+}
+
+.recipe-card-modern .favorite-badge i {
+    font-size: 16px;
+}
+
+.recipe-card-modern .favorite-badge.heart-badge {
+    top: 10px;
+    left: 10px;
+    background: rgba(255, 107, 107, 0.95);
+    animation: heartBeatCard 1.5s ease-in-out infinite;
+}
+
+.recipe-card-modern .favorite-badge.heart-badge i {
+    color: #fff;
+}
+
+.recipe-card-modern .favorite-badge.star-badge {
+    top: 55px;
+    left: 10px;
+    background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+}
+
+.recipe-card-modern .favorite-badge.star-badge i {
+    color: #fff;
+}
+
+.recipe-card-modern .favorite-badge.star-badge.single-badge {
+    top: 10px;
+}
+
+.recipe-card-modern .difficulty-tag {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 2;
+}
+
+@keyframes heartBeatCard {
+    0%, 100% {
+        transform: scale(1);
+    }
+    25% {
+        transform: scale(1.1);
+    }
+    50% {
+        transform: scale(1);
+    }
 }

@@ -4,7 +4,7 @@ import "../styles/home.css";
 import BannerRecetas from "../assets/img/BannerRecetas.png";
 import Comment from './Comment';
 import { RecipeCardMini } from "../components/RecipeCardMini";
-
+import useGlobalReducer from "../hooks/useGlobalReducer.jsx";
 
 const getApiUrl = () => {
   return import.meta.env.VITE_BACKEND_URL || '';
@@ -12,8 +12,12 @@ const getApiUrl = () => {
 
 export const Home = () => {
   const navigate = useNavigate();
+  const { store } = useGlobalReducer();
+  const token = store.token;
+
   const [categories, setCategories] = useState({});
   const [allCategories, setAllCategories] = useState([]);
+  const [topRatedRecipes, setTopRatedRecipes] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -29,6 +33,7 @@ export const Home = () => {
   useEffect(() => {
     fetchCategories();
     fetchRecipesSummary();
+    fetchTopRatedRecipes();
 
     const handleScroll = () => {
       if (window.scrollY > 400) {
@@ -44,7 +49,7 @@ export const Home = () => {
 
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  }, [token]);
 
   // Cerrar dropdown al hacer clic fuera
   useEffect(() => {
@@ -59,7 +64,6 @@ export const Home = () => {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
-
 
   // Buscar mientras escribe
   useEffect(() => {
@@ -101,6 +105,25 @@ export const Home = () => {
       setShowDropdown(false);
     }
   }, [searchTerm]);
+
+  // Fetch de recetas mejor valoradas + favoritas del usuario
+  const fetchTopRatedRecipes = async () => {
+    try {
+      const apiUrl = getApiUrl();
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+      
+      const response = await fetch(`${apiUrl}/recipes/top-rated`, {
+        headers: headers,
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setTopRatedRecipes(data.recipes || []);
+      }
+    } catch (error) {
+      console.error('Error fetching top rated recipes:', error);
+    }
+  };
 
   const fetchCategories = async () => {
     try {
@@ -158,14 +181,16 @@ export const Home = () => {
     setSearchTerm('');
     if (type === 'recipe') {
       navigate(`/recipe/${id}`);
+    } else if (type === 'favorites') {
+      navigate(`/favorites`);
     } else {
       navigate(`/category/${id}`);
     }
     window.scrollTo(0, 0);
   };
 
-  const scrollCarousel = (categoryId, direction) => {
-    const container = document.getElementById(`carousel-${categoryId}`);
+  const scrollCarousel = (carouselId, direction) => {
+    const container = document.getElementById(`carousel-${carouselId}`);
     if (container) {
       const scrollAmount = 320;
       container.scrollBy({
@@ -178,7 +203,22 @@ export const Home = () => {
   const handleCategoryClick = (categoryId) => {
     setSelectedCategory(categoryId);
 
-    if (categoryId !== 'all') {
+    if (categoryId === 'favorites') {
+      setTimeout(() => {
+        const sectionElement = document.getElementById('favorites-section');
+        if (sectionElement) {
+          const navbar = document.querySelector('nav.navbar');
+          const navbarHeight = navbar ? navbar.offsetHeight : 48;
+          const elementPosition = sectionElement.getBoundingClientRect().top;
+          const offsetPosition = elementPosition + window.pageYOffset - navbarHeight - 20;
+
+          window.scrollTo({
+            top: offsetPosition,
+            behavior: 'smooth'
+          });
+        }
+      }, 100);
+    } else if (categoryId !== 'all') {
       setTimeout(() => {
         const sectionElement = document.getElementById(`category-section-${categoryId}`);
         if (sectionElement) {
@@ -409,7 +449,19 @@ export const Home = () => {
             <i className="fa-solid fa-border-all"></i>
             <span>Todos</span>
           </button>
-          {categoriesWithRecipes.slice(0, 10).map((category) => (
+          
+          {/* Botón de Favoritos - Siempre visible si hay recetas top rated */}
+          {topRatedRecipes.length > 0 && (
+            <button
+              className={`pill-btn ${selectedCategory === 'favorites' ? 'active' : ''}`}
+              onClick={() => handleCategoryClick('favorites')}
+            >
+              <i className="fa-solid fa-star"></i>
+              <span>Mejor Valoradas</span>
+            </button>
+          )}
+          
+          {categoriesWithRecipes.slice(0, 9).map((category) => (
             <button
               key={category.id}
               className={`pill-btn ${selectedCategory === category.id ? 'active' : ''}`}
@@ -418,7 +470,7 @@ export const Home = () => {
               <span>{category.name_category}</span>
             </button>
           ))}
-          {categoriesWithRecipes.length >= 10 && (
+          {categoriesWithRecipes.length >= 9 && (
             <Link to="/categories" className="pill-btn view-all-pill">
               <span>Ver todas</span>
               <i className="fa-solid fa-arrow-right"></i>
@@ -429,6 +481,62 @@ export const Home = () => {
 
       {/* Recipes Section */}
       <div className="recipes-section-modern">
+        {/* Sección de MEJOR VALORADAS - Aparece PRIMERO */}
+        {topRatedRecipes.length > 0 && (
+          <div
+            className="category-section-modern"
+            id="favorites-section"
+          >
+            <div className="section-header-modern">
+              <div className="title-with-icon">
+                <div className="icon-circle" style={{ background: 'linear-gradient(135deg, #ffd700 0%, #ffed4e 100%)' }}>
+                  <i className="fa-solid fa-star"></i>
+                </div>
+                <h2 className="section-title-modern">Mejor Valoradas</h2>
+              </div>
+              <Link
+                to="/favorites"
+                className="view-all-modern"
+                onClick={() => window.scrollTo(0, 0)}
+              >
+                Ver todas
+                <i className="fa-solid fa-arrow-right"></i>
+              </Link>
+            </div>
+
+            <div className="carousel-modern-wrapper">
+              <button
+                className="nav-arrow nav-left"
+                onClick={() => scrollCarousel('favorites', 'left')}
+                aria-label="Anterior"
+              >
+                <i className="fa-solid fa-chevron-left"></i>
+              </button>
+
+              <div
+                className="carousel-modern-container"
+                id="carousel-favorites"
+              >
+                {topRatedRecipes.slice(0, 12).map((recipe) => (
+                  <RecipeCardMini 
+                    key={recipe.id} 
+                    recipe={recipe} 
+                  />
+                ))}
+              </div>
+
+              <button
+                className="nav-arrow nav-right"
+                onClick={() => scrollCarousel('favorites', 'right')}
+                aria-label="Siguiente"
+              >
+                <i className="fa-solid fa-chevron-right"></i>
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Resto de categorías */}
         {Object.keys(categories).length === 0 ? (
           <div className="no-recipes-modern">
             <div className="empty-state">
@@ -447,7 +555,7 @@ export const Home = () => {
               <div className="section-header-modern">
                 <div className="title-with-icon">
                   <div className="icon-circle">
-                    <i className="fa-solid fa-heart"></i>
+                    <i className="fa-solid fa-utensils"></i>
                   </div>
                   <h2 className="section-title-modern">{categoryName}</h2>
                 </div>

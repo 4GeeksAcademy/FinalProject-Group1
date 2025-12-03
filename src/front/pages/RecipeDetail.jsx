@@ -25,11 +25,10 @@ export const RecipeDetail = () => {
   const [hoverRating, setHoverRating] = useState(0);
   const [isRatingLoading, setIsRatingLoading] = useState(false);
 
-
   if (!token) {
     return (
       <div className='info'>
-        <Link to="/" className="back-button positions">
+        <Link to={-1} className="back-button positions">
           <i className="bi bi-arrow-left"></i> Volver
         </Link>
 
@@ -64,7 +63,7 @@ export const RecipeDetail = () => {
   if (!recipeId) {
     return (
       <div className="recipe-detail-container">
-        <Link to="/" className="back-button">
+        <Link to={-1} className="back-button">
           <i className="bi bi-arrow-left"></i> Volver
         </Link>
         <p>Esperando ID de la receta...</p>
@@ -219,7 +218,7 @@ export const RecipeDetail = () => {
   if (loading) {
     return (
       <div className="recipe-detail-container">
-        <Link to="/" className="back-button">
+        <Link to={-1} className="back-button">
           <i className="bi bi-arrow-left"></i> Volver
         </Link>
         <p>Cargando receta...</p>
@@ -230,7 +229,7 @@ export const RecipeDetail = () => {
   if (error) {
     return (
       <div className="recipe-detail-container">
-        <Link to="/" className="back-button">
+        <Link to={-1} className="back-button">
           <i className="bi bi-arrow-left"></i> Volver
         </Link>
         <div className="error-container">
@@ -247,7 +246,7 @@ export const RecipeDetail = () => {
   if (!recipe) {
     return (
       <div className="recipe-detail-container">
-        <Link to="/" className="back-button">
+        <Link to={-1} className="back-button">
           <i className="bi bi-arrow-left"></i> Volver
         </Link>
         <div className="error-container">
@@ -284,7 +283,7 @@ export const RecipeDetail = () => {
 
   return (
     <div className="recipe-detail-container">
-      <Link to="/" className="back-button">
+      <Link to={-1} className="back-button">
         <i className="bi bi-arrow-left"></i> Volver
       </Link>
 
@@ -410,4 +409,3 @@ export const RecipeDetail = () => {
     </div>
   );
 };
-

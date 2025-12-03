@@ -158,7 +158,7 @@ def register_user():
 
 @api.route("/categories", methods=["GET"])
 def get_categories():
-    categories = Category.query.order_by(Category.name_category).all()
+    categories = Category.query.order_by(Category.id_category).all() 
     data = [category.serialize() for category in categories]
     return jsonify(data), 200
 
@@ -804,6 +804,99 @@ def get_user_favorites():
         }), 500
 
 
+#ENDPOINT FAVORITOS Y RATING
+
+@api.route("/recipes/top-rated", methods=["GET"])
+@jwt_required(optional=True)
+def get_top_rated_recipes():
+    """
+    Devuelve recetas mejor valoradas (con al menos 3 votos y rating >= 4.0)
+    Si hay usuario autenticado, también incluye sus favoritos aunque no cumplan el criterio
+    """
+    try:
+        current_user_id = get_jwt_identity()
+        if current_user_id is not None:
+            try:
+                current_user_id = int(current_user_id)
+            except (TypeError, ValueError):
+                current_user_id = None
+
+        top_rated = (
+            db.session.query(Recipe)
+            .filter(
+                Recipe.state_recipe == stateRecipeEnum.PUBLISHED,
+                Recipe.vote_count >= 3,
+                Recipe.avg_rating >= 4.0
+            )
+            .order_by(Recipe.avg_rating.desc(), Recipe.vote_count.desc())
+            .limit(50)
+            .all()
+        )
+
+        recipe_ids_set = {recipe.id_recipe for recipe in top_rated}
+        
+        if current_user_id:
+            user_favorites = (
+                db.session.query(Recipe)
+                .join(RecipeFavorite, RecipeFavorite.recipe_id == Recipe.id_recipe)
+                .filter(
+                    RecipeFavorite.user_id == current_user_id,
+                    Recipe.state_recipe == stateRecipeEnum.PUBLISHED,
+                    Recipe.id_recipe.notin_(recipe_ids_set)
+                )
+                .all()
+            )
+            
+            all_recipes = list(top_rated) + list(user_favorites)
+        else:
+            all_recipes = top_rated
+
+        recipes_data = []
+        for recipe in all_recipes:
+            meets_top_criteria = (
+                recipe.vote_count is not None and 
+                recipe.vote_count >= 3 and 
+                recipe.avg_rating is not None and 
+                recipe.avg_rating >= 4.0
+            )
+            
+            recipe_dict = {
+                "id": recipe.id_recipe,
+                "title": recipe.title,
+                "image": recipe.image,
+                "portions": recipe.portions,
+                "prep_time_min": recipe.preparation_time_min,
+                "difficulty": recipe.difficulty.value,
+                "avg_rating": recipe.avg_rating,
+                "vote_count": recipe.vote_count,
+                "is_favorite": False,
+                "is_top_rated": meets_top_criteria
+            }
+            
+            if current_user_id:
+                is_fav = RecipeFavorite.query.filter_by(
+                    user_id=current_user_id,
+                    recipe_id=recipe.id_recipe
+                ).first()
+                recipe_dict["is_favorite"] = is_fav is not None
+            
+            recipes_data.append(recipe_dict)
+
+        return jsonify({
+            "message": "Top rated recipes retrieved successfully",
+            "recipes": recipes_data,
+            "count": len(recipes_data)
+        }), 200
+
+    except Exception as error:
+        print("Error en get_top_rated_recipes:", error)
+        return jsonify({
+            "message": "Error interno al obtener recetas mejor valoradas",
+            "details": str(error)
+        }), 500
+
+#endpoint Calidicacion recetas
+
 @api.route("/recetas/<int:recipe_id>/calificar", methods=["POST"])
 @jwt_required()
 def rate_recipe(recipe_id):
@@ -1104,18 +1197,25 @@ def delete_comment(comment_id):
 
 
 @api.route("/recipes/resumen", methods=["GET"])
+@jwt_required(optional=True)
 def get_recipes_summary():
     """
-    Devuelve un resumen con todas las categorías y 5-8 recetas publicadas por categoría
-    para los carruseles del home
+    Devuelve un resumen con todas las categorías y 12 recetas publicadas por categoría
+    para los carruseles del home. Incluye información de favoritos si hay usuario logueado.
     """
     try:
-        categories = Category.query.order_by(Category.name_category).all()
+        current_user_id = get_jwt_identity()
+        if current_user_id is not None:
+            try:
+                current_user_id = int(current_user_id)
+            except (TypeError, ValueError):
+                current_user_id = None
+
+        categories = Category.query.order_by(Category.id_category).all()
 
         summary = {}
 
         for category in categories:
-            # Obtener  recetas publicadas de esta categoría
             recipes = (
                 db.session.query(Recipe)
                 .filter(
@@ -1127,22 +1227,40 @@ def get_recipes_summary():
                 .all()
             )
 
-            # Solo incluir categorías que tengan recetas
             if recipes:
+                recipes_data = []
+                for recipe in recipes:
+                    meets_top_criteria = (
+                        recipe.vote_count is not None and 
+                        recipe.vote_count >= 3 and 
+                        recipe.avg_rating is not None and 
+                        recipe.avg_rating >= 4.0
+                    )
+                    
+                    recipe_dict = {
+                        "id": recipe.id_recipe,
+                        "title": recipe.title,
+                        "image": recipe.image,
+                        "portions": recipe.portions,
+                        "prep_time_min": recipe.preparation_time_min,
+                        "difficulty": recipe.difficulty.value,
+                        "is_top_rated": meets_top_criteria,
+                        "is_favorite": False
+                    }
+                    
+                    if current_user_id:
+                        is_fav = RecipeFavorite.query.filter_by(
+                            user_id=current_user_id,
+                            recipe_id=recipe.id_recipe
+                        ).first()
+                        recipe_dict["is_favorite"] = is_fav is not None
+                    
+                    recipes_data.append(recipe_dict)
+                
                 summary[category.name_category] = {
                     "category_id": category.id_category,
                     "category_name": category.name_category,
-                    "recipes": [
-                        {
-                            "id": recipe.id_recipe,
-                            "title": recipe.title,
-                            "image": recipe.image,
-                            "portions": recipe.portions,
-                            "prep_time_min": recipe.preparation_time_min,
-                            "difficulty": recipe.difficulty.value
-                        }
-                        for recipe in recipes
-                    ]
+                    "recipes": recipes_data
                 }
 
         return jsonify({
@@ -1151,12 +1269,11 @@ def get_recipes_summary():
         }), 200
 
     except Exception as error:
-        logger.error(f"Error getting recipe summary: {error}")
+        print(f"Error getting recipe summary: {error}")
         return jsonify({
             "message": "Error retrieving recipe summary",
             "details": str(error)
         }), 500
-
 
 @api.route("/recipes/category/<int:category_id>", methods=["GET"])
 def get_recipes_by_category(category_id):
