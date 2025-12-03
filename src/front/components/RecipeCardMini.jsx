@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-export const RecipeCardMini = ({ recipe, showOnlyStars = false }) => {
+export const RecipeCardMini = ({ recipe, showOnlyStars = false, showHeartOnlyIfFavorite = false }) => {
   return (
     <div className="recipe-card-modern">
       <div className="card-image-wrapper">
@@ -19,14 +19,19 @@ export const RecipeCardMini = ({ recipe, showOnlyStars = false }) => {
             )
           ) : (
             <>
-              {/* Corazón - SOLO si es favorito */}
-              {recipe.is_favorite && (
-                <div className="favorite-badge heart-badge">
-                  <i className="fa-solid fa-heart"></i>
-                </div>
+              {showHeartOnlyIfFavorite ? (
+                recipe.is_favorite && (
+                  <div className="favorite-badge heart-badge">
+                    <i className="fa-solid fa-heart"></i>
+                  </div>
+                )
+              ) : (
+                recipe.is_favorite && (
+                  <div className="favorite-badge heart-badge">
+                    <i className="fa-solid fa-heart"></i>
+                  </div>
+                )
               )}
-              
-              {/* Estrella - SOLO si es top rated */}
               {recipe.is_top_rated && (
                 <div className={`favorite-badge star-badge ${!recipe.is_favorite ? 'single-badge' : ''}`}>
                   <i className="fa-solid fa-star"></i>
