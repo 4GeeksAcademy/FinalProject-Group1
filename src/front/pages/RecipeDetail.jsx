@@ -27,6 +27,7 @@ export const RecipeDetail = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [conversionUnit, setConversionUnit] = useState("original");
+  const [loadingIngredients, setLoadingIngredients] = useState(false)
 
   const [recipeLoaded, setRecipeLoaded] = useState(false);
 
@@ -88,13 +89,13 @@ export const RecipeDetail = () => {
       setError(null);
       setRecipeLoaded(false);
 
-      if (!recipeId) {
-        console.error("Error: recipeId es indefinido. No se puede cargar la receta.");
+      if (!recipeId || !token) {
+        console.error("Error: recipeId o token es indefinido.");
         setLoading(false);
         return; // Detiene la ejecución del fetch
       }
 
-      const url = `${BACKEND_URL}/recetas/${recipeId}?unit=${conversionUnit}`;
+      const url = `${BACKEND_URL}/recetas/${recipeId}`;
 
       try {
         const res = await fetch(url, {
@@ -105,21 +106,6 @@ export const RecipeDetail = () => {
 
         const text = await res.text();
 
-        if (!res.ok) {
-          let message = 'Error al cargar la receta';
-          try {
-            const errData = JSON.parse(text);
-            if (errData?.message) message = errData.message;
-          } catch {
-          }
-
-          if (res.status === 404) {
-            message = 'Receta no encontrada';
-          }
-
-          throw new Error(message);
-        }
-
         let data;
         try {
           data = JSON.parse(text);
@@ -127,10 +113,20 @@ export const RecipeDetail = () => {
           throw new Error('Respuesta inválida del servidor (no es JSON)');
         }
 
-        setRecipe(data);
-        setIsFavorite(Boolean(data.is_favorite));
-        setUserRating(data.user_rating || 0);
-        setRecipeLoaded(true);
+        if (!res.ok) {
+                let message = data?.message || 'Error al cargar la receta';
+                if (res.status === 404) {
+                    message = 'Receta no encontrada';
+                }
+                throw new Error(message);
+            }
+
+            data.ingredients_original = data.ingredients; 
+            
+            setRecipe(data); 
+            setIsFavorite(Boolean(data.is_favorite));
+            setUserRating(data.user_rating || 0);
+            setRecipeLoaded(true);
 
       } catch (err) {
         console.error('Error en fetchRecipe:', err);
@@ -143,303 +139,354 @@ export const RecipeDetail = () => {
     if (token && recipeId) {
       fetchRecipe();
     }
-  }, [recipeId, token, conversionUnit]);
+  }, [recipeId, token]);
 
 
-  const handleRate = async (ratingValue) => {
-    if (!token) {
-      alert('Debes iniciar sesión para calificar.');
+  useEffect(() => {
+    if (!recipe || !recipeId || !token) return;
+
+    if (conversionUnit === "original") {
+      setRecipe(prevRecipe => {
+        if (!prevRecipe.ingredients_original) return prevRecipe; 
+        return {
+          ...prevRecipe,
+          ingredients: prevRecipe.ingredients_original 
+        };
+      });
       return;
     }
 
-    if (isRatingLoading) return;
-    setIsRatingLoading(true);
 
-    try {
-      const res = await fetch(`${BACKEND_URL}/recipe/${recipeId}/rate`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ rating: ratingValue }),
-      });
+    const fetchConvertedIngredients = async () => {
+            setLoadingIngredients(true);
 
-      const text = await res.text();
-      let data;
+            const url = `${BACKEND_URL}/recetas/${recipeId}/ingredientes?unit=${conversionUnit}`; 
+
+            try {
+                const res = await fetch(url, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+
+                const data = JSON.parse(await res.text());
+                if (!res.ok) throw new Error(data.message || 'Error al convertir ingredientes');
+
+                setRecipe(prevRecipe => {
+                    const ingredientsOriginal = prevRecipe.ingredients_original || prevRecipe.ingredients;
+
+                    return {
+                        ...prevRecipe,
+                        ingredients: data,
+                        ingredients_original: ingredientsOriginal 
+                    };
+                });
+            
+            } catch (err) {
+                console.error('Error en fetchConvertedIngredients:', err);
+            } finally {
+                setLoadingIngredients(false);
+            }
+        };
+
+        fetchConvertedIngredients();
+
+    }, [recipeId, token, conversionUnit]);
+
+    const handleRate = async (ratingValue) => {
+      if (!token) {
+        alert('Debes iniciar sesión para calificar.');
+        return;
+      }
+
+      if (isRatingLoading) return;
+      setIsRatingLoading(true);
+
       try {
-        data = JSON.parse(text);
-      } catch {
-        throw new Error('Respuesta inválida del servidor al calificar');
+        const res = await fetch(`${BACKEND_URL}/recipe/${recipeId}/rate`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ rating: ratingValue }),
+        });
+
+        const text = await res.text();
+        let data;
+        try {
+          data = JSON.parse(text);
+        } catch {
+          throw new Error('Respuesta inválida del servidor al calificar');
+        }
+
+        if (!res.ok) {
+          throw new Error(data.message || 'Error al enviar la calificación');
+        }
+
+        setUserRating(ratingValue);
+
+        setRecipe((prevRecipe) => ({
+          ...prevRecipe,
+          avg_rating: data.avg_rating,
+          vote_count: data.vote_count,
+        }));
+
+        console.log(data.message);
+      } catch (err) {
+        console.error('Error al calificar:', err);
+        alert(err.message || 'Error al calificar la receta.');
+      } finally {
+        setIsRatingLoading(false);
+      }
+    };
+
+    // Favoritos
+    const handleToggleFavorite = async () => {
+      if (!token) {
+        alert('Debes iniciar sesión para añadir a favoritos.');
+        return;
       }
 
-      if (!res.ok) {
-        throw new Error(data.message || 'Error al enviar la calificación');
-      }
-
-      setUserRating(ratingValue);
-
-      setRecipe((prevRecipe) => ({
-        ...prevRecipe,
-        avg_rating: data.avg_rating,
-        vote_count: data.vote_count,
-      }));
-
-      console.log(data.message);
-    } catch (err) {
-      console.error('Error al calificar:', err);
-      alert(err.message || 'Error al calificar la receta.');
-    } finally {
-      setIsRatingLoading(false);
-    }
-  };
-
-  // Favoritos
-  const handleToggleFavorite = async () => {
-    if (!token) {
-      alert('Debes iniciar sesión para añadir a favoritos.');
-      return;
-    }
-
-    try {
-      const res = await fetch(`${BACKEND_URL}/recetas/${recipeId}/favorito`, {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      const text = await res.text();
-      let data = {};
       try {
-        data = JSON.parse(text);
-      } catch {
-        throw new Error('Respuesta inválida del servidor al actualizar favorito');
-      }
+        const res = await fetch(`${BACKEND_URL}/recetas/${recipeId}/favorito`, {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
-      if (!res.ok) {
-        throw new Error(data.message || 'Error al actualizar favorito');
-      }
+        const text = await res.text();
+        let data = {};
+        try {
+          data = JSON.parse(text);
+        } catch {
+          throw new Error('Respuesta inválida del servidor al actualizar favorito');
+        }
 
-      setIsFavorite(Boolean(data.is_favorite));
-    } catch (err) {
-      console.error('Error en favorito:', err);
-      alert(err.message || 'Error al actualizar favorito');
+        if (!res.ok) {
+          throw new Error(data.message || 'Error al actualizar favorito');
+        }
+
+        setIsFavorite(Boolean(data.is_favorite));
+      } catch (err) {
+        console.error('Error en favorito:', err);
+        alert(err.message || 'Error al actualizar favorito');
+      }
+    };
+
+    if (loading) {
+      return (
+        <div className="recipe-detail-container">
+          <Link to="/" className="back-button">
+            <i className="bi bi-arrow-left"></i> Volver
+          </Link>
+          <p>Cargando receta...</p>
+        </div>
+      );
     }
-  };
 
-  if (loading) {
-    return (
-      <div className="recipe-detail-container">
-        <Link to="/" className="back-button">
-          <i className="bi bi-arrow-left"></i> Volver
-        </Link>
-        <p>Cargando receta...</p>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="recipe-detail-container">
-        <Link to="/" className="back-button">
-          <i className="bi bi-arrow-left"></i> Volver
-        </Link>
-        <div className="error-container">
-          <h2>Ups, algo salió mal</h2>
-          <p className="text-muted">{error}</p>
-          <Link to="/" className="btn btn-warning">
-            Volver al inicio
+    if (error) {
+      return (
+        <div className="recipe-detail-container">
+          <Link to="/" className="back-button">
+            <i className="bi bi-arrow-left"></i> Volver
           </Link>
-        </div>
-      </div>
-    );
-  }
-
-  if (!recipe) {
-    return (
-      <div className="recipe-detail-container">
-        <Link to="/" className="back-button">
-          <i className="bi bi-arrow-left"></i> Volver
-        </Link>
-        <div className="error-container">
-          <h2>Receta no encontrada</h2>
-          <p className="text-muted">
-            La funcionalidad será implementada próximamente
-          </p>
-          <Link to="/" className="btn btn-warning">
-            Volver al inicio
-          </Link>
-        </div>
-      </div>
-    );
-  }
-
-  const {
-    title,
-    difficulty,
-    prep_time_min,
-    portions,
-    category_name,
-    avg_rating,
-    vote_count,
-    image,
-    ingredients = [],
-    steps,
-    is_published = false,
-    comments = [],
-  } = recipe;
-
-  const stepsList = steps
-    ? steps.split('\n').filter((step) => step.trim())
-    : [];
-
-  return (
-    <div className="recipe-detail-container">
-      <Link to="/" className="back-button">
-        <i className="bi bi-arrow-left"></i> Volver
-      </Link>
-
-      <div className="recipe-hero">
-        <div className="recipe-hero-content">
-          <h1 className="recipe-detail-title">{title}</h1>
-
-          <div className="recipe-badges">
-            <span className="badge-item difficulty">
-              <i className="bi bi-speedometer2"></i> {difficulty}
-            </span>
-            <span className="badge-item">
-              <i className="bi bi-clock"></i> {prep_time_min} min
-            </span>
-            <span className="badge-item">
-              <i className="bi bi-people"></i> {portions} porciones
-            </span>
-            <span className="badge-item category">
-              <i className="bi bi-tag"></i> {category_name}
-            </span>
+          <div className="error-container">
+            <h2>Ups, algo salió mal</h2>
+            <p className="text-muted">{error}</p>
+            <Link to="/" className="btn btn-warning">
+              Volver al inicio
+            </Link>
           </div>
+        </div>
+      );
+    }
 
-          <div className="recipe-detail-rating recipe-global-rating"
-            onMouseLeave={() => token && setHoverRating(0)}>
-            <div className={`stars ${token ? 'stars-interactive' : ''} ${isRatingLoading ? 'disabled' : ''}`}>
-              {[...Array(5)].map((_, i) => {
-                const starValue = i + 1;
-                const displayValue = hoverRating
-                  || userRating
-                  || (token ? 0 : (recipe.avg_rating || 0));
-                return (
-                  <i
-                    key={`avg-${i}`}
-                    className={`bi ${starValue <= displayValue
-                      ? 'bi-star-fill'
-                      : 'bi-star'
-                      } ${token ? 'clickable star-item' : ''}`}
-                    onMouseEnter={() => token && setHoverRating(starValue)}
-                    onClick={() => token && handleRate(starValue)}
-                  ></i>
-                );
-              })}
+    if (!recipe) {
+      return (
+        <div className="recipe-detail-container">
+          <Link to="/" className="back-button">
+            <i className="bi bi-arrow-left"></i> Volver
+          </Link>
+          <div className="error-container">
+            <h2>Receta no encontrada</h2>
+            <p className="text-muted">
+              La funcionalidad será implementada próximamente
+            </p>
+            <Link to="/" className="btn btn-warning">
+              Volver al inicio
+            </Link>
+          </div>
+        </div>
+      );
+    }
+
+    const {
+      title,
+      difficulty,
+      prep_time_min,
+      portions,
+      category_name,
+      avg_rating,
+      vote_count,
+      image,
+      ingredients = [],
+      steps,
+      is_published = false,
+      comments = [],
+    } = recipe;
+
+    const stepsList = steps
+      ? steps.split('\n').filter((step) => step.trim())
+      : [];
+
+    return (
+      <div className="recipe-detail-container">
+        <Link to="/" className="back-button">
+          <i className="bi bi-arrow-left"></i> Volver
+        </Link>
+
+        <div className="recipe-hero">
+          <div className="recipe-hero-content">
+            <h1 className="recipe-detail-title">{title}</h1>
+
+            <div className="recipe-badges">
+              <span className="badge-item difficulty">
+                <i className="bi bi-speedometer2"></i> {difficulty}
+              </span>
+              <span className="badge-item">
+                <i className="bi bi-clock"></i> {prep_time_min} min
+              </span>
+              <span className="badge-item">
+                <i className="bi bi-people"></i> {portions} porciones
+              </span>
+              <span className="badge-item category">
+                <i className="bi bi-tag"></i> {category_name}
+              </span>
             </div>
-            <span className="rating-text">
-              Promedio: {(recipe.avg_rating || 0).toFixed(1)} | Votos: {recipe.vote_count || 0}
-            </span>
-          </div>
-          <div className='mt-4'>
-            <button
-              type="button"
-              className="badge-item"
-              onClick={handleToggleFavorite}
-              disabled={!token}
-              style={{ cursor: token ? 'pointer' : 'not-allowed' }}
-            >
-              <i
-                className={`
+
+            <div className="recipe-detail-rating recipe-global-rating"
+              onMouseLeave={() => token && setHoverRating(0)}>
+              <div className={`stars ${token ? 'stars-interactive' : ''} ${isRatingLoading ? 'disabled' : ''}`}>
+                {[...Array(5)].map((_, i) => {
+                  const starValue = i + 1;
+                  const displayValue = hoverRating
+                    || userRating
+                    || (token ? 0 : (recipe.avg_rating || 0));
+                  return (
+                    <i
+                      key={`avg-${i}`}
+                      className={`bi ${starValue <= displayValue
+                        ? 'bi-star-fill'
+                        : 'bi-star'
+                        } ${token ? 'clickable star-item' : ''}`}
+                      onMouseEnter={() => token && setHoverRating(starValue)}
+                      onClick={() => token && handleRate(starValue)}
+                    ></i>
+                  );
+                })}
+              </div>
+              <span className="rating-text">
+                Promedio: {(recipe.avg_rating || 0).toFixed(1)} | Votos: {recipe.vote_count || 0}
+              </span>
+            </div>
+            <div className='mt-4'>
+              <button
+                type="button"
+                className="badge-item"
+                onClick={handleToggleFavorite}
+                disabled={!token}
+                style={{ cursor: token ? 'pointer' : 'not-allowed' }}
+              >
+                <i
+                  className={`
                   bi 
                   ${isFavorite ? "bi-heart-fill" : "bi-heart"} 
                   favorite-icon 
                   ${isFavorite ? "active" : ""}
                   `.trim()}
-              />
+                />
 
-              {isFavorite
-                ? ' Quitar de favoritos'
-                : ' Añadir a favoritos'}
-            </button>
+                {isFavorite
+                  ? ' Quitar de favoritos'
+                  : ' Añadir a favoritos'}
+              </button>
+            </div>
+          </div>
+
+          <div className="recipe-hero-image">
+            <img src={image} alt={title} />
           </div>
         </div>
 
-        <div className="recipe-hero-image">
-          <img src={image} alt={title} />
-        </div>
-      </div>
+        <div className="recipe-content">
+          <div className="ingredients-section">
+            <h2 className="section-title">
+              <i className="bi bi-basket"></i> Ingredientes
+            </h2>
 
-      <div className="recipe-content">
-        <div className="ingredients-section">
-          <h2 className="section-title">
-            <i className="bi bi-basket"></i> Ingredientes
-          </h2>
+            <div className="unit-converter-selector mb-4">
+              <label htmlFor="unitSelect" className="form-label d-block fw-bold text-success">
+                Mostrar unidades de MASA en:
+              </label>
+              <select
+                id="unitSelect"
+                className="form-select form-select-sm w-auto d-inline-block"
+                value={conversionUnit}
+                onChange={(e) => setConversionUnit(e.target.value)}
+                disabled={loading}
+              >
+                {ALL_CONVERSION_UNITS.map(unit => (
+                  <option key={unit.value} value={unit.value}>
+                    {unit.label}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-          <div className="unit-converter-selector mb-4">
-            <label htmlFor="unitSelect" className="form-label d-block fw-bold text-success">
-              Mostrar unidades de MASA en:
-            </label>
-            <select
-              id="unitSelect"
-              className="form-select form-select-sm w-auto d-inline-block"
-              value={conversionUnit}
-              onChange={(e) => setConversionUnit(e.target.value)}
-              disabled={loading}
-            >
-              {ALL_CONVERSION_UNITS.map(unit => (
-                <option key={unit.value} value={unit.value}>
-                  {unit.label}
-                </option>
+            <div className="ingredients-list">
+              {ingredients.map((ingredient) => (
+                <div key={ingredient.id} className="ingredient-item">
+                  <span className="ingredient-bullet">•</span>
+                  <span className="ingredient-name">
+                    {ingredient.name}
+                  </span>
+                  <span className="ingredient-quantity">
+                    {ingredient.quantity} {ingredient.unit_measure}
+                  </span>
+                </div>
               ))}
-            </select>
+            </div>
           </div>
 
-          <div className="ingredients-list">
-            {ingredients.map((ingredient) => (
-              <div key={ingredient.id} className="ingredient-item">
-                <span className="ingredient-bullet">•</span>
-                <span className="ingredient-name">
-                  {ingredient.name}
-                </span>
-                <span className="ingredient-quantity">
-                  {ingredient.quantity} {ingredient.unit_measure}
-                </span>
-              </div>
-            ))}
+          <div className="steps-section">
+            <h2 className="section-title">
+              <i className="bi bi-list-ol"></i> Preparación
+            </h2>
+            <div className="steps-content">
+              {stepsList.map((step, index) => (
+                <div key={index} className="step-item">
+                  <div className="step-number">{index + 1}</div>
+                  <p className="step-text">{step}</p>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
+        {is_published && (
+          <NutritionalData recipeId={recipeId} token={token} />
+        )}
 
-        <div className="steps-section">
-          <h2 className="section-title">
-            <i className="bi bi-list-ol"></i> Preparación
-          </h2>
-          <div className="steps-content">
-            {stepsList.map((step, index) => (
-              <div key={index} className="step-item">
-                <div className="step-number">{index + 1}</div>
-                <p className="step-text">{step}</p>
-              </div>
-            ))}
-          </div>
-        </div>
+        {is_published && (
+          <Comment
+            recipeId={recipeId}
+            initialComments={comments}
+            isPublished={is_published}
+          />
+        )}
+
       </div>
-      {is_published && (
-        <NutritionalData recipeId={recipeId} token={token} />
-      )}
-
-      {is_published && (
-        <Comment
-          recipeId={recipeId}
-          initialComments={comments}
-          isPublished={is_published}
-        />
-      )}
-
-    </div>
-  );
-};
+    );
+  };
 
