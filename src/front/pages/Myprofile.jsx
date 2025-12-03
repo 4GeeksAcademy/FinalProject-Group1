@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import useGlobalReducer from "../hooks/useGlobalReducer.jsx";
 import storeReducer from "../store.js";
 import { Navigate } from "react-router-dom";
+import "../styles/myprofile.css";
 
 
 export const Myprofile = () => {
@@ -121,7 +122,7 @@ export const Myprofile = () => {
                 })
                 const data = await response.json();
                 setUser({
-                    profile: data.image,      
+                    profile: data.image,
                     username: data.username,
                     fullname: data.fullname,
                     email: data.email
@@ -168,198 +169,218 @@ export const Myprofile = () => {
 
 
     return (
-        <div className="container">
-            <div className="row">
+        <div className="container my-profile">
+            <div className="row justify-content-center">
                 <div className="col-12">
-                    <div className="row align-columns mt-5">
-                        <div className="div col-4 border">
-                            <div>
-                                <h2>Mi perfil</h2>
+                    <div className="row mt-5 g-4">
+                        {/* LADO IZQUIERDO */}
+                        <div className="col-12 col-md-4">
+                            <div className="profile-card profile-card--side">
+                                <h2 className="profile-title">Mi perfil</h2>
+                                <p className="profile-subtitle">
+                                    Gestiona tu información personal y mantén tu cuenta al día.
+                                </p>
+                                <button className="profile-side-btn w-100 my-2" disabled>
+                                    Detalles
+                                </button>
                             </div>
-                            <button className="btn btn-sm btn-warning w-100 my-2">Detalles</button>
                         </div>
 
-                        <div className="div col-8 border">
-                            <div>
-                                <h2>Detalles de mi perfil</h2>
-                            </div>
+                        {/* LADO DERECHO */}
+                        <div className="col-12 col-md-8">
+                            <div className="profile-card profile-card--main">
+                                <div className="profile-header">
+                                    <h2 className="profile-title">Detalles de mi perfil</h2>
+                                </div>
 
+                                {/* Avatar + input */}
+                                <div className="profile-avatar-row">
+                                    <div className="profile-avatar-wrapper">
+                                        <img
+                                            src={
+                                                user.profile ||
+                                                "https://ui-avatars.com/api/?name=" +
+                                                encodeURIComponent(user.fullname || "User")
+                                            }
+                                            alt="Profile"
+                                            className="profile-avatar"
+                                        />
+                                        <p className="profile-avatar-text">
+                                            Sube una imagen nítida donde se vea bien tu rostro.
+                                        </p>
+                                    </div>
 
-                            <div className="form-control d-flex align-items-center">
-                                <img
-                                    src={user.profile || "https://ui-avatars.com/api/?name=" + encodeURIComponent(user.fullname || "User")}
-                                    alt="Profile"
-                                    className="rounded-circle"
-                                    width={80}
-                                />
-
-
-                                <input
-                                    type="file"
-                                    accept="image/*"
-                                    className="form-control mx2"
-                                    onChange={handleImageUpload}
-                                ></input>
-                            </div>
-
-
-                            <div className="form-control">
-                                <label>Nombre Completo</label>
-                                {editing.fullname ? (
-                                    <div className="d-flex align-items-center">
+                                    <label className="profile-upload-label">
+                                        Cambiar foto
                                         <input
-                                            className="form-control mx-2"
-                                            type="text"
-                                            value={user.fullname}
-                                            onChange={(event) => {
-                                                setUser({ ...user, fullname: event.target.value });
-                                            }}
-                                            onKeyDown={async (event) => {
-                                                if (event.key === "Enter") {
-                                                    event.preventDefault();
+                                            type="file"
+                                            accept="image/*"
+                                            className="profile-upload-input"
+                                            onChange={handleImageUpload}
+                                        />
+                                    </label>
+                                </div>
+
+                                {/* Nombre completo */}
+                                <div className="profile-field">
+                                    <label className="profile-label">Nombre Completo</label>
+                                    {editing.fullname ? (
+                                        <div className="d-flex align-items-center gap-2">
+                                            <input
+                                                className="form-control profile-input"
+                                                type="text"
+                                                value={user.fullname}
+                                                onChange={(event) => {
+                                                    setUser({ ...user, fullname: event.target.value });
+                                                }}
+                                                onKeyDown={async (event) => {
+                                                    if (event.key === "Enter") {
+                                                        event.preventDefault();
+                                                        setEditing({ ...editing, fullname: false });
+                                                    }
+                                                }}
+                                                placeholder="Nombre Completo"
+                                                autoFocus
+                                            />
+                                            <button
+                                                className="btn btn-success btn-sm profile-save-btn"
+                                                onClick={async () => {
+                                                    const updated = await updateUser();
+                                                    if (updated) setUser(updated);
                                                     setEditing({ ...editing, fullname: false });
-                                                }
-                                            }}
-                                            placeholder="Nombre Completo"
-                                            autoFocus
-                                        />
-                                        <button
-                                            className="btn btn-success btn-sm"
-                                            onClick={async () => {
-                                                const updated = await updateUser();
-                                                if (updated) {
-                                                    setUser(updated);
-                                                }
-                                                setEditing({ ...editing, fullname: false });
-                                            }}
-                                        >
-                                            Guardar
-                                        </button>
-                                    </div>
-                                ) : (
-                                    <div className="d-flex align-items-center">
-                                        <div className="form-control mx-2 mb-0" type="text">
-                                            {user.fullname || <div>Nombre Completo</div>}
+                                                }}
+                                            >
+                                                Guardar
+                                            </button>
                                         </div>
-                                        <button
-                                            className="btn btn-secondary btn-sm"
-                                            onClick={() => setEditing({ ...editing, fullname: true })}
-                                        >
-                                            Editar
-                                        </button>
-                                    </div>
-                                )}
-                            </div>
+                                    ) : (
+                                        <div className="profile-value-row">
+                                            <div className="profile-value">
+                                                {user.fullname || "Nombre Completo"}
+                                            </div>
+                                            <button
+                                                className="btn btn-outline-secondary btn-sm profile-edit-btn"
+                                                onClick={() =>
+                                                    setEditing({ ...editing, fullname: true })
+                                                }
+                                            >
+                                                Editar
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
 
-
-                            <div className="form-control">
-                                <label>Nombre de Usuario</label>
-                                {editing.username ? (
-                                    <div className="d-flex align-items-center">
-                                        <input
-                                            className="form-control mx-2"
-                                            type="text"
-                                            value={user.username}
-                                            onChange={(event) => {
-                                                setUser({ ...user, username: event.target.value });
-                                            }}
-                                            onKeyDown={(event) => {
-                                                if (event.key === "Enter") {
-                                                    event.preventDefault();
+                                {/* Nombre de usuario */}
+                                <div className="profile-field">
+                                    <label className="profile-label">Nombre de Usuario</label>
+                                    {editing.username ? (
+                                        <div className="d-flex align-items-center gap-2">
+                                            <input
+                                                className="form-control profile-input"
+                                                type="text"
+                                                value={user.username}
+                                                onChange={(event) => {
+                                                    setUser({ ...user, username: event.target.value });
+                                                }}
+                                                onKeyDown={(event) => {
+                                                    if (event.key === "Enter") {
+                                                        event.preventDefault();
+                                                        setEditing({ ...editing, username: false });
+                                                    }
+                                                }}
+                                                placeholder="Nombre de Usuario"
+                                                autoFocus
+                                            />
+                                            <button
+                                                className="btn btn-success btn-sm profile-save-btn"
+                                                onClick={async () => {
+                                                    const updated = await updateUser();
+                                                    if (updated) setUser(updated);
                                                     setEditing({ ...editing, username: false });
+                                                }}
+                                            >
+                                                Guardar
+                                            </button>
+                                        </div>
+                                    ) : (
+                                        <div className="profile-value-row">
+                                            <div className="profile-value">
+                                                {user.username || "User Name"}
+                                            </div>
+                                            <button
+                                                className="btn btn-outline-secondary btn-sm profile-edit-btn"
+                                                onClick={() =>
+                                                    setEditing({ ...editing, username: true })
                                                 }
-                                            }}
-                                            placeholder="Nombre de Usuario"
-                                            autoFocus
-                                        />
-                                        <button
-                                            className="btn btn-success btn-sm"
-                                            onClick={async () => {
-                                                const updated = await updateUser();
-                                                if (updated) {
-                                                    setUser(updated);
-                                                }
-                                                setEditing({ ...editing, username: false })
+                                            >
+                                                Editar
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
 
-                                            }}
-                                        >
-                                            Guardar
-                                        </button>
-                                    </div>
-                                ) : (
-                                    <div className="d-flex align-items-center">
-                                        <div className="form-control mx-2 mb-0" type="text">
-                                            {user.username || <div>User Name</div>}
+                                {/* Email */}
+                                <div className="profile-field">
+                                    <label className="profile-label">Correo</label>
+                                    {editing.email ? (
+                                        <div className="d-flex align-items-center gap-2">
+                                            <input
+                                                className="form-control profile-input"
+                                                type="email"
+                                                value={user.email}
+                                                onChange={(event) =>
+                                                    setUser({ ...user, email: event.target.value })
+                                                }
+                                                onKeyDown={(event) => {
+                                                    if (event.key === "Enter") {
+                                                        event.preventDefault();
+                                                        setEditing({ ...editing, email: false });
+                                                    }
+                                                }}
+                                                placeholder="Correo"
+                                                autoFocus
+                                            />
+                                            <button
+                                                className="btn btn-success btn-sm profile-save-btn"
+                                                onClick={async () => {
+                                                    const updated = await updateUser();
+                                                    if (updated) setUser(updated);
+                                                    setEditing({ ...editing, email: false });
+                                                }}
+                                            >
+                                                Guardar
+                                            </button>
+                                        </div>
+                                    ) : (
+                                        <div className="profile-value-row">
+                                            <div className="profile-value">
+                                                {user.email || "Email"}
+                                            </div>
+                                            <button
+                                                className="btn btn-outline-secondary btn-sm profile-edit-btn"
+                                                onClick={() => setEditing({ ...editing, email: true })}
+                                            >
+                                                Editar
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Contraseña */}
+                                <div className="profile-field">
+                                    <label className="profile-label">Contraseña</label>
+                                    <div className="profile-value-row">
+                                        <div className="profile-value profile-password-value">
+                                            *********
                                         </div>
                                         <button
-                                            className="btn btn-secondary btn-sm"
-                                            onClick={() => setEditing({ ...editing, username: true })}
+                                            className="btn btn-outline-secondary btn-sm profile-edit-btn"
+                                            onClick={() => setShowPasswordModal(true)}
                                         >
-                                            Editar
+                                            Cambiar
                                         </button>
                                     </div>
-                                )}
-                            </div>
-
-                            <div className="form-control">
-                                <label>Correo</label>
-                                {editing.email ? (
-                                    <div className="d-flex align-items-center">
-                                        <input
-                                            className="form-control mx-2 mb-2 flex-grow-1"
-                                            type="email"
-                                            value={user.email}
-                                            onChange={(event) => setUser({ ...user, email: event.target.value })}
-                                            onKeyDown={(event) => {
-                                                if (event.key === "Enter") {
-                                                    event.preventDefault();
-                                                    setEditing({ ...editing, email: false });
-                                                }
-                                            }}
-                                            placeholder="Correo"
-                                            autoFocus
-                                        />
-                                        <button
-                                            className="btn btn-success btn-sm mb-2"
-                                            onClick={async () => {
-                                                const updated = await updateUser();
-                                                if (updated) {
-                                                    setUser(updated);
-                                                }
-                                                setEditing({ ...editing, email: false })
-
-                                            }}
-                                        >
-                                            Guardar
-                                        </button>
-                                    </div>
-                                ) : (
-                                    <div className="d-flex align-items-center">
-                                        <input
-                                            readOnly
-                                            className="form-control mx-2 mb-0 flex-grow-1"
-                                            type="email"
-                                            value={user.email || "Email"}
-                                        />
-                                        <button
-                                            className="btn btn-secondary btn-sm mb-0"
-                                            onClick={() => setEditing({ ...editing, email: true })}
-                                        >
-                                            Editar
-                                        </button>
-                                    </div>
-                                )}
-                            </div>
-
-                            <div className="form-control">
-                                <label>Contraseña</label>
-                                <input className="mx-2" type="password" placeholder="*********" disabled />
-                                <button
-                                    className="btn btn-sm btn-secondary mx-2"
-                                    onClick={() => setShowPasswordModal(true)}
-                                >
-                                    Editar
-                                </button>
+                                </div>
                             </div>
                         </div>
                     </div>
