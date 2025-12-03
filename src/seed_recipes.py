@@ -78,12 +78,12 @@ RECIPES_DATA = [
         "difficulty": difficultyEnum.EASY, "prep_time": 28, "portions": 4, "ingredients": [("Zanahoria", 800, "g"), ("Jengibre", 20, "g"), ("Crema", 100, "ml")],"auto_rating": 5, "rating_count": 80, "make_favorite": True},
 
     {"category_index": 1, "title": "Sopa de Tomate", "steps": "1. Asar los tomates\n2. Licuar con ajo\n3. Cocinar a fuego lento\n4. Servir con crema", "image": "https://images.unsplash.com/photo-1578020190125-f4f7c18bc9cb?q=80&w=735&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D?w=600&q=80",
-        "difficulty": difficultyEnum.EASY, "prep_time": 25, "portions": 4, "ingredients": [("Tomate", 6, "unidades"), ("Ajo", 3, "unidades"), ("Crema", 100, "ml")],"auto_rating": 3, "rating_count": 113, "make_favorite": False},
+        "difficulty": difficultyEnum.EASY, "prep_time": 25, "portions": 4, "ingredients": [("Tomate", 6, "unidades"), ("Ajo", 3, "unidades"), ("Crema", 100, "ml")],"auto_rating": 4, "rating_count": 113, "make_favorite": False},
 
 # CATEGORÍA 3: ENSALADAS (12 recetas)
 
     {"category_index": 2, "title": "Ensalada César", "steps": "1. Lavar la lechuga\n2. Preparar el aderezo\n3. Agregar crutones\n4. Mezclar todo", "image": "https://plus.unsplash.com/premium_photo-1700089483464-4f76cc3d360b?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D?w=600&q=80",
-        "difficulty": difficultyEnum.EASY, "prep_time": 15, "portions": 2, "ingredients": [("Lechuga", 200, "g"), ("Pollo", 150, "g"), ("Queso parmesano", 50, "g")],"auto_rating": 3, "rating_count": 8, "make_favorite": True},
+        "difficulty": difficultyEnum.EASY, "prep_time": 15, "portions": 2, "ingredients": [("Lechuga", 200, "g"), ("Pollo", 150, "g"), ("Queso parmesano", 50, "g")],"auto_rating": 5, "rating_count": 8, "make_favorite": True},
     
     {"category_index": 2, "title": "Ensalada Griega", "steps": "1. Cortar pepino y tomate\n2. Añadir aceitunas y cebolla\n3. Agregar queso feta\n4. Aliñar con aceite", "image": "https://plus.unsplash.com/premium_photo-1690561082636-06237f98bfab?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D?w=600&q=80",
         "difficulty": difficultyEnum.EASY, "prep_time": 15, "portions": 4, "ingredients": [("Pepino", 2, "unidades"), ("Tomate", 3, "unidades"), ("Queso feta", 150, "g")],"auto_rating": 3, "rating_count": 17, "make_favorite": False},
@@ -164,7 +164,7 @@ RECIPES_DATA = [
         "difficulty": difficultyEnum.MEDIUM, "prep_time": 45, "portions": 6, "ingredients": [("Carne de res", 500, "g"), ("Tortilla", 12, "unidades"), ("Cebolla", 1, "unidades")],"auto_rating": 3, "rating_count": 2, "make_favorite": False},
     
     {"category_index": 4, "title": "Enchiladas Verdes", "steps": "1. Preparar salsa verde\n2. Rellenar tortillas con pollo\n3. Bañar con salsa\n4. Gratinar con queso", "image": "https://images.unsplash.com/photo-1534352956036-cd81e27dd615?w=600&q=80",
-        "difficulty": difficultyEnum.MEDIUM, "prep_time": 45, "portions": 4, "ingredients": [("Tortilla", 8, "unidades"), ("Pollo", 400, "g"), ("Tomate verde", 500, "g")],"auto_rating": 2, "rating_count": 5, "make_favorite": True},
+        "difficulty": difficultyEnum.MEDIUM, "prep_time": 45, "portions": 4, "ingredients": [("Tortilla", 8, "unidades"), ("Pollo", 400, "g"), ("Tomate verde", 500, "g")],"auto_rating": 5, "rating_count": 5, "make_favorite": True},
     
     {"category_index": 4, "title": "Quesadillas de Queso", "steps": "1. Calentar tortilla\n2. Añadir queso\n3. Doblar y dorar\n4. Servir con guacamole", "image": "https://images.unsplash.com/photo-1618040996337-56904b7850b9?w=600&q=80",
         "difficulty": difficultyEnum.EASY, "prep_time": 10, "portions": 2, "ingredients": [("Tortilla de harina", 4, "unidades"), ("Queso Oaxaca", 200, "g"), ("Jalapeño", 2, "unidades")],"auto_rating": 3, "rating_count": 13, "make_favorite": False},
@@ -260,16 +260,16 @@ RECIPES_DATA = [
         "difficulty": difficultyEnum.EASY, "prep_time": 30, "portions": 4, "ingredients": [("Salmón", 600, "g"), ("Limón", 3, "unidades"), ("Eneldo", 15, "g")],"auto_rating": 3, "rating_count": 13, "make_favorite": False},
     
     {"category_index": 6, "title": "Tilapia a la Veracruzana", "steps": "1. Dorar filetes de tilapia\n2. Preparar salsa de tomate\n3. Añadir aceitunas y alcaparras\n4. Cocinar 15 min", "image": "https://images.unsplash.com/photo-1606234157022-15343d99efa1?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D?w=600&q=80",
-        "difficulty": difficultyEnum.MEDIUM, "prep_time": 35, "portions": 4, "ingredients": [("Tilapia", 600, "g"), ("Tomate", 5, "unidades"), ("Aceitunas", 80, "g")],"auto_rating": 3, "rating_count": 13, "make_favorite": False},
+        "difficulty": difficultyEnum.MEDIUM, "prep_time": 35, "portions": 4, "ingredients": [("Tilapia", 600, "g"), ("Tomate", 5, "unidades"), ("Aceitunas", 80, "g")],"auto_rating": 4, "rating_count": 13, "make_favorite": False},
     
     {"category_index": 6, "title": "Pulpo a la Gallega", "steps": "1. Cocer pulpo en agua\n2. Cortar en rodajas\n3. Sazonar con pimentón\n4. Rociar con aceite de oliva", "image": "https://images.unsplash.com/photo-1626232442070-46902c617ec6?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D?w=600&q=80",
         "difficulty": difficultyEnum.MEDIUM, "prep_time": 50, "portions": 6, "ingredients": [("Pulpo", 1000, "g"), ("Pimentón", 20, "g"), ("Aceite de oliva", 80, "ml")],"auto_rating": 3, "rating_count": 13, "make_favorite": False},
     
     {"category_index": 6, "title": "Brochetas de Camarón", "steps": "1. Marinar camarones\n2. Ensartar en palillos con vegetales\n3. Asar a la parrilla\n4. Servir con limón", "image": "https://plus.unsplash.com/premium_photo-1693221705442-3bb06c114aff?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D?w=600&q=80",
-        "difficulty": difficultyEnum.EASY, "prep_time": 25, "portions": 4, "ingredients": [("Camarón", 600, "g"), ("Pimiento", 2, "unidades"), ("Cebolla", 1, "unidades")],"auto_rating": 3, "rating_count": 13, "make_favorite": False},
+        "difficulty": difficultyEnum.EASY, "prep_time": 25, "portions": 4, "ingredients": [("Camarón", 600, "g"), ("Pimiento", 2, "unidades"), ("Cebolla", 1, "unidades")],"auto_rating": 3, "rating_count": 13, "make_favorite": True},
     
     {"category_index": 6, "title": "Bacalao al Pil Pil", "steps": "1. Desalar bacalao 24 horas\n2. Confitar en aceite y ajo\n3. Emulsionar moviendo sartén\n4. Servir caliente", "image":"https://www.cocina-ecuatoriana.com/base/stock/Recipe/bacalao-frito/bacalao-frito_web.jpg.webp?w=600&q=80",
-        "difficulty": difficultyEnum.DIFFICULT, "prep_time": 40, "portions": 4, "ingredients": [("Bacalao", 600, "g"), ("Ajo", 8, "unidades"), ("Aceite de oliva", 250, "ml")],"auto_rating": 3, "rating_count": 26, "make_favorite": True},
+        "difficulty": difficultyEnum.DIFFICULT, "prep_time": 40, "portions": 4, "ingredients": [("Bacalao", 600, "g"), ("Ajo", 8, "unidades"), ("Aceite de oliva", 250, "ml")],"auto_rating": 4, "rating_count": 26, "make_favorite": True},
 
 
 # CATEGORÍA 8: CARNES ROJAS (11 recetas)
@@ -293,7 +293,7 @@ RECIPES_DATA = [
         "difficulty": difficultyEnum.MEDIUM, "prep_time": 60, "portions": 12, "ingredients": [("Masa para empanadas", 500, "g"), ("Carne molida", 400, "g"), ("Cebolla", 2, "unidades")],"auto_rating": 3, "rating_count": 13, "make_favorite": False},
     
     {"category_index": 7, "title": "Lasaña Boloñesa", "steps": "1. Preparar salsa boloñesa\n2. Hacer bechamel\n3. Armar capas\n4. Hornear 45 min", "image": "https://images.unsplash.com/photo-1574894709920-11b28e7367e3?w=600&q=80",
-        "difficulty": difficultyEnum.DIFFICULT, "prep_time": 90, "portions": 8, "ingredients": [("Pasta lasaña", 500, "g"), ("Carne molida", 600, "g"), ("Queso mozzarella", 300, "g")],"auto_rating": 3, "rating_count": 13, "make_favorite": False},
+        "difficulty": difficultyEnum.DIFFICULT, "prep_time": 90, "portions": 8, "ingredients": [("Pasta lasaña", 500, "g"), ("Carne molida", 600, "g"), ("Queso mozzarella", 300, "g")],"auto_rating": 3, "rating_count": 13, "make_favorite": True},
     
     {"category_index": 7,"title": "Churrasco Argentino", "steps": "1. Sazonar corte de carne\n2. Asar a la parrilla\n3. Dejar reposar 5 min\n4. Servir con chimichurri", "image": "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D?w=600&q=80",
         "difficulty": difficultyEnum.MEDIUM, "prep_time": 30, "portions": 4, "ingredients": [("Churrasco", 800, "g"), ("Chimichurri", 100, "ml"), ("Sal gruesa", 20, "g")],"auto_rating": 3, "rating_count": 13, "make_favorite": False},
@@ -332,7 +332,7 @@ RECIPES_DATA = [
         "difficulty": difficultyEnum.DIFFICULT, "prep_time": 45, "portions": 4, "ingredients": [("Arroz arborio", 300, "g"), ("Champiñón", 250, "g"), ("Queso parmesano", 80, "g")],"auto_rating": 3, "rating_count": 13, "make_favorite": False},
     
     {"category_index": 8, "title": "Pizza Margherita", "steps": "1. Preparar la masa\n2. Añadir salsa de tomate\n3. Agregar mozzarella\n4. Hornear 15 min", "image": "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=600&q=80",
-        "difficulty": difficultyEnum.MEDIUM, "prep_time": 60, "portions": 4, "ingredients": [("Harina", 300, "g"), ("Mozzarella", 200, "g"), ("Tomate", 3, "unidades")],"auto_rating": 3, "rating_count": 13, "make_favorite": False},
+        "difficulty": difficultyEnum.MEDIUM, "prep_time": 60, "portions": 4, "ingredients": [("Harina", 300, "g"), ("Mozzarella", 200, "g"), ("Tomate", 3, "unidades")],"auto_rating": 3, "rating_count": 13, "make_favorite": True},
     
     {"category_index": 8, "title": "Berenjena a la Parmesana", "steps": "1. Cortar y freír berenjenas\n2. Preparar salsa de tomate\n3. Armar capas con queso\n4. Hornear 30 min", "image": "https://images.unsplash.com/photo-1617093727343-374698b1b08d?w=600&q=80",
         "difficulty": difficultyEnum.MEDIUM, "prep_time": 55, "portions": 6, "ingredients": [("Berenjena", 3, "unidades"), ("Mozzarella", 300, "g"), ("Tomate", 6, "unidades")],"auto_rating": 3, "rating_count": 13, "make_favorite": False},

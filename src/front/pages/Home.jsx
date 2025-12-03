@@ -14,7 +14,6 @@ export const Home = () => {
   const navigate = useNavigate();
   const { store } = useGlobalReducer();
   const token = store.token;
-
   const [categories, setCategories] = useState({});
   const [allCategories, setAllCategories] = useState([]);
   const [topRatedRecipes, setTopRatedRecipes] = useState([]);
@@ -23,8 +22,6 @@ export const Home = () => {
   const [error, setError] = useState(null);
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-
-  // Estados para el dropdown
   const [searchResults, setSearchResults] = useState({ recipes: [], categories: [] });
   const [showDropdown, setShowDropdown] = useState(false);
   const [loadingSearch, setLoadingSearch] = useState(false);
@@ -51,7 +48,6 @@ export const Home = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [token]);
 
-  // Cerrar dropdown al hacer clic fuera
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -65,7 +61,7 @@ export const Home = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Buscar mientras escribe
+ 
   useEffect(() => {
     if (searchTerm.length >= 2) {
       setLoadingSearch(true);
@@ -106,7 +102,7 @@ export const Home = () => {
     }
   }, [searchTerm]);
 
-  // Fetch de recetas mejor valoradas + favoritas del usuario
+
   const fetchTopRatedRecipes = async () => {
     try {
       const apiUrl = getApiUrl();
@@ -142,7 +138,11 @@ export const Home = () => {
   const fetchRecipesSummary = async () => {
     try {
       const apiUrl = getApiUrl();
-      const response = await fetch(`${apiUrl}/recipes/resumen`);
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+      
+      const response = await fetch(`${apiUrl}/recipes/resumen`, {
+        headers: headers,
+      });
       const data = await response.json();
 
       if (response.ok) {
@@ -481,7 +481,6 @@ export const Home = () => {
 
       {/* Recipes Section */}
       <div className="recipes-section-modern">
-        {/* Sección de MEJOR VALORADAS - Aparece PRIMERO */}
         {topRatedRecipes.length > 0 && (
           <div
             className="category-section-modern"
@@ -520,7 +519,8 @@ export const Home = () => {
                 {topRatedRecipes.slice(0, 12).map((recipe) => (
                   <RecipeCardMini 
                     key={recipe.id} 
-                    recipe={recipe} 
+                    recipe={recipe}
+                    showOnlyStars={true}
                   />
                 ))}
               </div>
@@ -536,7 +536,6 @@ export const Home = () => {
           </div>
         )}
 
-        {/* Resto de categorías */}
         {Object.keys(categories).length === 0 ? (
           <div className="no-recipes-modern">
             <div className="empty-state">
@@ -583,7 +582,12 @@ export const Home = () => {
                   id={`carousel-${categoryData.category_id}`}
                 >
                   {categoryData.recipes.slice(0, 12).map((recipe) => (
-                    <RecipeCardMini key={recipe.id} recipe={recipe} />
+                    <RecipeCardMini 
+                      key={recipe.id} 
+                      recipe={recipe}
+                      showOnlyStars={false}
+                      showHeartOnlyIfFavorite={true} 
+                    />
                   ))}
                 </div>
 
