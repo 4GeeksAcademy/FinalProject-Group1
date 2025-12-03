@@ -190,7 +190,7 @@ const Register = () => {
                                 />
                             </div>
                             <div className="form-group my-4">
-                                <label htmlFor="txtUsername" className="mb-2"><b>Nombre de ususario:</b></label>
+                                <label htmlFor="txtUsername" className="mb-2"><b>Nombre de usuario:</b></label>
                                 <input
                                     type="text"
                                     placeholder="usuario"
