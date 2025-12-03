@@ -1,3 +1,66 @@
+.navbar {
+  background: var(--color-background-page);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+.navbar .container-fluid {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 18px;
+}
+
+.navbar-brand {
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: #1f2933;
+  padding-top: 1rem;
+  padding-bottom: 0.5rem;
+}
+
+.navbar .nav-link {
+  font-weight: 500;
+  color: #4b5563;
+}
+
+.navbar .nav-link:hover,
+.navbar .nav-link.active {
+  color: #e48b4d;
+}
+
+.navbar-nav {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.navbar-group {
+  display: flex;
+  align-items: center;
+  gap: 1.8rem;
+}
+
+.navbar-group.left .nav-link {
+  margin-left: 1rem;
+}
+
+.navbar-group.center {
+  flex: 1;
+  justify-content: center;
+}
+
+.navbar-group.right {
+  gap: 1.5rem;
+}
+
+.navbar a,
+.navbar .nav-link,
+.navbar .dropdown-item {
+  text-decoration: none;
+  color: #1c1c1c;
+}
+
 .menus {
   position: relative;
   display: inline-block;
@@ -48,4 +111,82 @@ a {
 
 .sub-menu li:hover span {
   color: green;
+}
+
+.favorites-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #fde9d6;
+  text-decoration: none;
+  border: none;
+  padding: 0;
+  transition: background-color 0.15s ease,
+              transform 0.15s ease,
+              box-shadow 0.15s ease;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+  cursor: pointer;
+}
+
+.favorites-btn i {
+  color: var(--color-text-highlight, #e48b4d);
+  font-size: 1.1rem;
+}
+
+.favorites-btn:hover {
+  background-color: #f9d6b4;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
+}
+
+@media (max-width: 991.98px) {
+  .navbar .container-fluid {
+    padding: 0 12px;
+  }
+
+  .navbar-nav {
+    width: 100%;
+    align-items: flex-start;
+  }
+
+  .navbar-nav > .nav-item:first-child {
+    margin-right: 0;
+  }
+
+  .navbar-nav > .d-flex {
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  .nav-item.d-flex.align-items-center {
+    margin-left: 0;
+    margin-top: 0.5rem;
+  }
+
+  .favorites-btn {
+    margin-left: 0;
+    margin-top: 0.5rem;
+  }
+}
+
+.brand-group {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+}
+
+.brand-group .navbar-brand {
+  padding: 0;
+  margin: 0;
+  line-height: 1.1;
+}
+
+.brand-group .brand-link {
+  padding: 0;
+  margin: 0;
+  line-height: 1.1;
+  font-size: 1.05rem;
 }
