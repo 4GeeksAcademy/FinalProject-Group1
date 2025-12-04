@@ -1,0 +1,48 @@
+/* FavoriteBadge.css */
+
+/* El contenedor que reemplazará tu corazón actual */
+.favorite-icon-wrapper {
+    position: relative;
+    display: inline-flex; /* Para que el div ocupe solo el espacio del icono */
+    /* Asegúrate de que el tamaño coincida con tu diseño */
+    height: 40px; 
+    width: 40px; 
+    align-items: center;
+    justify-content: center;
+}
+
+/* Estilos para el número superpuesto */
+.favorite-badge {
+    position: absolute;
+    top: 0;           /* Ajustar para posicionar en la esquina superior */
+    right: 0;
+    
+    /* Apariencia del badge: fondo rojo, texto blanco, circular */
+    background-color: #ff0000; /* Color que contraste, como rojo */
+    color: white;
+    font-size: 10px;
+    font-weight: bold;
+    
+    /* Forma y padding */
+    border-radius: 50%; /* Para hacerlo circular */
+    padding: 2px 5px;   /* Ajusta el padding para el tamaño */
+    min-width: 20px;    /* Asegura que el círculo sea visible */
+    height: 20px;
+    line-height: 14px; /* Centra el texto verticalmente */
+    text-align: center;
+    
+    /* Asegura que esté por encima de otros elementos */
+    z-index: 10; 
+}
+
+/* Opcional: Estilos para el ícono de corazón */
+.favorite-icon {
+    /* Aquí irían los estilos de tu círculo color durazno */
+    height: 30px;
+    width: 30px;
+    background-color: #f0e6e6; /* Ejemplo de color durazno */
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
