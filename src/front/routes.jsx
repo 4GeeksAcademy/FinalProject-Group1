@@ -1,5 +1,5 @@
 import { createBrowserRouter, createRoutesFromElements, Route, } from "react-router-dom";
-import { Layout } from "./pages/Layout";
+import Layout from "./pages/Layout"; 
 import { Home } from "./pages/Home";
 import { Single } from "./pages/Single";
 import { Demo } from "./pages/Demo";
@@ -19,8 +19,11 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import { CategoryView } from "./pages/CategoryView";
 import { CategoriesListView } from './pages/CategoriesListView';
 import { RecipeDetail } from "./pages/RecipeDetail";
-
+import MyFavorites from "./pages/MyFavorites";
 import AdminUsuarios from "./pages/AdminUsuarios";
+import { SearchResults } from './pages/SearchResults';
+import UserDashboard from "./pages/UserDashboard";
+import { FavoritesView } from './pages/FavoritesView';
 
 export const router = createBrowserRouter(
   createRoutesFromElements(
@@ -85,14 +88,27 @@ export const router = createBrowserRouter(
         </AdminProtectedRoute>
       } />
        <Route path="/category/:categoryId" element={<CategoryView />} />
-       <Route path="/recipe/:recipeId" element={<RecipeDetail />} />
+       {/* <Route path="/recipe/:recipeId" element={<RecipeDetail />} /> */}
        <Route path="/categories" element={<CategoriesListView />} />
+       <Route path="/search" element={<SearchResults />} />
+      <Route path="/category/:categoryId" element={<CategoryView />} />
+      <Route path="/recipe/:recipeId" element={<RecipeDetail />} />
+      
+      <Route path="/categories" element={<CategoriesListView />} />
       <Route path="/administrar/users" element={
         <AdminProtectedRoute>
           <AdminUsuarios />
         </AdminProtectedRoute>
       } />
+      <Route path="/favoritos" element={
+        <ProtectedRoute>
+           <MyFavorites />
+        </ProtectedRoute>
+      } />
 
+      <Route path="/user/status" element={<ProtectedRoute><UserDashboard /></ProtectedRoute>} />
+      <Route path="/favorites" element={<FavoritesView />} />
+      
     </Route>
   )
 ); 

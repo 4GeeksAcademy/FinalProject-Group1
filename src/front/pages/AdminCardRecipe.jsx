@@ -30,16 +30,15 @@ const AdminCardRecipe = ({ recipes, title, handleDelete, handleStatusChange, ico
 
                 </div>
             </div>
-
-            <div className="row">
+            <div className="row d-flex justify-content-center">
                 {recipes.map((item) => (
-                    <div key={item.id} className="col-12 col-md-6 col-lg-4 my-5 px-5">
+                    <div key={item.id} className="col-12 col-sm-10 col-md-6 col-lg-4 my-5 px-4">
                         <div className="card bg-pink shadow p-3 border border-0">
                             <img src={item.image} className="card-img-top format-image" alt={item.title} />
                             <div className="card-body">
                                 <h5 className="text-center">{item.title}</h5>
                                 <p className="my-2"><b>Dificultad: </b> {item.difficulty}</p>
-                                <p className="my-2"><b>Creador: </b>{item.creator_name}</p>
+                                <p className="my-0"><b>Creador: </b>{item.creator_name}</p>
                                 <div className='d-flex justify-content-between pt-3'>
                                     <span>
                                         {item.status === 'pending' && (
@@ -53,7 +52,7 @@ const AdminCardRecipe = ({ recipes, title, handleDelete, handleStatusChange, ico
                                                 </button>
                                                 <button
                                                     onClick={() => handleStatusChange(item.id, 'rejected')}
-                                                    className='border border-0'
+                                                    className='border border-0 mt-3'
                                                     title="Rechazar Receta"
                                                 >
                                                     <i className="fa-solid fa-circle-down fa-2xl text-info"></i>
@@ -63,15 +62,15 @@ const AdminCardRecipe = ({ recipes, title, handleDelete, handleStatusChange, ico
                                         {(item.status === 'published' || item.status === 'rejected') && (
                                             <button
                                                 onClick={() => handleStatusChange(item.id, 'pending')}
-                                                className='border border-0'
+                                                className='border border-0 mt-3'
                                                 title="Revertir a Pendiente"
                                             >
                                                 <i className="fa-solid fa-circle-down fa-2xl text-info"></i>
                                             </button>
                                         )}
                                     </span>
-                                    <span>
-                                        <Link to={"/"}><i className="fa-solid fa-book fa-lg mx-3"></i></Link>
+                                    <span className="mt-3">
+                                        <Link to={`/recipe/${item.id}`}><i className="fa-solid fa-book fa-lg mx-3"></i></Link>
                                         <Link to={`recipes/edit/${item.id}`}><i className="fa-solid fa-pencil fa-lg mx-3 text-success"></i></Link>
                                         <button
                                             onClick={() => handleDelete(item.id)}
