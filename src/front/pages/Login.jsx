@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import useGlobalReducer from '../hooks/useGlobalReducer';
-
+import "../styles/login.css";
 
 export const Login = () => {
 
@@ -66,62 +66,85 @@ export const Login = () => {
     };
 
     return (
-        <div className="container mt-5">
-            <div className="row justify-content-center">
-                <div className="col-md-6">
-                    <div className="card">
-                        <div className="card-header">
-                            Inicio de Sesión
-                        </div>
-                        <div className="card-body">
-                            <form onSubmit={handleSubmit}>
-                                {error && <div className="alert alert-danger">{error}</div>}
+        <div className="login-page">
+            <div className="container">
+                <div className="row justify-content-center">
+                    <div className="col-12 col-md-6 col-lg-5">
+                        <div className="card login-card">
+                            <div className="login-card-header">
+                                <h1 className="login-title">Bienvenido de nuevo</h1>
+                                <p className="login-subtitle">
+                                    Inicia sesión para acceder a tus recetas y favoritos.
+                                </p>
+                            </div>
 
-                                <div className="mb-3">
-                                    <label htmlFor="username">Usuario</label>
-                                    <input
-                                        type="text"
-                                        className="form-control"
-                                        id="username"
-                                        value={username}
-                                        onChange={(e) => setUsername(e.target.value)}
-                                        required
-                                    />
-                                </div>
+                            <div className="card-body login-card-body">
+                                <form onSubmit={handleSubmit} className="login-form">
+                                    {error && (
+                                        <div className="alert alert-danger login-alert">
+                                            {error}
+                                        </div>
+                                    )}
 
-                                <div className="mb-3">
-                                    <label htmlFor="password">Contraseña</label>
-                                    <div className="input-group">
+                                    <div className="mb-3">
+                                        <label htmlFor="username" className="login-label">
+                                            Usuario
+                                        </label>
                                         <input
-                                            type={showPassword ? "text" : "password"}
-                                            className="form-control"
-                                            id="password"
-                                            value={password}
-                                            onChange={(e) => setPassword(e.target.value)}
+                                            type="text"
+                                            className="form-control login-input"
+                                            id="username"
+                                            value={username}
+                                            onChange={(e) => setUsername(e.target.value)}
                                             required
                                         />
-                                        <button
-                                            type="button"
-                                            className="btn btn-outline-secondary"
-                                            onClick={togglePasswordVisibility}
-                                        >
-                                            {showPassword ? (
-                                                <i className="fa-solid fa-eye-slash"></i>
-                                            ) : (
-                                                <i className="fa-solid fa-eye"></i>
-                                            )}
-                                        </button>
                                     </div>
+
+                                    <div className="mb-3">
+                                        <label htmlFor="password" className="login-label">
+                                            Contraseña
+                                        </label>
+                                        <div className="input-group login-input-group">
+                                            <input
+                                                type={showPassword ? "text" : "password"}
+                                                className="form-control login-input"
+                                                id="password"
+                                                value={password}
+                                                onChange={(e) => setPassword(e.target.value)}
+                                                required
+                                            />
+                                            <button
+                                                type="button"
+                                                className="btn toggle-password-btn"
+                                                onClick={togglePasswordVisibility}
+                                            >
+                                                {showPassword ? (
+                                                    <i className="fa-solid fa-eye-slash" />
+                                                ) : (
+                                                    <i className="fa-solid fa-eye" />
+                                                )}
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <button
+                                        type="submit"
+                                        className="btn login-submit-btn w-100"
+                                        disabled={loading}
+                                    >
+                                        {loading ? "Cargando..." : "Ingresar"}
+                                    </button>
+                                </form>
+
+                                <div className="login-links mt-3 text-center">
+                                    <Link to="/register" className="login-link">
+                                        Registrarme
+                                    </Link>
+                                    <span className="login-links-separator">·</span>
+                                    <Link to="/forgot-password" className="login-link">
+                                        Olvidé mi contraseña
+                                    </Link>
                                 </div>
-                                <button type="submit" className="btn btn-primary w-100" disabled={loading}>
-                                    {loading ? 'Cargando...' : 'Ingresar'}
-                                </button>
-                            </form>
-
-
-                            <div className="mt-3 text-center">
-                                <Link to="/register" className="me-3">Registrarme</Link>
-                                <Link to="/forgot-password">Olvidé mi contraseña</Link>
                             </div>
                         </div>
                     </div>

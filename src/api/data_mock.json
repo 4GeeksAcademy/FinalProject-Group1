@@ -1,0 +1,3728 @@
+{
+    "categories": [
+        {
+            "name_category": "Pastas Italianas"
+        },
+        {
+            "name_category": "Sopas y Cremas"
+        },
+        {
+            "name_category": "Ensaladas"
+        },
+        {
+            "name_category": "Platos con Pollo"
+        },
+        {
+            "name_category": "Comida Mexicana"
+        },
+        {
+            "name_category": "Comida Asiática"
+        },
+        {
+            "name_category": "Mariscos y Pescados"
+        },
+        {
+            "name_category": "Carnes Rojas"
+        },
+        {
+            "name_category": "Comida Vegetariana"
+        },
+        {
+            "name_category": "Postres"
+        },
+        {
+            "name_category": "Desayunos y Brunch"
+        },
+        {
+            "name_category": "Bocadillos y Aperitivos"
+        }
+    ],
+    "recipes": [
+        {
+            "title": "Pasta Carbonara Clásica",
+            "steps": "1. Cocinar la pasta al dente\n2. Freír el tocino\n3. Mezclar huevos con queso\n4. Combinar todo",
+            "image": "https://images.unsplash.com/photo-1612874742237-6526221588e3?w=600&q=80",
+            "difficulty": "MEDIUM",
+            "prep_time": 30,
+            "portions": 4,
+            "user_id": 1,
+            "category_id": 1,
+            "ingredients": [
+                {
+                    "name": "Pasta",
+                    "quantity": 400,
+                    "unit": "g"
+                },
+                {
+                    "name": "Tocino",
+                    "quantity": 200,
+                    "unit": "g"
+                },
+                {
+                    "name": "Huevo",
+                    "quantity": 3,
+                    "unit": "unidades"
+                }
+            ]
+        },
+        {
+            "title": "Pasta Alfredo",
+            "steps": "1. Cocinar fettuccine\n2. Preparar salsa de crema\n3. Añadir parmesano\n4. Mezclar con pasta",
+            "image": "https://images.unsplash.com/photo-1645112411341-6c4fd023714a?w=600&q=80",
+            "difficulty": "EASY",
+            "prep_time": 25,
+            "portions": 4,
+            "user_id": 1,
+            "category_id": 1,
+            "ingredients": [
+                {
+                    "name": "Fettuccine",
+                    "quantity": 400,
+                    "unit": "g"
+                },
+                {
+                    "name": "Crema",
+                    "quantity": 300,
+                    "unit": "ml"
+                },
+                {
+                    "name": "Queso parmesano",
+                    "quantity": 100,
+                    "unit": "g"
+                }
+            ]
+        },
+        {
+            "title": "Lasaña Boloñesa",
+            "steps": "1. Preparar salsa boloñesa\n2. Hacer bechamel\n3. Armar capas\n4. Hornear 45 min",
+            "image": "https://images.unsplash.com/photo-1574894709920-11b28e7367e3?w=600&q=80",
+            "difficulty": "DIFFICULT",
+            "prep_time": 90,
+            "portions": 8,
+            "user_id": 1,
+            "category_id": 1,
+            "ingredients": [
+                {
+                    "name": "Pasta lasaña",
+                    "quantity": 500,
+                    "unit": "g"
+                },
+                {
+                    "name": "Carne molida",
+                    "quantity": 600,
+                    "unit": "g"
+                },
+                {
+                    "name": "Queso mozzarella",
+                    "quantity": 300,
+                    "unit": "g"
+                }
+            ]
+        },
+        {
+            "title": "Fusilli con Salsa de Tomate y Albahaca",
+            "steps": "1. Cocinar fusilli\n2. Preparar salsa de tomate\n3. Añadir albahaca\n4. Mezclar",
+            "image": "https://images.unsplash.com/photo-1743591255092-e986dda52fef?q=80&w=714&auto=format&fit=crop",
+            "difficulty": "EASY",
+            "prep_time": 25,
+            "portions": 4,
+            "user_id": 1,
+            "category_id": 1,
+            "ingredients": [
+                {
+                    "name": "Fusilli",
+                    "quantity": 400,
+                    "unit": "g"
+                },
+                {
+                    "name": "Tomate",
+                    "quantity": 4,
+                    "unit": "unidades"
+                },
+                {
+                    "name": "Albahaca",
+                    "quantity": 20,
+                    "unit": "g"
+                }
+            ]
+        },
+        {
+            "title": "Ensalada de Pasta",
+            "steps": "1. Cocer pasta\n2. Añadir tomate y mozzarella\n3. Agregar albahaca\n4. Aliñar con pesto",
+            "image": "https://plus.unsplash.com/premium_photo-1726754590888-aee3acabeb43",
+            "difficulty": "EASY",
+            "prep_time": 20,
+            "portions": 6,
+            "user_id": 1,
+            "category_id": 1,
+            "ingredients": [
+                {
+                    "name": "Pasta corta",
+                    "quantity": 400,
+                    "unit": "g"
+                },
+                {
+                    "name": "Tomate cherry",
+                    "quantity": 200,
+                    "unit": "g"
+                },
+                {
+                    "name": "Mozzarella",
+                    "quantity": 200,
+                    "unit": "g"
+                }
+            ]
+        },
+        {
+            "title": "Pasta nesca",
+            "steps": "1. Cocinar spaghetti\n2. Saltear ajo y anchoas\n3. Añadir tomate y aceitunas\n4. Mezclar con pasta",
+            "image": "https://images.unsplash.com/photo-1733700469181-fc8edf9af33f",
+            "difficulty": "MEDIUM",
+            "prep_time": 30,
+            "portions": 4,
+            "user_id": 1,
+            "category_id": 1,
+            "ingredients": [
+                {
+                    "name": "Spaghetti",
+                    "quantity": 400,
+                    "unit": "g"
+                },
+                {
+                    "name": "Anchoas",
+                    "quantity": 50,
+                    "unit": "g"
+                },
+                {
+                    "name": "Aceitunas",
+                    "quantity": 100,
+                    "unit": "g"
+                }
+            ]
+        },
+        {
+            "title": "Pasta Primavera",
+            "steps": "1. Cocinar pasta\n2. Saltear vegetales frescos\n3. Añadir crema ligera\n4. Mezclar con pasta",
+            "image": "https://images.unsplash.com/photo-1473093226795-af9932fe5856?w=600&q=80",
+            "difficulty": "EASY",
+            "prep_time": 28,
+            "portions": 4,
+            "user_id": 1,
+            "category_id": 1,
+            "ingredients": [
+                {
+                    "name": "Pasta penne",
+                    "quantity": 400,
+                    "unit": "g"
+                },
+                {
+                    "name": "Brócoli",
+                    "quantity": 200,
+                    "unit": "g"
+                },
+                {
+                    "name": "Zanahoria",
+                    "quantity": 150,
+                    "unit": "g"
+                }
+            ]
+        },
+        {
+            "title": "Spaghetti Boloñesa",
+            "steps": "1. Cocinar spaghetti\n2. Preparar salsa boloñesa\n3. Cocinar a fuego lento 30 min\n4. Servir con parmesano",
+            "image": "https://images.unsplash.com/photo-1598866594230-a7c12756260f?w=600&q=80",
+            "difficulty": "MEDIUM",
+            "prep_time": 50,
+            "portions": 6,
+            "user_id": 1,
+            "category_id": 1,
+            "ingredients": [
+                {
+                    "name": "Spaghetti",
+                    "quantity": 500,
+                    "unit": "g"
+                },
+                {
+                    "name": "Carne molida",
+                    "quantity": 500,
+                    "unit": "g"
+                },
+                {
+                    "name": "Tomate",
+                    "quantity": 6,
+                    "unit": "unidades"
+                }
+            ]
+        },
+        {
+            "title": "Pasta Arrabbiata",
+            "steps": "1. Cocinar penne\n2. Preparar salsa picante de tomate\n3. Añadir chile\n4. Servir con perejil",
+            "image": "https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9?w=600&q=80",
+            "difficulty": "EASY",
+            "prep_time": 22,
+            "portions": 4,
+            "user_id": 1,
+            "category_id": 1,
+            "ingredients": [
+                {
+                    "name": "Penne",
+                    "quantity": 400,
+                    "unit": "g"
+                },
+                {
+                    "name": "Chile",
+                    "quantity": 3,
+                    "unit": "unidades"
+                },
+                {
+                    "name": "Tomate",
+                    "quantity": 5,
+                    "unit": "unidades"
+                }
+            ]
+        },
+        {
+            "title": "Ravioles de Ricota",
+            "steps": "1. Preparar masa de pasta\n2. Hacer relleno de ricota\n3. Armar ravioles\n4. Cocinar y servir con salsa",
+            "image": "https://es.cravingsjournal.com/wp-content/uploads/2021/09/ravioles-de-ricotta-y-espinaca-internet-1.jpg?w=600&q=80",
+            "difficulty": "DIFFICULT",
+            "prep_time": 75,
+            "portions": 4,
+            "user_id": 1,
+            "category_id": 1,
+            "ingredients": [
+                {
+                    "name": "Harina",
+                    "quantity": 400,
+                    "unit": "g"
+                },
+                {
+                    "name": "Ricota",
+                    "quantity": 300,
+                    "unit": "g"
+                },
+                {
+                    "name": "Huevo",
+                    "quantity": 4,
+                    "unit": "unidades"
+                }
+            ]
+        },
+        {
+            "title": "Crema de Champiñones",
+            "steps": "1. Saltear champiñones\n2. Añadir caldo\n3. Licuar hasta cremoso\n4. Añadir crema",
+            "image": "https://plus.unsplash.com/premium_photo-1669631647057-3403888e87da?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D?w=600&q=80",
+            "difficulty": "EASY",
+            "prep_time": 30,
+            "portions": 4,
+            "user_id": 1,
+            "category_id": 2,
+            "ingredients": [
+                {
+                    "name": "Champiñón",
+                    "quantity": 400,
+                    "unit": "g"
+                },
+                {
+                    "name": "Crema",
+                    "quantity": 200,
+                    "unit": "ml"
+                },
+                {
+                    "name": "Cebolla",
+                    "quantity": 1,
+                    "unit": "unidades"
+                }
+            ]
+        },
+        {
+            "title": "Sopa Minestrone",
+            "steps": "1. Sofreír verduras\n2. Añadir caldo y tomate\n3. Agregar pasta y frijoles\n4. Cocinar 30 min",
+            "image": "https://images.unsplash.com/photo-1603355736640-34a2bee52da3?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D?w=600&q=80",
+            "difficulty": "EASY",
+            "prep_time": 45,
+            "portions": 6,
+            "user_id": 1,
+            "category_id": 2,
+            "ingredients": [
+                {
+                    "name": "Pasta corta",
+                    "quantity": 150,
+                    "unit": "g"
+                },
+                {
+                    "name": "Frijol",
+                    "quantity": 200,
+                    "unit": "g"
+                },
+                {
+                    "name": "Calabacín",
+                    "quantity": 2,
+                    "unit": "unidades"
+                }
+            ]
+        },
+        {
+            "title": "Gazpacho Andaluz",
+            "steps": "1. Triturar tomates\n2. Añadir pepino y pimiento\n3. Agregar vinagre y aceite\n4. Refrigerar 2 horas",
+            "image": "https://images.unsplash.com/photo-1638043139484-1534e2c14bcb?q=80&w=1077&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D?w=600&q=80",
+            "difficulty": "EASY",
+            "prep_time": 20,
+            "portions": 6,
+            "user_id": 1,
+            "category_id": 2,
+            "ingredients": [
+                {
+                    "name": "Tomate",
+                    "quantity": 1000,
+                    "unit": "g"
+                },
+                {
+                    "name": "Pepino",
+                    "quantity": 1,
+                    "unit": "unidades"
+                },
+                {
+                    "name": "Pimiento",
+                    "quantity": 1,
+                    "unit": "unidades"
+                }
+            ]
+        },
+        {
+            "title": "Sopa de Cebolla Francesa",
+            "steps": "1. Caramelizar cebollas\n2. Añadir vino y caldo\n3. Servir en cazuelas\n4. Gratinar con queso",
+            "image": "https://images.unsplash.com/photo-1726514730712-1445245c7f91?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D?w=600&q=80",
+            "difficulty": "MEDIUM",
+            "prep_time": 60,
+            "portions": 4,
+            "user_id": 1,
+            "category_id": 2,
+            "ingredients": [
+                {
+                    "name": "Cebolla",
+                    "quantity": 6,
+                    "unit": "unidades"
+                },
+                {
+                    "name": "Queso gruyere",
+                    "quantity": 200,
+                    "unit": "g"
+                },
+                {
+                    "name": "Pan",
+                    "quantity": 4,
+                    "unit": "unidades"
+                }
+            ]
+        },
+        {
+            "title": "Crema de Calabaza",
+            "steps": "1. Asar calabaza\n2. Licuar con caldo\n3. Añadir especias\n4. Terminar con crema",
+            "image": "https://images.unsplash.com/photo-1476718406336-bb5a9690ee2a?w=600&q=80",
+            "difficulty": "EASY",
+            "prep_time": 40,
+            "portions": 6,
+            "user_id": 1,
+            "category_id": 2,
+            "ingredients": [
+                {
+                    "name": "Calabaza",
+                    "quantity": 800,
+                    "unit": "g"
+                },
+                {
+                    "name": "Caldo de verduras",
+                    "quantity": 1000,
+                    "unit": "ml"
+                },
+                {
+                    "name": "Crema",
+                    "quantity": 150,
+                    "unit": "ml"
+                }
+            ]
+        },
+        {
+            "title": "Sopa de Lentejas",
+            "steps": "1. Remojar lentejas\n2. Sofreír verduras\n3. Añadir lentejas y caldo\n4. Cocinar 45 minutos",
+            "image": "https://plus.unsplash.com/premium_photo-1712678665862-3c51d1fac466?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D?w=600&q=80",
+            "difficulty": "EASY",
+            "prep_time": 60,
+            "portions": 6,
+            "user_id": 1,
+            "category_id": 2,
+            "ingredients": [
+                {
+                    "name": "Lenteja",
+                    "quantity": 400,
+                    "unit": "g"
+                },
+                {
+                    "name": "Zanahoria",
+                    "quantity": 2,
+                    "unit": "unidades"
+                },
+                {
+                    "name": "Chorizo",
+                    "quantity": 150,
+                    "unit": "g"
+                }
+            ]
+        },
+        {
+            "title": "Crema de Brócoli",
+            "steps": "1. Cocer brócoli\n2. Licuar con caldo\n3. Añadir queso crema\n4. Servir con crutones",
+            "image": "https://plus.unsplash.com/premium_photo-1723532544295-73989ae6c2b6?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D?w=600&q=80",
+            "difficulty": "EASY",
+            "prep_time": 25,
+            "portions": 4,
+            "user_id": 1,
+            "category_id": 2,
+            "ingredients": [
+                {
+                    "name": "Brócoli",
+                    "quantity": 600,
+                    "unit": "g"
+                },
+                {
+                    "name": "Queso crema",
+                    "quantity": 100,
+                    "unit": "g"
+                },
+                {
+                    "name": "Caldo",
+                    "quantity": 800,
+                    "unit": "ml"
+                }
+            ]
+        },
+        {
+            "title": "Crema de Espárragos",
+            "steps": "1. Cocer espárragos\n2. Licuar con caldo\n3. Añadir crema\n4. Sazonar",
+            "image": "https://images.unsplash.com/photo-1719785045946-cdb5a4506972?q=80&w=1172&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D?w=600&q=80",
+            "difficulty": "EASY",
+            "prep_time": 30,
+            "portions": 4,
+            "user_id": 1,
+            "category_id": 2,
+            "ingredients": [
+                {
+                    "name": "Espárrago",
+                    "quantity": 500,
+                    "unit": "g"
+                },
+                {
+                    "name": "Crema",
+                    "quantity": 150,
+                    "unit": "ml"
+                },
+                {
+                    "name": "Caldo",
+                    "quantity": 700,
+                    "unit": "ml"
+                }
+            ]
+        },
+        {
+            "title": "Sopa de Tortilla",
+            "steps": "1. Freír tiras de tortilla\n2. Preparar caldo de tomate\n3. Servir con aguacate\n4. Añadir queso y crema",
+            "image": "https://images.unsplash.com/photo-1547592166-23ac45744acd?w=600&q=80",
+            "difficulty": "MEDIUM",
+            "prep_time": 35,
+            "portions": 6,
+            "user_id": 1,
+            "category_id": 2,
+            "ingredients": [
+                {
+                    "name": "Tortilla",
+                    "quantity": 8,
+                    "unit": "unidades"
+                },
+                {
+                    "name": "Tomate",
+                    "quantity": 6,
+                    "unit": "unidades"
+                },
+                {
+                    "name": "Aguacate",
+                    "quantity": 2,
+                    "unit": "unidades"
+                }
+            ]
+        },
+        {
+            "title": "Sopa de Pollo con Fideos",
+            "steps": "1. Cocinar pollo con verduras\n2. Desmenuzar pollo\n3. Añadir fideos\n4. Cocinar 10 min más",
+            "image": "https://plus.unsplash.com/premium_photo-1675707499311-726434ce10fc?q=80&w=1171&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D?w=600&q=80",
+            "difficulty": "EASY",
+            "prep_time": 35,
+            "portions": 6,
+            "user_id": 1,
+            "category_id": 2,
+            "ingredients": [
+                {
+                    "name": "Pollo",
+                    "quantity": 500,
+                    "unit": "g"
+                },
+                {
+                    "name": "Fideos",
+                    "quantity": 150,
+                    "unit": "g"
+                },
+                {
+                    "name": "Zanahoria",
+                    "quantity": 2,
+                    "unit": "unidades"
+                }
+            ]
+        },
+        {
+            "title": "Crema de Zanahoria",
+            "steps": "1. Cocer zanahorias\n2. Licuar con caldo\n3. Añadir jengibre\n4. Servir con crema",
+            "image": "https://www.sortirambnens.com/wp-content/uploads/2019/02/crema-de-pastanaga.jpg?w=600&q=80",
+            "difficulty": "EASY",
+            "prep_time": 28,
+            "portions": 4,
+            "user_id": 1,
+            "category_id": 2,
+            "ingredients": [
+                {
+                    "name": "Zanahoria",
+                    "quantity": 800,
+                    "unit": "g"
+                },
+                {
+                    "name": "Jengibre",
+                    "quantity": 20,
+                    "unit": "g"
+                },
+                {
+                    "name": "Crema",
+                    "quantity": 100,
+                    "unit": "ml"
+                }
+            ]
+        },
+        {
+            "title": "Sopa de Tomate",
+            "steps": "1. Asar los tomates\n2. Licuar con ajo\n3. Cocinar a fuego lento\n4. Servir con crema",
+            "image": "https://images.unsplash.com/photo-1578020190125-f4f7c18bc9cb?q=80&w=735&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D?w=600&q=80",
+            "difficulty": "EASY",
+            "prep_time": 25,
+            "portions": 4,
+            "user_id": 1,
+            "category_id": 2,
+            "ingredients": [
+                {
+                    "name": "Tomate",
+                    "quantity": 6,
+                    "unit": "unidades"
+                },
+                {
+                    "name": "Ajo",
+                    "quantity": 3,
+                    "unit": "unidades"
+                },
+                {
+                    "name": "Crema",
+                    "quantity": 100,
+                    "unit": "ml"
+                }
+            ]
+        },
+        {
+            "title": "Ensalada César",
+            "steps": "1. Lavar la lechuga\n2. Preparar el aderezo\n3. Agregar crutones\n4. Mezclar todo",
+            "image": "https://plus.unsplash.com/premium_photo-1700089483464-4f76cc3d360b?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D?w=600&q=80",
+            "difficulty": "EASY",
+            "prep_time": 15,
+            "portions": 2,
+            "user_id": 1,
+            "category_id": 3,
+            "ingredients": [
+                {
+                    "name": "Lechuga",
+                    "quantity": 200,
+                    "unit": "g"
+                },
+                {
+                    "name": "Pollo",
+                    "quantity": 150,
+                    "unit": "g"
+                },
+                {
+                    "name": "Queso parmesano",
+                    "quantity": 50,
+                    "unit": "g"
+                }
+            ]
+        },
+        {
+            "title": "Ensalada Griega",
+            "steps": "1. Cortar pepino y tomate\n2. Añadir aceitunas y cebolla\n3. Agregar queso feta\n4. Aliñar con aceite",
+            "image": "https://plus.unsplash.com/premium_photo-1690561082636-06237f98bfab?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D?w=600&q=80",
+            "difficulty": "EASY",
+            "prep_time": 15,
+            "portions": 4,
+            "user_id": 1,
+            "category_id": 3,
+            "ingredients": [
+                {
+                    "name": "Pepino",
+                    "quantity": 2,
+                    "unit": "unidades"
+                },
+                {
+                    "name": "Tomate",
+                    "quantity": 3,
+                    "unit": "unidades"
+                },
+                {
+                    "name": "Queso feta",
+                    "quantity": 150,
+                    "unit": "g"
+                }
+            ]
+        },
+        {
+            "title": "Ensalada Caprese",
+            "steps": "1. Cortar tomate y mozzarella\n2. Intercalar en plato\n3. Añadir albahaca fresca\n4. Rociar con aceite",
+            "image": "https://7diasdesabor.com/wp-content/uploads/2023/07/APERITIVO-1.jpg?w=600&q=80",
+            "difficulty": "EASY",
+            "prep_time": 10,
+            "portions": 2,
+            "user_id": 1,
+            "category_id": 3,
+            "ingredients": [
+                {
+                    "name": "Tomate",
+                    "quantity": 3,
+                    "unit": "unidades"
+                },
+                {
+                    "name": "Mozzarella",
+                    "quantity": 250,
+                    "unit": "g"
+                },
+                {
+                    "name": "Albahaca",
+                    "quantity": 20,
+                    "unit": "g"
+                }
+            ]
+        },
+        {
+            "title": "Ensalada de Quinoa",
+            "steps": "1. Cocer quinoa\n2. Picar vegetales frescos\n3. Mezclar con vinagreta\n4. Añadir nueces",
+            "image": "https://images.unsplash.com/photo-1505576399279-565b52d4ac71?w=600&q=80",
+            "difficulty": "EASY",
+            "prep_time": 25,
+            "portions": 4,
+            "user_id": 1,
+            "category_id": 3,
+            "ingredients": [
+                {
+                    "name": "Quinoa",
+                    "quantity": 200,
+                    "unit": "g"
+                },
+                {
+                    "name": "Tomate cherry",
+                    "quantity": 150,
+                    "unit": "g"
+                },
+                {
+                    "name": "Pepino",
+                    "quantity": 1,
+                    "unit": "unidades"
+                }
+            ]
+        },
+        {
+            "title": "Ensalada Waldorf",
+            "steps": "1. Cortar manzana y apio\n2. Añadir nueces\n3. Mezclar con mayonesa\n4. Servir sobre lechuga",
+            "image": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=600&q=80",
+            "difficulty": "EASY",
+            "prep_time": 15,
+            "portions": 4,
+            "user_id": 1,
+            "category_id": 3,
+            "ingredients": [
+                {
+                    "name": "Manzana",
+                    "quantity": 2,
+                    "unit": "unidades"
+                },
+                {
+                    "name": "Apio",
+                    "quantity": 3,
+                    "unit": "unidades"
+                },
+                {
+                    "name": "Nuez",
+                    "quantity": 100,
+                    "unit": "g"
+                }
+            ]
+        },
+        {
+            "title": "Ensalada Nicoise",
+            "steps": "1. Cocer huevos y papas\n2. Añadir atún y judías\n3. Agregar aceitunas\n4. Aliñar con vinagreta",
+            "image": "https://images.unsplash.com/photo-1725030660031-585ea459d55f?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D?w=600&q=80",
+            "difficulty": "MEDIUM",
+            "prep_time": 30,
+            "portions": 4,
+            "user_id": 1,
+            "category_id": 3,
+            "ingredients": [
+                {
+                    "name": "Atún",
+                    "quantity": 300,
+                    "unit": "g"
+                },
+                {
+                    "name": "Papa",
+                    "quantity": 400,
+                    "unit": "g"
+                },
+                {
+                    "name": "Huevo",
+                    "quantity": 4,
+                    "unit": "unidades"
+                }
+            ]
+        },
+        {
+            "title": "Ensalada de Espinacas",
+            "steps": "1. Lavar espinacas\n2. Añadir fresas y nueces\n3. Agregar queso de cabra\n4. Aliñar con balsámico",
+            "image": "https://plus.unsplash.com/premium_photo-1701699258166-b14d782a4188?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D?w=600&q=80",
+            "difficulty": "EASY",
+            "prep_time": 10,
+            "portions": 2,
+            "user_id": 1,
+            "category_id": 3,
+            "ingredients": [
+                {
+                    "name": "Espinaca",
+                    "quantity": 200,
+                    "unit": "g"
+                },
+                {
+                    "name": "Fresa",
+                    "quantity": 150,
+                    "unit": "g"
+                },
+                {
+                    "name": "Queso de cabra",
+                    "quantity": 100,
+                    "unit": "g"
+                }
+            ]
+        },
+        {
+            "title": "Ensalada Mediterránea",
+            "steps": "1. Mezclar lechuga y rúcula\n2. Añadir tomate y pepino\n3. Agregar garbanzos\n4. Aliñar con limón",
+            "image": "https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=600&q=80",
+            "difficulty": "EASY",
+            "prep_time": 15,
+            "portions": 4,
+            "user_id": 1,
+            "category_id": 3,
+            "ingredients": [
+                {
+                    "name": "Lechuga mixta",
+                    "quantity": 250,
+                    "unit": "g"
+                },
+                {
+                    "name": "Garbanzo",
+                    "quantity": 200,
+                    "unit": "g"
+                },
+                {
+                    "name": "Pepino",
+                    "quantity": 1,
+                    "unit": "unidades"
+                }
+            ]
+        },
+        {
+            "title": "Ensalada Cobb",
+            "steps": "1. Disponer lechuga de base\n2. Añadir pollo en tiras\n3. Agregar aguacate y tocino\n4. Servir con aderezo ranch",
+            "image": "https://images.unsplash.com/photo-1546793665-c74683f339c1?w=600&q=80",
+            "difficulty": "MEDIUM",
+            "prep_time": 25,
+            "portions": 4,
+            "user_id": 1,
+            "category_id": 3,
+            "ingredients": [
+                {
+                    "name": "Lechuga",
+                    "quantity": 300,
+                    "unit": "g"
+                },
+                {
+                    "name": "Pollo",
+                    "quantity": 400,
+                    "unit": "g"
+                },
+                {
+                    "name": "Aguacate",
+                    "quantity": 2,
+                    "unit": "unidades"
+                }
+            ]
+        },
+        {
+            "title": "Ensalada de Mango",
+            "steps": "1. Cortar mango en cubos\n2. Añadir cebolla morada\n3. Agregar cilantro\n4. Aliñar con limón",
+            "image": "https://plus.unsplash.com/premium_photo-1695055513545-c13fa9363ad6?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D?w=600&q=80",
+            "difficulty": "EASY",
+            "prep_time": 15,
+            "portions": 4,
+            "user_id": 1,
+            "category_id": 3,
+            "ingredients": [
+                {
+                    "name": "Mango",
+                    "quantity": 2,
+                    "unit": "unidades"
+                },
+                {
+                    "name": "Cebolla morada",
+                    "quantity": 1,
+                    "unit": "unidades"
+                },
+                {
+                    "name": "Cilantro",
+                    "quantity": 30,
+                    "unit": "g"
+                }
+            ]
+        },
+        {
+            "title": "Ensalada de Lentejas",
+            "steps": "1. Cocer lentejas\n2. Picar pimiento y cebolla\n3. Mezclar con vinagreta\n4. Servir fría",
+            "image": "https://plus.unsplash.com/premium_photo-1699881082057-2dec9aad9a10?q=80&w=732&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D?w=600&q=80",
+            "difficulty": "EASY",
+            "prep_time": 35,
+            "portions": 6,
+            "user_id": 1,
+            "category_id": 3,
+            "ingredients": [
+                {
+                    "name": "Lenteja",
+                    "quantity": 300,
+                    "unit": "g"
+                },
+                {
+                    "name": "Pimiento",
+                    "quantity": 2,
+                    "unit": "unidades"
+                },
+                {
+                    "name": "Cebolla",
+                    "quantity": 1,
+                    "unit": "unidades"
+                }
+            ]
+        },
+        {
+            "title": "Ensalada de Col",
+            "steps": "1. Rallar col y zanahoria\n2. Preparar aderezo cremoso\n3. Mezclar bien\n4. Refrigerar 30 min",
+            "image": "https://images.unsplash.com/photo-1630409350018-0e06ea178b92?q=80&w=1174&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D?w=600&q=80",
+            "difficulty": "EASY",
+            "prep_time": 15,
+            "portions": 8,
+            "user_id": 1,
+            "category_id": 3,
+            "ingredients": [
+                {
+                    "name": "Col",
+                    "quantity": 500,
+                    "unit": "g"
+                },
+                {
+                    "name": "Zanahoria",
+                    "quantity": 2,
+                    "unit": "unidades"
+                },
+                {
+                    "name": "Mayonesa",
+                    "quantity": 150,
+                    "unit": "ml"
+                }
+            ]
+        },
+        {
+            "category_id": 4,
+            "title": "Pollo al Curry",
+            "steps": "1. Dorar el pollo\n2. Añadir curry y especias\n3. Agregar leche de coco\n4. Cocinar 20 min",
+            "image": "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D?w=600&q=80",
+            "difficulty": "MEDIUM",
+            "prep_time": 40,
+            "portions": 4,
+            "user_id": 1,
+            "ingredients": [
+                {
+                    "name": "Pollo",
+                    "quantity": 600,
+                    "unit": "g"
+                },
+                {
+                    "name": "Curry",
+                    "quantity": 30,
+                    "unit": "g"
+                },
+                {
+                    "name": "Leche de coco",
+                    "quantity": 400,
+                    "unit": "ml"
+                }
+            ]
+        },
+        {
+            "category_id": 4,
+            "title": "Pollo a la Naranja",
+            "steps": "1. Dorar el pollo\n2. Preparar salsa de naranja\n3. Bañar el pollo\n4. Hornear 20 min",
+            "image": "https://images.unsplash.com/photo-1525755662778-989d0524087e?q=80&w=1074&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D?w=600&q=80",
+            "difficulty": "MEDIUM",
+            "prep_time": 45,
+            "portions": 4,
+            "user_id": 1,
+            "ingredients": [
+                {
+                    "name": "Pollo",
+                    "quantity": 600,
+                    "unit": "g"
+                },
+                {
+                    "name": "Naranja",
+                    "quantity": 4,
+                    "unit": "unidades"
+                },
+                {
+                    "name": "Miel",
+                    "quantity": 50,
+                    "unit": "ml"
+                }
+            ]
+        },
+        {
+            "category_id": 4,
+            "title": "Arroz con Pollo",
+            "steps": "1. Dorar el pollo\n2. Sofreír verduras\n3. Añadir arroz y caldo\n4. Cocinar 25 min",
+            "image": "https://images.unsplash.com/photo-1512058564366-18510be2db19?w=600&q=80",
+            "difficulty": "MEDIUM",
+            "prep_time": 50,
+            "portions": 6,
+            "user_id": 1,
+            "ingredients": [
+                {
+                    "name": "Arroz",
+                    "quantity": 400,
+                    "unit": "g"
+                },
+                {
+                    "name": "Pollo",
+                    "quantity": 800,
+                    "unit": "g"
+                },
+                {
+                    "name": "Zanahoria",
+                    "quantity": 2,
+                    "unit": "unidades"
+                }
+            ]
+        },
+        {
+            "category_id": 4,
+            "title": "Wrap de Pollo",
+            "steps": "1. Cocinar el pollo\n2. Cortar verduras\n3. Calentar tortilla\n4. Enrollar con ingredientes",
+            "image": "https://images.unsplash.com/photo-1529006557810-274b9b2fc783?q=80&w=1176&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D?w=600&q=80",
+            "difficulty": "EASY",
+            "prep_time": 20,
+            "portions": 2,
+            "user_id": 1,
+            "ingredients": [
+                {
+                    "name": "Pollo",
+                    "quantity": 200,
+                    "unit": "g"
+                },
+                {
+                    "name": "Tortilla de harina",
+                    "quantity": 2,
+                    "unit": "unidades"
+                },
+                {
+                    "name": "Lechuga",
+                    "quantity": 50,
+                    "unit": "g"
+                }
+            ]
+        },
+        {
+            "category_id": 4,
+            "title": "Burritos de Pollo",
+            "steps": "1. Cocinar el pollo\n2. Preparar frijoles y arroz\n3. Calentar tortillas\n4. Armar y enrollar",
+            "image": "https://images.unsplash.com/photo-1626700051175-6818013e1d4f?w=600&q=80",
+            "difficulty": "EASY",
+            "prep_time": 35,
+            "portions": 4,
+            "user_id": 1,
+            "ingredients": [
+                {
+                    "name": "Pollo",
+                    "quantity": 400,
+                    "unit": "g"
+                },
+                {
+                    "name": "Tortilla de harina",
+                    "quantity": 4,
+                    "unit": "unidades"
+                },
+                {
+                    "name": "Frijol",
+                    "quantity": 200,
+                    "unit": "g"
+                }
+            ]
+        },
+        {
+            "category_id": 4,
+            "title": "Alitas Buffalo",
+            "steps": "1. Hornear las alitas\n2. Preparar salsa buffalo\n3. Bañar alitas en salsa\n4. Servir con aderezo ranch",
+            "image": "https://images.unsplash.com/photo-1527477396000-e27163b481c2?w=600&q=80",
+            "difficulty": "MEDIUM",
+            "prep_time": 45,
+            "portions": 4,
+            "user_id": 1,
+            "ingredients": [
+                {
+                    "name": "Alitas de pollo",
+                    "quantity": 1000,
+                    "unit": "g"
+                },
+                {
+                    "name": "Salsa picante",
+                    "quantity": 150,
+                    "unit": "ml"
+                },
+                {
+                    "name": "Mantequilla",
+                    "quantity": 80,
+                    "unit": "g"
+                }
+            ]
+        },
+        {
+            "category_id": 4,
+            "title": "Pollo al Limón y Romero",
+            "steps": "1. Marinar pollo\n2. Sellar en sartén\n3. Añadir limón y romero\n4. Hornear 20 min",
+            "image": "https://images.unsplash.com/photo-1553163147-622ab57be1c7?w=600&q=80",
+            "difficulty": "MEDIUM",
+            "prep_time": 40,
+            "portions": 4,
+            "user_id": 1,
+            "ingredients": [
+                {
+                    "name": "Pollo",
+                    "quantity": 600,
+                    "unit": "g"
+                },
+                {
+                    "name": "Limón",
+                    "quantity": 2,
+                    "unit": "unidades"
+                },
+                {
+                    "name": "Romero",
+                    "quantity": 10,
+                    "unit": "g"
+                }
+            ]
+        },
+        {
+            "category_id": 4,
+            "title": "Pollo Teriyaki",
+            "steps": "1. Cortar pollo en cubos\n2. Marinar en salsa teriyaki\n3. Saltear con vegetales\n4. Servir con arroz",
+            "image": "https://images.unsplash.com/photo-1609183480237-ccbb2d7c5772?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D?w=600&q=80",
+            "difficulty": "EASY",
+            "prep_time": 30,
+            "portions": 4,
+            "user_id": 1,
+            "ingredients": [
+                {
+                    "name": "Pollo",
+                    "quantity": 500,
+                    "unit": "g"
+                },
+                {
+                    "name": "Salsa teriyaki",
+                    "quantity": 120,
+                    "unit": "ml"
+                },
+                {
+                    "name": "Brócoli",
+                    "quantity": 200,
+                    "unit": "g"
+                }
+            ]
+        },
+        {
+            "category_id": 4,
+            "title": "Pollo Tikka Masala",
+            "steps": "1. Marinar pollo con yogurt\n2. Asar el pollo\n3. Preparar salsa masala\n4. Cocinar a fuego lento",
+            "image": "https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=600&q=80",
+            "difficulty": "DIFFICULT",
+            "prep_time": 55,
+            "portions": 4,
+            "user_id": 1,
+            "ingredients": [
+                {
+                    "name": "Pollo",
+                    "quantity": 600,
+                    "unit": "g"
+                },
+                {
+                    "name": "Yogurt",
+                    "quantity": 200,
+                    "unit": "ml"
+                },
+                {
+                    "name": "Garam masala",
+                    "quantity": 30,
+                    "unit": "g"
+                }
+            ]
+        },
+        {
+            "category_id": 4,
+            "title": "Pollo Parmesano",
+            "steps": "1. Empanar pechugas de pollo\n2. Freír hasta dorar\n3. Cubrir con salsa y queso\n4. Gratinar en horno",
+            "image": "https://images.unsplash.com/photo-1632778149955-e80f8ceca2e8?w=600&q=80",
+            "difficulty": "MEDIUM",
+            "prep_time": 45,
+            "portions": 4,
+            "user_id": 1,
+            "ingredients": [
+                {
+                    "name": "Pechuga de pollo",
+                    "quantity": 600,
+                    "unit": "g"
+                },
+                {
+                    "name": "Queso mozzarella",
+                    "quantity": 200,
+                    "unit": "g"
+                },
+                {
+                    "name": "Pan rallado",
+                    "quantity": 150,
+                    "unit": "g"
+                }
+            ]
+        },
+        {
+            "category_id": 4,
+            "title": "Pollo a la Plancha con Hierbas",
+            "steps": "1. Marinar con hierbas\n2. Calentar plancha\n3. Cocinar 6 min por lado\n4. Servir con limón",
+            "image": "https://images.unsplash.com/photo-1598103442097-8b74394b95c6?w=600&q=80",
+            "difficulty": "EASY",
+            "prep_time": 25,
+            "portions": 4,
+            "user_id": 1,
+            "ingredients": [
+                {
+                    "name": "Pechuga de pollo",
+                    "quantity": 600,
+                    "unit": "g"
+                },
+                {
+                    "name": "Hierbas mixtas",
+                    "quantity": 20,
+                    "unit": "g"
+                },
+                {
+                    "name": "Limón",
+                    "quantity": 2,
+                    "unit": "unidades"
+                }
+            ]
+        },
+        {
+            "category_id": 4,
+            "title": "Pollo Agridulce",
+            "steps": "1. Cortar y empanar pollo\n2. Freír hasta dorar\n3. Preparar salsa agridulce\n4. Mezclar y servir",
+            "image": "https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=600&q=80",
+            "difficulty": "MEDIUM",
+            "prep_time": 40,
+            "portions": 4,
+            "user_id": 1,
+            "ingredients": [
+                {
+                    "name": "Pollo",
+                    "quantity": 600,
+                    "unit": "g"
+                },
+                {
+                    "name": "Piña",
+                    "quantity": 200,
+                    "unit": "g"
+                },
+                {
+                    "name": "Vinagre",
+                    "quantity": 50,
+                    "unit": "ml"
+                }
+            ]
+        },
+        {
+            "title": "Tacos de Carne Asada",
+            "steps": "1. Marinar la carne\n2. Asar a la parrilla\n3. Cortar en tiras\n4. Servir en tortillas",
+            "image": "https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=600&q=80",
+            "difficulty": "MEDIUM",
+            "prep_time": 45,
+            "portions": 6,
+            "user_id": 1,
+            "category_id": 5,
+            "ingredients": [
+                {
+                    "name": "Carne de res",
+                    "quantity": 500,
+                    "unit": "g"
+                },
+                {
+                    "name": "Tortilla",
+                    "quantity": 12,
+                    "unit": "unidades"
+                },
+                {
+                    "name": "Cebolla",
+                    "quantity": 1,
+                    "unit": "unidades"
+                }
+            ]
+        },
+        {
+            "title": "Enchiladas Verdes",
+            "steps": "1. Preparar salsa verde\n2. Rellenar tortillas con pollo\n3. Bañar con salsa\n4. Gratinar con queso",
+            "image": "https://images.unsplash.com/photo-1534352956036-cd81e27dd615?w=600&q=80",
+            "difficulty": "MEDIUM",
+            "prep_time": 45,
+            "portions": 4,
+            "user_id": 1,
+            "category_id": 5,
+            "ingredients": [
+                {
+                    "name": "Tortilla",
+                    "quantity": 8,
+                    "unit": "unidades"
+                },
+                {
+                    "name": "Pollo",
+                    "quantity": 400,
+                    "unit": "g"
+                },
+                {
+                    "name": "Tomate verde",
+                    "quantity": 500,
+                    "unit": "g"
+                }
+            ]
+        },
+        {
+            "title": "Quesadillas de Queso",
+            "steps": "1. Calentar tortilla\n2. Añadir queso\n3. Doblar y dorar\n4. Servir con guacamole",
+            "image": "https://images.unsplash.com/photo-1618040996337-56904b7850b9?w=600&q=80",
+            "difficulty": "EASY",
+            "prep_time": 10,
+            "portions": 2,
+            "user_id": 1,
+            "category_id": 5,
+            "ingredients": [
+                {
+                    "name": "Tortilla de harina",
+                    "quantity": 4,
+                    "unit": "unidades"
+                },
+                {
+                    "name": "Queso Oaxaca",
+                    "quantity": 200,
+                    "unit": "g"
+                },
+                {
+                    "name": "Jalapeño",
+                    "quantity": 2,
+                    "unit": "unidades"
+                }
+            ]
+        },
+        {
+            "title": "Tacos al Pastor",
+            "steps": "1. Marinar cerdo con achiote\n2. Asar en trompo o sartén\n3. Cortar en trozos\n4. Servir con piña",
+            "image": "https://images.unsplash.com/photo-1551504734-5ee1c4a1479b?w=600&q=80",
+            "difficulty": "MEDIUM",
+            "prep_time": 50,
+            "portions": 6,
+            "user_id": 1,
+            "category_id": 5,
+            "ingredients": [
+                {
+                    "name": "Cerdo",
+                    "quantity": 600,
+                    "unit": "g"
+                },
+                {
+                    "name": "Piña",
+                    "quantity": 200,
+                    "unit": "g"
+                },
+                {
+                    "name": "Tortilla",
+                    "quantity": 12,
+                    "unit": "unidades"
+                }
+            ]
+        },
+        {
+            "title": "Nachos con Queso",
+            "steps": "1. Extender totopos\n2. Cubrir con queso cheddar\n3. Gratinar en horno\n4. Añadir jalapeños",
+            "image": "https://images.unsplash.com/photo-1513456852971-30c0b8199d4d?w=600&q=80",
+            "difficulty": "EASY",
+            "prep_time": 15,
+            "portions": 4,
+            "user_id": 1,
+            "category_id": 5,
+            "ingredients": [
+                {
+                    "name": "Totopos",
+                    "quantity": 300,
+                    "unit": "g"
+                },
+                {
+                    "name": "Queso cheddar",
+                    "quantity": 200,
+                    "unit": "g"
+                },
+                {
+                    "name": "Jalapeño",
+                    "quantity": 3,
+                    "unit": "unidades"
+                }
+            ]
+        },
+        {
+            "title": "Pozole Rojo",
+            "steps": "1. Cocer carne de cerdo\n2. Añadir maíz pozolero\n3. Preparar chile guajillo\n4. Servir con tostadas",
+            "image": "https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?w=600&q=80",
+            "difficulty": "DIFFICULT",
+            "prep_time": 180,
+            "portions": 10,
+            "user_id": 1,
+            "category_id": 5,
+            "ingredients": [
+                {
+                    "name": "Cerdo",
+                    "quantity": 1500,
+                    "unit": "g"
+                },
+                {
+                    "name": "Maíz pozolero",
+                    "quantity": 800,
+                    "unit": "g"
+                },
+                {
+                    "name": "Chile guajillo",
+                    "quantity": 100,
+                    "unit": "g"
+                }
+            ]
+        },
+        {
+            "title": "Chilaquiles Verdes",
+            "steps": "1. Freír tortillas cortadas\n2. Preparar salsa verde\n3. Bañar totopos con salsa\n4. Servir con crema y queso",
+            "image": "https://prensadehouston.com/wp-content/uploads/2024/06/CHILAQUILES-VERDES-1170x768.png?w=600&q=80",
+            "difficulty": "EASY",
+            "prep_time": 25,
+            "portions": 4,
+            "user_id": 1,
+            "category_id": 5,
+            "ingredients": [
+                {
+                    "name": "Tortilla",
+                    "quantity": 10,
+                    "unit": "unidades"
+                },
+                {
+                    "name": "Tomate verde",
+                    "quantity": 400,
+                    "unit": "g"
+                },
+                {
+                    "name": "Crema",
+                    "quantity": 100,
+                    "unit": "ml"
+                }
+            ]
+        },
+        {
+            "title": "Tacos de Pescado",
+            "steps": "1. Empanar pescado\n2. Freír hasta dorar\n3. Preparar col rallada\n4. Servir en tortillas",
+            "image": "https://mandolina.co/wp-content/uploads/2024/09/Tacos-de-salmon-con-aguacate-y-salsa-tartara-scaled.jpg?w=600&q=80",
+            "difficulty": "MEDIUM",
+            "prep_time": 35,
+            "portions": 4,
+            "user_id": 1,
+            "category_id": 5,
+            "ingredients": [
+                {
+                    "name": "Pescado blanco",
+                    "quantity": 500,
+                    "unit": "g"
+                },
+                {
+                    "name": "Tortilla",
+                    "quantity": 8,
+                    "unit": "unidades"
+                },
+                {
+                    "name": "Col",
+                    "quantity": 200,
+                    "unit": "g"
+                }
+            ]
+        },
+        {
+            "title": "Fajitas de Res",
+            "steps": "1. Marinar carne en tiras\n2. Saltear con pimientos\n3. Calentar tortillas\n4. Servir con guacamole",
+            "image": "https://mandolina.co/wp-content/uploads/2020/11/comidas-mexicanas-recetas-fajitas-de-carne.jpg?w=600&q=80",
+            "difficulty": "MEDIUM",
+            "prep_time": 35,
+            "portions": 4,
+            "user_id": 1,
+            "category_id": 5,
+            "ingredients": [
+                {
+                    "name": "Carne de res",
+                    "quantity": 600,
+                    "unit": "g"
+                },
+                {
+                    "name": "Pimiento",
+                    "quantity": 3,
+                    "unit": "unidades"
+                },
+                {
+                    "name": "Tortilla",
+                    "quantity": 8,
+                    "unit": "unidades"
+                }
+            ]
+        },
+        {
+            "title": "Tamales de Pollo",
+            "steps": "1. Preparar masa de maíz\n2. Hacer relleno de pollo\n3. Envolver en hojas\n4. Cocer al vapor 90 min",
+            "image": "https://polloseldorado.co/wp-content/uploads/2024/04/Header-1-1024x536.jpg?w=600&q=80",
+            "difficulty": "DIFFICULT",
+            "prep_time": 120,
+            "portions": 12,
+            "user_id": 1,
+            "category_id": 5,
+            "ingredients": [
+                {
+                    "name": "Masa de maíz",
+                    "quantity": 1000,
+                    "unit": "g"
+                },
+                {
+                    "name": "Pollo",
+                    "quantity": 600,
+                    "unit": "g"
+                },
+                {
+                    "name": "Hojas de maíz",
+                    "quantity": 24,
+                    "unit": "unidades"
+                }
+            ]
+        },
+        {
+            "title": "Tostadas de Tinga",
+            "steps": "1. Cocinar pollo desmenuzado\n2. Preparar salsa de chipotle\n3. Mezclar pollo con salsa\n4. Servir sobre tostadas",
+            "image": "https://images.unsplash.com/photo-1657770651689-c948d7eed8f1?q=80&w=1212&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D?w=600&q=80",
+            "difficulty": "EASY",
+            "prep_time": 30,
+            "portions": 6,
+            "user_id": 1,
+            "category_id": 5,
+            "ingredients": [
+                {
+                    "name": "Pollo",
+                    "quantity": 500,
+                    "unit": "g"
+                },
+                {
+                    "name": "Tostadas",
+                    "quantity": 12,
+                    "unit": "unidades"
+                },
+                {
+                    "name": "Chipotle",
+                    "quantity": 3,
+                    "unit": "unidades"
+                }
+            ]
+        },
+        {
+            "title": "Flautas de Pollo",
+            "steps": "1. Desmenuzar pollo cocido\n2. Rellenar tortillas\n3. Enrollar y freír\n4. Servir con crema y lechuga",
+            "image": "https://plus.unsplash.com/premium_photo-1664391997303-dab867f07ad4?q=80&w=1028&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D?w=600&q=80",
+            "difficulty": "MEDIUM",
+            "prep_time": 35,
+            "portions": 4,
+            "user_id": 1,
+            "category_id": 5,
+            "ingredients": [
+                {
+                    "name": "Tortilla",
+                    "quantity": 12,
+                    "unit": "unidades"
+                },
+                {
+                    "name": "Pollo",
+                    "quantity": 400,
+                    "unit": "g"
+                },
+                {
+                    "name": "Crema",
+                    "quantity": 150,
+                    "unit": "ml"
+                }
+            ]
+        },
+        {
+            "title": "Sushi Roll California",
+            "steps": "1. Preparar arroz de sushi\n2. Extender en nori\n3. Rellenar y enrollar\n4. Cortar en piezas",
+            "image": "https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=600&q=80",
+            "difficulty": "DIFFICULT",
+            "prep_time": 60,
+            "portions": 4,
+            "user_id": 1,
+            "category_id": 6,
+            "ingredients": [
+                {
+                    "name": "Arroz para sushi",
+                    "quantity": 300,
+                    "unit": "g"
+                },
+                {
+                    "name": "Cangrejo",
+                    "quantity": 200,
+                    "unit": "g"
+                },
+                {
+                    "name": "Aguacate",
+                    "quantity": 2,
+                    "unit": "unidades"
+                }
+            ]
+        },
+        {
+            "title": "Pad Thai",
+            "steps": "1. Remojar fideos de arroz\n2. Saltear con huevo y tofu\n3. Añadir salsa pad thai\n4. Servir con cacahuates",
+            "image": "https://images.unsplash.com/photo-1559314809-0d155014e29e?w=600&q=80",
+            "difficulty": "MEDIUM",
+            "prep_time": 35,
+            "portions": 4,
+            "user_id": 1,
+            "category_id": 6,
+            "ingredients": [
+                {
+                    "name": "Fideos de arroz",
+                    "quantity": 300,
+                    "unit": "g"
+                },
+                {
+                    "name": "Huevo",
+                    "quantity": 2,
+                    "unit": "unidades"
+                },
+                {
+                    "name": "Cacahuate",
+                    "quantity": 50,
+                    "unit": "g"
+                }
+            ]
+        },
+        {
+            "title": "Ramen Japonés",
+            "steps": "1. Preparar caldo dashi\n2. Cocinar fideos ramen\n3. Añadir cerdo y huevo\n4. Decorar con nori",
+            "image": "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=600&q=80",
+            "difficulty": "DIFFICULT",
+            "prep_time": 120,
+            "portions": 4,
+            "user_id": 1,
+            "category_id": 6,
+            "ingredients": [
+                {
+                    "name": "Fideos ramen",
+                    "quantity": 400,
+                    "unit": "g"
+                },
+                {
+                    "name": "Cerdo",
+                    "quantity": 300,
+                    "unit": "g"
+                },
+                {
+                    "name": "Huevo",
+                    "quantity": 4,
+                    "unit": "unidades"
+                }
+            ]
+        },
+        {
+            "title": "Sopa Wonton",
+            "steps": "1. Preparar wontons\n2. Hacer caldo aromático\n3. Cocer wontons\n4. Servir con cebollín",
+            "image": "https://images.unsplash.com/photo-1607095097076-bf0221751ed6?q=80&w=688&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D?w=600&q=80",
+            "difficulty": "DIFFICULT",
+            "prep_time": 50,
+            "portions": 4,
+            "user_id": 1,
+            "category_id": 6,
+            "ingredients": [
+                {
+                    "name": "Masa wonton",
+                    "quantity": 300,
+                    "unit": "g"
+                },
+                {
+                    "name": "Cerdo molido",
+                    "quantity": 250,
+                    "unit": "g"
+                },
+                {
+                    "name": "Cebollín",
+                    "quantity": 30,
+                    "unit": "g"
+                }
+            ]
+        },
+        {
+            "title": "Sopa Tom Yum",
+            "steps": "1. Hacer caldo picante\n2. Añadir camarones\n3. Agregar limón y cilantro\n4. Servir caliente",
+            "image": "https://mochilerosentailandia.com/wp-content/uploads/2017/04/1-3.jpg?w=600&q=80",
+            "difficulty": "MEDIUM",
+            "prep_time": 30,
+            "portions": 4,
+            "user_id": 1,
+            "category_id": 6,
+            "ingredients": [
+                {
+                    "name": "Camarón",
+                    "quantity": 400,
+                    "unit": "g"
+                },
+                {
+                    "name": "Galanga",
+                    "quantity": 30,
+                    "unit": "g"
+                },
+                {
+                    "name": "Limón",
+                    "quantity": 3,
+                    "unit": "unidades"
+                }
+            ]
+        },
+        {
+            "title": "Salteado de Vegetales Asiáticos",
+            "steps": "1. Cortar vegetales\n2. Saltear con salsa soya\n3. Agregar jengibre\n4. Servir caliente",
+            "image": "https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?w=600&q=80",
+            "difficulty": "EASY",
+            "prep_time": 15,
+            "portions": 3,
+            "user_id": 1,
+            "category_id": 6,
+            "ingredients": [
+                {
+                    "name": "Zanahoria",
+                    "quantity": 1,
+                    "unit": "unidades"
+                },
+                {
+                    "name": "Brócoli",
+                    "quantity": 200,
+                    "unit": "g"
+                },
+                {
+                    "name": "Salsa soya",
+                    "quantity": 30,
+                    "unit": "ml"
+                }
+            ]
+        },
+        {
+            "title": "Chow Mein",
+            "steps": "1. Cocinar fideos chinos\n2. Saltear vegetales y carne\n3. Añadir salsa de ostras\n4. Mezclar con fideos",
+            "image": "https://images.unsplash.com/photo-1612929633738-8fe44f7ec841?w=600&q=80",
+            "difficulty": "MEDIUM",
+            "prep_time": 30,
+            "portions": 4,
+            "user_id": 1,
+            "category_id": 6,
+            "ingredients": [
+                {
+                    "name": "Fideos chinos",
+                    "quantity": 400,
+                    "unit": "g"
+                },
+                {
+                    "name": "Pollo",
+                    "quantity": 300,
+                    "unit": "g"
+                },
+                {
+                    "name": "Salsa de ostras",
+                    "quantity": 60,
+                    "unit": "ml"
+                }
+            ]
+        },
+        {
+            "title": "Arroz Frito",
+            "steps": "1. Cocinar arroz previamente\n2. Saltear con huevo\n3. Añadir vegetales y salsa soya\n4. Mezclar todo",
+            "image": "https://images.unsplash.com/photo-1603133872878-684f208fb84b?w=600&q=80",
+            "difficulty": "EASY",
+            "prep_time": 20,
+            "portions": 4,
+            "user_id": 1,
+            "category_id": 6,
+            "ingredients": [
+                {
+                    "name": "Arroz cocido",
+                    "quantity": 600,
+                    "unit": "g"
+                },
+                {
+                    "name": "Huevo",
+                    "quantity": 3,
+                    "unit": "unidades"
+                },
+                {
+                    "name": "Zanahoria",
+                    "quantity": 1,
+                    "unit": "unidades"
+                }
+            ]
+        },
+        {
+            "title": "Dumplings al Vapor",
+            "steps": "1. Preparar relleno de cerdo\n2. Armar dumplings\n3. Cocer al vapor 12 min\n4. Servir con salsa",
+            "image": "https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?w=600&q=80",
+            "difficulty": "DIFFICULT",
+            "prep_time": 55,
+            "portions": 6,
+            "user_id": 1,
+            "category_id": 6,
+            "ingredients": [
+                {
+                    "name": "Masa para dumplings",
+                    "quantity": 400,
+                    "unit": "g"
+                },
+                {
+                    "name": "Cerdo molido",
+                    "quantity": 300,
+                    "unit": "g"
+                },
+                {
+                    "name": "Col china",
+                    "quantity": 150,
+                    "unit": "g"
+                }
+            ]
+        },
+        {
+            "title": "Teriyaki de Salmón",
+            "steps": "1. Marinar salmón en teriyaki\n2. Sellar en sartén\n3. Glasear con salsa\n4. Servir con arroz",
+            "image": "https://images.unsplash.com/photo-1553621042-f6e147245754?w=600&q=80",
+            "difficulty": "MEDIUM",
+            "prep_time": 25,
+            "portions": 4,
+            "user_id": 1,
+            "category_id": 6,
+            "ingredients": [
+                {
+                    "name": "Salmón",
+                    "quantity": 600,
+                    "unit": "g"
+                },
+                {
+                    "name": "Salsa teriyaki",
+                    "quantity": 100,
+                    "unit": "ml"
+                },
+                {
+                    "name": "Ajonjolí",
+                    "quantity": 20,
+                    "unit": "g"
+                }
+            ]
+        },
+        {
+            "title": "Yakisoba",
+            "steps": "1. Cocinar fideos yakisoba\n2. Saltear con vegetales\n3. Añadir salsa yakisoba\n4. Servir caliente",
+            "image": "https://images.unsplash.com/photo-1617093727343-374698b1b08d?w=600&q=80",
+            "difficulty": "EASY",
+            "prep_time": 25,
+            "portions": 4,
+            "user_id": 1,
+            "category_id": 6,
+            "ingredients": [
+                {
+                    "name": "Fideos yakisoba",
+                    "quantity": 400,
+                    "unit": "g"
+                },
+                {
+                    "name": "Repollo",
+                    "quantity": 200,
+                    "unit": "g"
+                },
+                {
+                    "name": "Salsa yakisoba",
+                    "quantity": 80,
+                    "unit": "ml"
+                }
+            ]
+        },
+        {
+            "title": "Bibimbap Coreano",
+            "steps": "1. Cocinar arroz\n2. Preparar vegetales salteados\n3. Añadir huevo frito\n4. Servir con gochujang",
+            "image": "https://images.unsplash.com/photo-1553621042-f6e147245754?w=600&q=80",
+            "difficulty": "MEDIUM",
+            "prep_time": 40,
+            "portions": 4,
+            "user_id": 1,
+            "category_id": 6,
+            "ingredients": [
+                {
+                    "name": "Arroz",
+                    "quantity": 400,
+                    "unit": "g"
+                },
+                {
+                    "name": "Espinaca",
+                    "quantity": 150,
+                    "unit": "g"
+                },
+                {
+                    "name": "Gochujang",
+                    "quantity": 60,
+                    "unit": "g"
+                }
+            ]
+        },
+        {
+            "category_id": 7,
+            "title": "Ceviche de Camarón",
+            "steps": "1. Limpiar camarones\n2. Marinar en limón\n3. Agregar verduras\n4. Refrigerar 30 min",
+            "image": "https://images.unsplash.com/photo-1626663011519-b42e5ee10056?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D?w=600&q=80",
+            "difficulty": "MEDIUM",
+            "prep_time": 45,
+            "portions": 4,
+            "user_id": 1,
+            "ingredients": [
+                {
+                    "name": "Camarón",
+                    "quantity": 500,
+                    "unit": "g"
+                },
+                {
+                    "name": "Limón",
+                    "quantity": 8,
+                    "unit": "unidades"
+                },
+                {
+                    "name": "Cebolla morada",
+                    "quantity": 1,
+                    "unit": "unidades"
+                }
+            ]
+        },
+        {
+            "category_id": 7,
+            "title": "Camarones al Ajillo",
+            "steps": "1. Picar ajo finamente\n2. Saltear camarones\n3. Añadir vino blanco\n4. Terminar con perejil",
+            "image": "https://images.unsplash.com/photo-1764337944130-45560c1f8b41?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D?w=600&q=80",
+            "difficulty": "EASY",
+            "prep_time": 20,
+            "portions": 4,
+            "user_id": 1,
+            "ingredients": [
+                {
+                    "name": "Camarón",
+                    "quantity": 500,
+                    "unit": "g"
+                },
+                {
+                    "name": "Ajo",
+                    "quantity": 6,
+                    "unit": "unidades"
+                },
+                {
+                    "name": "Vino blanco",
+                    "quantity": 100,
+                    "unit": "ml"
+                }
+            ]
+        },
+        {
+            "category_id": 7,
+            "title": "Fish and Chips",
+            "steps": "1. Preparar masa para rebozar\n2. Freír el pescado\n3. Cortar y freír papas\n4. Servir con salsa tártara",
+            "image": "https://images.unsplash.com/photo-1697748836791-9ddf7e616ece?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D?w=600&q=80",
+            "difficulty": "MEDIUM",
+            "prep_time": 40,
+            "portions": 4,
+            "user_id": 1,
+            "ingredients": [
+                {
+                    "name": "Pescado blanco",
+                    "quantity": 600,
+                    "unit": "g"
+                },
+                {
+                    "name": "Papa",
+                    "quantity": 800,
+                    "unit": "g"
+                },
+                {
+                    "name": "Harina",
+                    "quantity": 200,
+                    "unit": "g"
+                }
+            ]
+        },
+        {
+            "category_id": 7,
+            "title": "Paella Valenciana",
+            "steps": "1. Sofreír carnes\n2. Añadir verduras\n3. Incorporar arroz y caldo\n4. Cocinar sin revolver",
+            "image": "https://plus.unsplash.com/premium_photo-1664457234003-cf41eceb6a8f?q=80&w=693&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D?w=600&q=80",
+            "difficulty": "DIFFICULT",
+            "prep_time": 75,
+            "portions": 6,
+            "user_id": 1,
+            "ingredients": [
+                {
+                    "name": "Arroz",
+                    "quantity": 400,
+                    "unit": "g"
+                },
+                {
+                    "name": "Pollo",
+                    "quantity": 400,
+                    "unit": "g"
+                },
+                {
+                    "name": "Mariscos",
+                    "quantity": 300,
+                    "unit": "g"
+                }
+            ]
+        },
+        {
+            "category_id": 7,
+            "title": "Tostadas de Atún",
+            "steps": "1. Tostar pan de caja\n2. Mezclar atún con mayonesa\n3. Añadir cebolla picada\n4. Montar sobre tostadas",
+            "image": "https://d36fw6y2wq3bat.cloudfront.net/recipes/tosta-de-atun/900/tosta-de-atun_version_1658808094.jpg?w=600&q=80",
+            "difficulty": "EASY",
+            "prep_time": 10,
+            "portions": 4,
+            "user_id": 1,
+            "ingredients": [
+                {
+                    "name": "Atún en lata",
+                    "quantity": 300,
+                    "unit": "g"
+                },
+                {
+                    "name": "Pan de caja",
+                    "quantity": 8,
+                    "unit": "unidades"
+                },
+                {
+                    "name": "Mayonesa",
+                    "quantity": 80,
+                    "unit": "g"
+                }
+            ]
+        },
+        {
+            "category_id": 7,
+            "title": "Bisque de Langosta",
+            "steps": "1. Saltear cáscaras\n2. Hacer base con tomate\n3. Licuar y colar\n4. Añadir crema y coñac",
+            "image": "https://images.unsplash.com/photo-1590759668628-05b0fc34bb70?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D?w=600&q=80",
+            "difficulty": "DIFFICULT",
+            "prep_time": 90,
+            "portions": 4,
+            "user_id": 1,
+            "ingredients": [
+                {
+                    "name": "Langosta",
+                    "quantity": 800,
+                    "unit": "g"
+                },
+                {
+                    "name": "Tomate",
+                    "quantity": 400,
+                    "unit": "g"
+                },
+                {
+                    "name": "Crema",
+                    "quantity": 200,
+                    "unit": "ml"
+                }
+            ]
+        },
+        {
+            "category_id": 7,
+            "title": "Salmón al Horno con Limón",
+            "steps": "1. Marinar salmón con limón\n2. Colocar en papel aluminio\n3. Hornear 180°C por 20 min\n4. Servir con hierbas",
+            "image": "https://images.unsplash.com/photo-1614627293113-e7e68163d958?q=80&w=880&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D?w=600&q=80",
+            "difficulty": "EASY",
+            "prep_time": 30,
+            "portions": 4,
+            "user_id": 1,
+            "ingredients": [
+                {
+                    "name": "Salmón",
+                    "quantity": 600,
+                    "unit": "g"
+                },
+                {
+                    "name": "Limón",
+                    "quantity": 3,
+                    "unit": "unidades"
+                },
+                {
+                    "name": "Eneldo",
+                    "quantity": 15,
+                    "unit": "g"
+                }
+            ]
+        },
+        {
+            "category_id": 7,
+            "title": "Tilapia a la Veracruzana",
+            "steps": "1. Dorar filetes de tilapia\n2. Preparar salsa de tomate\n3. Añadir aceitunas y alcaparras\n4. Cocinar 15 min",
+            "image": "https://images.unsplash.com/photo-1606234157022-15343d99efa1?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D?w=600&q=80",
+            "difficulty": "MEDIUM",
+            "prep_time": 35,
+            "portions": 4,
+            "user_id": 1,
+            "ingredients": [
+                {
+                    "name": "Tilapia",
+                    "quantity": 600,
+                    "unit": "g"
+                },
+                {
+                    "name": "Tomate",
+                    "quantity": 5,
+                    "unit": "unidades"
+                },
+                {
+                    "name": "Aceitunas",
+                    "quantity": 80,
+                    "unit": "g"
+                }
+            ]
+        },
+        {
+            "category_id": 7,
+            "title": "Pulpo a la Gallega",
+            "steps": "1. Cocer pulpo en agua\n2. Cortar en rodajas\n3. Sazonar con pimentón\n4. Rociar con aceite de oliva",
+            "image": "https://images.unsplash.com/photo-1626232442070-46902c617ec6?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D?w=600&q=80",
+            "difficulty": "MEDIUM",
+            "prep_time": 50,
+            "portions": 6,
+            "user_id": 1,
+            "ingredients": [
+                {
+                    "name": "Pulpo",
+                    "quantity": 1000,
+                    "unit": "g"
+                },
+                {
+                    "name": "Pimentón",
+                    "quantity": 20,
+                    "unit": "g"
+                },
+                {
+                    "name": "Aceite de oliva",
+                    "quantity": 80,
+                    "unit": "ml"
+                }
+            ]
+        },
+        {
+            "category_id": 7,
+            "title": "Brochetas de Camarón",
+            "steps": "1. Marinar camarones\n2. Ensartar en palillos con vegetales\n3. Asar a la parrilla\n4. Servir con limón",
+            "image": "https://plus.unsplash.com/premium_photo-1693221705442-3bb06c114aff?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D?w=600&q=80",
+            "difficulty": "EASY",
+            "prep_time": 25,
+            "portions": 4,
+            "user_id": 1,
+            "ingredients": [
+                {
+                    "name": "Camarón",
+                    "quantity": 600,
+                    "unit": "g"
+                },
+                {
+                    "name": "Pimiento",
+                    "quantity": 2,
+                    "unit": "unidades"
+                },
+                {
+                    "name": "Cebolla",
+                    "quantity": 1,
+                    "unit": "unidades"
+                }
+            ]
+        },
+        {
+            "category_id": 7,
+            "title": "Bacalao al Pil Pil",
+            "steps": "1. Desalar bacalao 24 horas\n2. Confitar en aceite y ajo\n3. Emulsionar moviendo sartén\n4. Servir caliente",
+            "image": "https://www.cocina-ecuatoriana.com/base/stock/Recipe/bacalao-frito/bacalao-frito_web.jpg.webp?w=600&q=80",
+            "difficulty": "DIFFICULT",
+            "prep_time": 40,
+            "portions": 4,
+            "user_id": 1,
+            "ingredients": [
+                {
+                    "name": "Bacalao",
+                    "quantity": 600,
+                    "unit": "g"
+                },
+                {
+                    "name": "Ajo",
+                    "quantity": 8,
+                    "unit": "unidades"
+                },
+                {
+                    "name": "Aceite de oliva",
+                    "quantity": 250,
+                    "unit": "ml"
+                }
+            ]
+        },
+        {
+            "category_id": 8,
+            "title": "Hamburguesa Clásica",
+            "steps": "1. Formar las carnes\n2. Asar a la parrilla\n3. Tostar el pan\n4. Armar con vegetales",
+            "image": "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600&q=80",
+            "difficulty": "EASY",
+            "prep_time": 25,
+            "portions": 4,
+            "user_id": 1,
+            "ingredients": [
+                {
+                    "name": "Carne molida",
+                    "quantity": 500,
+                    "unit": "g"
+                },
+                {
+                    "name": "Pan de hamburguesa",
+                    "quantity": 4,
+                    "unit": "unidades"
+                },
+                {
+                    "name": "Queso cheddar",
+                    "quantity": 4,
+                    "unit": "unidades"
+                }
+            ]
+        },
+        {
+            "category_id": 8,
+            "title": "Costillas BBQ",
+            "steps": "1. Marinar costillas\n2. Hornear tapadas 2 horas\n3. Añadir salsa BBQ\n4. Gratinar 15 min",
+            "image": "https://plus.unsplash.com/premium_photo-1664478272084-532c1bfebd25?q=80&w=1020&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D?w=600&q=80",
+            "difficulty": "MEDIUM",
+            "prep_time": 150,
+            "portions": 4,
+            "user_id": 1,
+            "ingredients": [
+                {
+                    "name": "Costillas de cerdo",
+                    "quantity": 1000,
+                    "unit": "g"
+                },
+                {
+                    "name": "Salsa BBQ",
+                    "quantity": 250,
+                    "unit": "ml"
+                },
+                {
+                    "name": "Miel",
+                    "quantity": 50,
+                    "unit": "ml"
+                }
+            ]
+        },
+        {
+            "category_id": 8,
+            "title": "Bistec con Papas",
+            "steps": "1. Cocinar bistec\n2. Freír papas\n3. Sazonar\n4. Servir",
+            "image": "https://mandolina.co/wp-content/uploads/2023/12/bife-de-cuadril.jpg?w=600&q=80",
+            "difficulty": "EASY",
+            "prep_time": 35,
+            "portions": 3,
+            "user_id": 1,
+            "ingredients": [
+                {
+                    "name": "Carne",
+                    "quantity": 400,
+                    "unit": "g"
+                },
+                {
+                    "name": "Papa",
+                    "quantity": 500,
+                    "unit": "g"
+                },
+                {
+                    "name": "Aceite",
+                    "quantity": 20,
+                    "unit": "ml"
+                }
+            ]
+        },
+        {
+            "category_id": 8,
+            "title": "Carpaccio de Res",
+            "steps": "1. Congelar carne ligeramente\n2. Cortar en láminas finas\n3. Disponer en plato\n4. Aliñar con aceite y parmesano",
+            "image": "https://images.unsplash.com/photo-1721094231595-1f6451cf1f0f?q=80&w=1074&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D?w=600&q=80",
+            "difficulty": "MEDIUM",
+            "prep_time": 25,
+            "portions": 4,
+            "user_id": 1,
+            "ingredients": [
+                {
+                    "name": "Lomo de res",
+                    "quantity": 300,
+                    "unit": "g"
+                },
+                {
+                    "name": "Parmesano",
+                    "quantity": 50,
+                    "unit": "g"
+                },
+                {
+                    "name": "Rúcula",
+                    "quantity": 100,
+                    "unit": "g"
+                }
+            ]
+        },
+        {
+            "category_id": 8,
+            "title": "Empanadas de Carne",
+            "steps": "1. Preparar el relleno\n2. Armar las empanadas\n3. Sellar los bordes\n4. Hornear hasta dorar",
+            "image": "https://mandolina.co/wp-content/uploads/2023/08/empanadas-espanolasx1080x550-1.png?w=600&q=80",
+            "difficulty": "MEDIUM",
+            "prep_time": 60,
+            "portions": 12,
+            "user_id": 1,
+            "ingredients": [
+                {
+                    "name": "Masa para empanadas",
+                    "quantity": 500,
+                    "unit": "g"
+                },
+                {
+                    "name": "Carne molida",
+                    "quantity": 400,
+                    "unit": "g"
+                },
+                {
+                    "name": "Cebolla",
+                    "quantity": 2,
+                    "unit": "unidades"
+                }
+            ]
+        },
+        {
+            "category_id": 8,
+            "title": "Churrasco Argentino",
+            "steps": "1. Sazonar corte de carne\n2. Asar a la parrilla\n3. Dejar reposar 5 min\n4. Servir con chimichurri",
+            "image": "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D?w=600&q=80",
+            "difficulty": "MEDIUM",
+            "prep_time": 30,
+            "portions": 4,
+            "user_id": 1,
+            "ingredients": [
+                {
+                    "name": "Churrasco",
+                    "quantity": 800,
+                    "unit": "g"
+                },
+                {
+                    "name": "Chimichurri",
+                    "quantity": 100,
+                    "unit": "ml"
+                },
+                {
+                    "name": "Sal gruesa",
+                    "quantity": 20,
+                    "unit": "g"
+                }
+            ]
+        },
+        {
+            "category_id": 8,
+            "title": "Carne Asada a la Parrilla",
+            "steps": "1. Marinar carne 2 horas\n2. Calentar parrilla\n3. Asar 4 min por lado\n4. Servir con guarnición",
+            "image": "https://images.unsplash.com/photo-1544025162-d76694265947?w=600&q=80",
+            "difficulty": "MEDIUM",
+            "prep_time": 25,
+            "portions": 6,
+            "user_id": 1,
+            "ingredients": [
+                {
+                    "name": "Carne de res",
+                    "quantity": 1000,
+                    "unit": "g"
+                },
+                {
+                    "name": "Limón",
+                    "quantity": 2,
+                    "unit": "unidades"
+                },
+                {
+                    "name": "Ajo",
+                    "quantity": 4,
+                    "unit": "unidades"
+                }
+            ]
+        },
+        {
+            "category_id": 8,
+            "title": "Albóndigas en Salsa",
+            "steps": "1. Formar albóndigas\n2. Dorar en sartén\n3. Preparar salsa de tomate\n4. Cocinar juntos 20 min",
+            "image": "https://images.unsplash.com/photo-1529042410759-befb1204b468?w=600&q=80",
+            "difficulty": "MEDIUM",
+            "prep_time": 45,
+            "portions": 4,
+            "user_id": 1,
+            "ingredients": [
+                {
+                    "name": "Carne molida",
+                    "quantity": 500,
+                    "unit": "g"
+                },
+                {
+                    "name": "Tomate",
+                    "quantity": 6,
+                    "unit": "unidades"
+                },
+                {
+                    "name": "Pan rallado",
+                    "quantity": 80,
+                    "unit": "g"
+                }
+            ]
+        },
+        {
+            "category_id": 8,
+            "title": "Filete Wellington",
+            "steps": "1. Sellar filete de res\n2. Cubrir con paté y champiñones\n3. Envolver en hojaldre\n4. Hornear 200°C por 25 min",
+            "image": "https://plus.unsplash.com/premium_photo-1668616815106-2fb55768587c?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D?w=600&q=80",
+            "difficulty": "DIFFICULT",
+            "prep_time": 80,
+            "portions": 4,
+            "user_id": 1,
+            "ingredients": [
+                {
+                    "name": "Filete de res",
+                    "quantity": 800,
+                    "unit": "g"
+                },
+                {
+                    "name": "Hojaldre",
+                    "quantity": 400,
+                    "unit": "g"
+                },
+                {
+                    "name": "Champiñón",
+                    "quantity": 200,
+                    "unit": "g"
+                }
+            ]
+        },
+        {
+            "category_id": 9,
+            "title": "Curry de Garbanzos",
+            "steps": "1. Sofreír especias\n2. Añadir tomate y garbanzos\n3. Agregar leche de coco\n4. Cocinar 20 min",
+            "image": "https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=600&q=80",
+            "difficulty": "EASY",
+            "prep_time": 30,
+            "portions": 4,
+            "user_id": 1,
+            "ingredients": [
+                {
+                    "name": "Garbanzo",
+                    "quantity": 400,
+                    "unit": "g"
+                },
+                {
+                    "name": "Leche de coco",
+                    "quantity": 400,
+                    "unit": "ml"
+                },
+                {
+                    "name": "Tomate",
+                    "quantity": 3,
+                    "unit": "unidades"
+                }
+            ]
+        },
+        {
+            "category_id": 9,
+            "title": "Hummus Clásico",
+            "steps": "1. Remojar garbanzos\n2. Cocinar hasta suaves\n3. Licuar con tahini y limón\n4. Servir con aceite",
+            "image": "https://images.unsplash.com/photo-1568625365131-079e026a927d?q=80&w=880&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D?w=600&q=80",
+            "difficulty": "EASY",
+            "prep_time": 20,
+            "portions": 6,
+            "user_id": 1,
+            "ingredients": [
+                {
+                    "name": "Garbanzo",
+                    "quantity": 400,
+                    "unit": "g"
+                },
+                {
+                    "name": "Tahini",
+                    "quantity": 100,
+                    "unit": "g"
+                },
+                {
+                    "name": "Limón",
+                    "quantity": 2,
+                    "unit": "unidades"
+                }
+            ]
+        },
+        {
+            "category_id": 9,
+            "title": "Spring Rolls Vegetales",
+            "steps": "1. Remojar papel de arroz\n2. Rellenar con vegetales\n3. Enrollar firmemente\n4. Servir con salsa",
+            "image": "https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?w=600&q=80",
+            "difficulty": "MEDIUM",
+            "prep_time": 30,
+            "portions": 8,
+            "user_id": 1,
+            "ingredients": [
+                {
+                    "name": "Papel de arroz",
+                    "quantity": 16,
+                    "unit": "unidades"
+                },
+                {
+                    "name": "Zanahoria",
+                    "quantity": 2,
+                    "unit": "unidades"
+                },
+                {
+                    "name": "Lechuga",
+                    "quantity": 100,
+                    "unit": "g"
+                }
+            ]
+        },
+        {
+            "category_id": 9,
+            "title": "Champiñones Rellenos",
+            "steps": "1. Limpiar champiñones\n2. Preparar relleno de queso\n3. Rellenar y hornear\n4. Gratinar 15 minutos",
+            "image": "https://images.unsplash.com/photo-1577594990850-e843a8e91512?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D?w=600&q=80",
+            "difficulty": "MEDIUM",
+            "prep_time": 35,
+            "portions": 8,
+            "user_id": 1,
+            "ingredients": [
+                {
+                    "name": "Champiñón grande",
+                    "quantity": 12,
+                    "unit": "unidades"
+                },
+                {
+                    "name": "Queso crema",
+                    "quantity": 150,
+                    "unit": "g"
+                },
+                {
+                    "name": "Pan rallado",
+                    "quantity": 50,
+                    "unit": "g"
+                }
+            ]
+        },
+        {
+            "category_id": 9,
+            "title": "Tostadas de Aguacate",
+            "steps": "1. Tostar pan\n2. Machacar aguacate\n3. Añadir limón\n4. Servir con sal",
+            "image": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=600&q=80",
+            "difficulty": "EASY",
+            "prep_time": 10,
+            "portions": 2,
+            "user_id": 1,
+            "ingredients": [
+                {
+                    "name": "Pan",
+                    "quantity": 4,
+                    "unit": "unidades"
+                },
+                {
+                    "name": "Aguacate",
+                    "quantity": 1,
+                    "unit": "unidades"
+                },
+                {
+                    "name": "Limón",
+                    "quantity": 1,
+                    "unit": "unidades"
+                }
+            ]
+        },
+        {
+            "category_id": 9,
+            "title": "Risotto de Hongos",
+            "steps": "1. Saltear hongos\n2. Tostar arroz arborio\n3. Añadir caldo poco a poco\n4. Terminar con parmesano",
+            "image": "https://images.unsplash.com/photo-1476124369491-e7addf5db371?w=600&q=80",
+            "difficulty": "DIFFICULT",
+            "prep_time": 45,
+            "portions": 4,
+            "user_id": 1,
+            "ingredients": [
+                {
+                    "name": "Arroz arborio",
+                    "quantity": 300,
+                    "unit": "g"
+                },
+                {
+                    "name": "Champiñón",
+                    "quantity": 250,
+                    "unit": "g"
+                },
+                {
+                    "name": "Queso parmesano",
+                    "quantity": 80,
+                    "unit": "g"
+                }
+            ]
+        },
+        {
+            "category_id": 9,
+            "title": "Pizza Margherita",
+            "steps": "1. Preparar la masa\n2. Añadir salsa de tomate\n3. Agregar mozzarella\n4. Hornear 15 min",
+            "image": "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=600&q=80",
+            "difficulty": "MEDIUM",
+            "prep_time": 60,
+            "portions": 4,
+            "user_id": 1,
+            "ingredients": [
+                {
+                    "name": "Harina",
+                    "quantity": 300,
+                    "unit": "g"
+                },
+                {
+                    "name": "Mozzarella",
+                    "quantity": 200,
+                    "unit": "g"
+                },
+                {
+                    "name": "Tomate",
+                    "quantity": 3,
+                    "unit": "unidades"
+                }
+            ]
+        },
+        {
+            "category_id": 9,
+            "title": "Berenjena a la Parmesana",
+            "steps": "1. Cortar y freír berenjenas\n2. Preparar salsa de tomate\n3. Armar capas con queso\n4. Hornear 30 min",
+            "image": "https://images.unsplash.com/photo-1617093727343-374698b1b08d?w=600&q=80",
+            "difficulty": "MEDIUM",
+            "prep_time": 55,
+            "portions": 6,
+            "user_id": 1,
+            "ingredients": [
+                {
+                    "name": "Berenjena",
+                    "quantity": 3,
+                    "unit": "unidades"
+                },
+                {
+                    "name": "Mozzarella",
+                    "quantity": 300,
+                    "unit": "g"
+                },
+                {
+                    "name": "Tomate",
+                    "quantity": 6,
+                    "unit": "unidades"
+                }
+            ]
+        },
+        {
+            "category_id": 9,
+            "title": "Falafel",
+            "steps": "1. Remojar garbanzos\n2. Moler con especias\n3. Formar bolitas\n4. Freír hasta dorar",
+            "image": "https://plus.unsplash.com/premium_photo-1663853051660-91bd9b822799?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D?w=600&q=80",
+            "difficulty": "MEDIUM",
+            "prep_time": 40,
+            "portions": 6,
+            "user_id": 1,
+            "ingredients": [
+                {
+                    "name": "Garbanzo",
+                    "quantity": 400,
+                    "unit": "g"
+                },
+                {
+                    "name": "Cilantro",
+                    "quantity": 50,
+                    "unit": "g"
+                },
+                {
+                    "name": "Comino",
+                    "quantity": 15,
+                    "unit": "g"
+                }
+            ]
+        },
+        {
+            "category_id": 9,
+            "title": "Buddha Bowl",
+            "steps": "1. Cocinar quinoa\n2. Preparar vegetales asados\n3. Añadir legumbres\n4. Servir con tahini",
+            "image": "https://images.unsplash.com/photo-1546069901-d5bfd2cbfb1f?w=600&q=80",
+            "difficulty": "EASY",
+            "prep_time": 35,
+            "portions": 2,
+            "user_id": 1,
+            "ingredients": [
+                {
+                    "name": "Quinoa",
+                    "quantity": 150,
+                    "unit": "g"
+                },
+                {
+                    "name": "Batata",
+                    "quantity": 200,
+                    "unit": "g"
+                },
+                {
+                    "name": "Garbanzo",
+                    "quantity": 150,
+                    "unit": "g"
+                }
+            ]
+        },
+        {
+            "category_id": 9,
+            "title": "Tacos Vegetarianos",
+            "steps": "1. Saltear frijoles negros\n2. Preparar vegetales\n3. Calentar tortillas\n4. Armar con guacamole",
+            "image": "https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=600&q=80",
+            "difficulty": "EASY",
+            "prep_time": 25,
+            "portions": 4,
+            "user_id": 1,
+            "ingredients": [
+                {
+                    "name": "Frijol negro",
+                    "quantity": 300,
+                    "unit": "g"
+                },
+                {
+                    "name": "Tortilla",
+                    "quantity": 8,
+                    "unit": "unidades"
+                },
+                {
+                    "name": "Aguacate",
+                    "quantity": 2,
+                    "unit": "unidades"
+                }
+            ]
+        },
+        {
+            "category_id": 10,
+            "title": "Brownies de Chocolate",
+            "steps": "1. Derretir chocolate\n2. Mezclar ingredientes\n3. Verter en molde\n4. Hornear 25 min",
+            "image": "https://images.unsplash.com/photo-1564355808539-22fda35bed7e?w=600&q=80",
+            "difficulty": "EASY",
+            "prep_time": 40,
+            "portions": 12,
+            "user_id": 1,
+            "ingredients": [
+                {
+                    "name": "Chocolate",
+                    "quantity": 200,
+                    "unit": "g"
+                },
+                {
+                    "name": "Mantequilla",
+                    "quantity": 150,
+                    "unit": "g"
+                },
+                {
+                    "name": "Azúcar",
+                    "quantity": 200,
+                    "unit": "g"
+                }
+            ]
+        },
+        {
+            "category_id": 10,
+            "title": "Tiramisú Italiano",
+            "steps": "1. Preparar crema de mascarpone\n2. Mojar bizcochos en café\n3. Armar capas\n4. Refrigerar 4 horas",
+            "image": "https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?w=600&q=80",
+            "difficulty": "MEDIUM",
+            "prep_time": 30,
+            "portions": 8,
+            "user_id": 1,
+            "ingredients": [
+                {
+                    "name": "Mascarpone",
+                    "quantity": 500,
+                    "unit": "g"
+                },
+                {
+                    "name": "Bizcocho",
+                    "quantity": 300,
+                    "unit": "g"
+                },
+                {
+                    "name": "Café",
+                    "quantity": 300,
+                    "unit": "ml"
+                }
+            ]
+        },
+        {
+            "category_id": 10,
+            "title": "Flan de Caramelo",
+            "steps": "1. Hacer caramelo\n2. Mezclar huevos con leche\n3. Verter en molde\n4. Hornear a baño maría",
+            "image": "https://images.unsplash.com/photo-1528975604071-b4dc52a2d18c?w=600&q=80",
+            "difficulty": "MEDIUM",
+            "prep_time": 60,
+            "portions": 8,
+            "user_id": 1,
+            "ingredients": [
+                {
+                    "name": "Huevo",
+                    "quantity": 6,
+                    "unit": "unidades"
+                },
+                {
+                    "name": "Leche",
+                    "quantity": 500,
+                    "unit": "ml"
+                },
+                {
+                    "name": "Azúcar",
+                    "quantity": 200,
+                    "unit": "g"
+                }
+            ]
+        },
+        {
+            "category_id": 10,
+            "title": "Cheesecake New York",
+            "steps": "1. Hacer base de galleta\n2. Preparar mezcla de queso\n3. Hornear a baja temperatura\n4. Refrigerar toda la noche",
+            "image": "https://images.unsplash.com/photo-1524351199678-941a58a3df50?w=600&q=80",
+            "difficulty": "DIFFICULT",
+            "prep_time": 90,
+            "portions": 12,
+            "user_id": 1,
+            "ingredients": [
+                {
+                    "name": "Queso crema",
+                    "quantity": 600,
+                    "unit": "g"
+                },
+                {
+                    "name": "Galleta",
+                    "quantity": 200,
+                    "unit": "g"
+                },
+                {
+                    "name": "Azúcar",
+                    "quantity": 150,
+                    "unit": "g"
+                }
+            ]
+        },
+        {
+            "category_id": 10,
+            "title": "Mousse de Chocolate",
+            "steps": "1. Derretir chocolate\n2. Batir claras a punto de nieve\n3. Mezclar con cuidado\n4. Refrigerar 4 horas",
+            "image": "https://images.unsplash.com/photo-1541783245831-57d6fb0926d3?w=600&q=80",
+            "difficulty": "MEDIUM",
+            "prep_time": 30,
+            "portions": 6,
+            "user_id": 1,
+            "ingredients": [
+                {
+                    "name": "Chocolate",
+                    "quantity": 200,
+                    "unit": "g"
+                },
+                {
+                    "name": "Huevo",
+                    "quantity": 4,
+                    "unit": "unidades"
+                },
+                {
+                    "name": "Azúcar",
+                    "quantity": 50,
+                    "unit": "g"
+                }
+            ]
+        },
+        {
+            "category_id": 10,
+            "title": "Pancakes Esponjosos",
+            "steps": "1. Mezclar ingredientes secos\n2. Añadir húmedos\n3. Cocinar en sartén\n4. Servir con miel",
+            "image": "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=600&q=80",
+            "difficulty": "EASY",
+            "prep_time": 20,
+            "portions": 4,
+            "user_id": 1,
+            "ingredients": [
+                {
+                    "name": "Harina",
+                    "quantity": 200,
+                    "unit": "g"
+                },
+                {
+                    "name": "Leche",
+                    "quantity": 250,
+                    "unit": "ml"
+                },
+                {
+                    "name": "Huevo",
+                    "quantity": 2,
+                    "unit": "unidades"
+                }
+            ]
+        },
+        {
+            "category_id": 10,
+            "title": "Crème Brûlée",
+            "steps": "1. Mezclar crema con yemas\n2. Añadir vainilla\n3. Hornear a baño maría\n4. Caramelizar azúcar encima",
+            "image": "https://images.unsplash.com/photo-1470124182917-cc6e71b22ecc?w=600&q=80",
+            "difficulty": "DIFFICULT",
+            "prep_time": 50,
+            "portions": 6,
+            "user_id": 1,
+            "ingredients": [
+                {
+                    "name": "Crema",
+                    "quantity": 500,
+                    "unit": "ml"
+                },
+                {
+                    "name": "Yema de huevo",
+                    "quantity": 6,
+                    "unit": "unidades"
+                },
+                {
+                    "name": "Azúcar",
+                    "quantity": 150,
+                    "unit": "g"
+                }
+            ]
+        },
+        {
+            "category_id": 10,
+            "title": "Tarta de Manzana",
+            "steps": "1. Preparar masa quebrada\n2. Cortar manzanas en láminas\n3. Armar tarta\n4. Hornear 40 min",
+            "image": "https://images.unsplash.com/photo-1535920527002-b35e96722eb9?w=600&q=80",
+            "difficulty": "MEDIUM",
+            "prep_time": 65,
+            "portions": 8,
+            "user_id": 1,
+            "ingredients": [
+                {
+                    "name": "Manzana",
+                    "quantity": 6,
+                    "unit": "unidades"
+                },
+                {
+                    "name": "Harina",
+                    "quantity": 250,
+                    "unit": "g"
+                },
+                {
+                    "name": "Mantequilla",
+                    "quantity": 120,
+                    "unit": "g"
+                }
+            ]
+        },
+        {
+            "category_id": 10,
+            "title": "Helado de Vainilla Casero",
+            "steps": "1. Calentar leche y crema\n2. Mezclar con yemas\n3. Enfriar completamente\n4. Batir en heladera",
+            "image": "https://images.unsplash.com/photo-1563805042-7684c019e1cb?w=600&q=80",
+            "difficulty": "MEDIUM",
+            "prep_time": 45,
+            "portions": 8,
+            "user_id": 1,
+            "ingredients": [
+                {
+                    "name": "Crema",
+                    "quantity": 400,
+                    "unit": "ml"
+                },
+                {
+                    "name": "Leche",
+                    "quantity": 300,
+                    "unit": "ml"
+                },
+                {
+                    "name": "Vainilla",
+                    "quantity": 2,
+                    "unit": "unidades"
+                }
+            ]
+        },
+        {
+            "category_id": 10,
+            "title": "Galletas con Chispas de Chocolate",
+            "steps": "1. Mezclar mantequilla con azúcar\n2. Añadir harina y chispas\n3. Formar galletas\n4. Hornear 12 min",
+            "image": "https://images.unsplash.com/photo-1499636136210-6f4ee915583e?w=600&q=80",
+            "difficulty": "EASY",
+            "prep_time": 30,
+            "portions": 24,
+            "user_id": 1,
+            "ingredients": [
+                {
+                    "name": "Harina",
+                    "quantity": 300,
+                    "unit": "g"
+                },
+                {
+                    "name": "Mantequilla",
+                    "quantity": 150,
+                    "unit": "g"
+                },
+                {
+                    "name": "Chispas de chocolate",
+                    "quantity": 200,
+                    "unit": "g"
+                }
+            ]
+        },
+        {
+            "category_id": 10,
+            "title": "Tres Leches",
+            "steps": "1. Hornear bizcocho\n2. Perforar con tenedor\n3. Bañar con mezcla de leches\n4. Cubrir con merengue",
+            "image": "https://images.unsplash.com/photo-1673974798330-23e8f4c9ae05?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D?w=600&q=80",
+            "difficulty": "MEDIUM",
+            "prep_time": 50,
+            "portions": 12,
+            "user_id": 1,
+            "ingredients": [
+                {
+                    "name": "Leche evaporada",
+                    "quantity": 400,
+                    "unit": "ml"
+                },
+                {
+                    "name": "Leche condensada",
+                    "quantity": 400,
+                    "unit": "ml"
+                },
+                {
+                    "name": "Crema",
+                    "quantity": 200,
+                    "unit": "ml"
+                }
+            ]
+        },
+        {
+            "category_id": 10,
+            "title": "Churros con Chocolate",
+            "steps": "1. Preparar masa de churros\n2. Freír en aceite caliente\n3. Rebozar en azúcar\n4. Servir con chocolate caliente",
+            "image": "https://plus.unsplash.com/premium_photo-1714180194796-8cb272b0bfed?q=80&w=1169&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D?w=600&q=80",
+            "difficulty": "MEDIUM",
+            "prep_time": 35,
+            "portions": 6,
+            "user_id": 1,
+            "ingredients": [
+                {
+                    "name": "Harina",
+                    "quantity": 250,
+                    "unit": "g"
+                },
+                {
+                    "name": "Chocolate",
+                    "quantity": 150,
+                    "unit": "g"
+                },
+                {
+                    "name": "Azúcar",
+                    "quantity": 100,
+                    "unit": "g"
+                }
+            ]
+        },
+        {
+            "category_id": 11,
+            "title": "Huevos Benedictinos",
+            "steps": "1. Tostar muffins ingleses\n2. Preparar huevos pochados\n3. Hacer salsa holandesa\n4. Armar y servir",
+            "image": "https://images.unsplash.com/photo-1608039829572-78524f79c4c7?w=600&q=80",
+            "difficulty": "DIFFICULT",
+            "prep_time": 30,
+            "portions": 2,
+            "user_id": 1,
+            "ingredients": [
+                {
+                    "name": "Muffin inglés",
+                    "quantity": 2,
+                    "unit": "unidades"
+                },
+                {
+                    "name": "Huevo",
+                    "quantity": 4,
+                    "unit": "unidades"
+                },
+                {
+                    "name": "Mantequilla",
+                    "quantity": 100,
+                    "unit": "g"
+                }
+            ]
+        },
+        {
+            "category_id": 11,
+            "title": "Omelette de Queso",
+            "steps": "1. Batir huevos\n2. Cocinar en sartén\n3. Añadir queso\n4. Doblar y servir",
+            "image": "https://images.unsplash.com/photo-1710024893503-2c91534d284a?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D?w=600&q=80",
+            "difficulty": "EASY",
+            "prep_time": 12,
+            "portions": 2,
+            "user_id": 1,
+            "ingredients": [
+                {
+                    "name": "Huevo",
+                    "quantity": 4,
+                    "unit": "unidades"
+                },
+                {
+                    "name": "Queso cheddar",
+                    "quantity": 80,
+                    "unit": "g"
+                },
+                {
+                    "name": "Mantequilla",
+                    "quantity": 20,
+                    "unit": "g"
+                }
+            ]
+        },
+        {
+            "category_id": 11,
+            "title": "French Toast",
+            "steps": "1. Batir huevos con leche\n2. Remojar pan\n3. Freír hasta dorar\n4. Servir con azúcar",
+            "image": "https://images.unsplash.com/photo-1484723091739-30a097e8f929?w=600&q=80",
+            "difficulty": "EASY",
+            "prep_time": 15,
+            "portions": 4,
+            "user_id": 1,
+            "ingredients": [
+                {
+                    "name": "Pan",
+                    "quantity": 8,
+                    "unit": "unidades"
+                },
+                {
+                    "name": "Huevo",
+                    "quantity": 3,
+                    "unit": "unidades"
+                },
+                {
+                    "name": "Leche",
+                    "quantity": 150,
+                    "unit": "ml"
+                }
+            ]
+        },
+        {
+            "category_id": 11,
+            "title": "Waffles Belgas",
+            "steps": "1. Mezclar ingredientes\n2. Precalentar waflera\n3. Verter masa\n4. Cocinar hasta dorar",
+            "image": "https://images.unsplash.com/photo-1562376552-0d160a2f238d?w=600&q=80",
+            "difficulty": "EASY",
+            "prep_time": 25,
+            "portions": 6,
+            "user_id": 1,
+            "ingredients": [
+                {
+                    "name": "Harina",
+                    "quantity": 250,
+                    "unit": "g"
+                },
+                {
+                    "name": "Leche",
+                    "quantity": 300,
+                    "unit": "ml"
+                },
+                {
+                    "name": "Huevo",
+                    "quantity": 2,
+                    "unit": "unidades"
+                }
+            ]
+        },
+        {
+            "category_id": 11,
+            "title": "Burrito de Desayuno",
+            "steps": "1. Revolver huevos\n2. Añadir tocino y queso\n3. Calentar tortilla\n4. Enrollar",
+            "image": "https://images.unsplash.com/photo-1626700051175-6818013e1d4f?w=600&q=80",
+            "difficulty": "EASY",
+            "prep_time": 18,
+            "portions": 2,
+            "user_id": 1,
+            "ingredients": [
+                {
+                    "name": "Tortilla de harina",
+                    "quantity": 2,
+                    "unit": "unidades"
+                },
+                {
+                    "name": "Huevo",
+                    "quantity": 4,
+                    "unit": "unidades"
+                },
+                {
+                    "name": "Tocino",
+                    "quantity": 100,
+                    "unit": "g"
+                }
+            ]
+        },
+        {
+            "category_id": 11,
+            "title": "Smoothie Bowl",
+            "steps": "1. Licuar frutas congeladas\n2. Añadir yogurt\n3. Servir en bowl\n4. Decorar con granola",
+            "image": "https://images.unsplash.com/photo-1610450624105-58a2f25f7911?q=80&w=715&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3Dw=600&q=80",
+            "difficulty": "EASY",
+            "prep_time": 10,
+            "portions": 2,
+            "user_id": 1,
+            "ingredients": [
+                {
+                    "name": "Banana congelada",
+                    "quantity": 2,
+                    "unit": "unidades"
+                },
+                {
+                    "name": "Fresa",
+                    "quantity": 150,
+                    "unit": "g"
+                },
+                {
+                    "name": "Yogurt",
+                    "quantity": 200,
+                    "unit": "ml"
+                }
+            ]
+        },
+        {
+            "category_id": 11,
+            "title": "Bagel con Salmón",
+            "steps": "1. Tostar bagel\n2. Untar queso crema\n3. Añadir salmón ahumado\n4. Decorar con alcaparras",
+            "image": "https://images.unsplash.com/photo-1555507036-ab1f4038808a?w=600&q=80",
+            "difficulty": "EASY",
+            "prep_time": 8,
+            "portions": 2,
+            "user_id": 1,
+            "ingredients": [
+                {
+                    "name": "Bagel",
+                    "quantity": 2,
+                    "unit": "unidades"
+                },
+                {
+                    "name": "Salmón ahumado",
+                    "quantity": 100,
+                    "unit": "g"
+                },
+                {
+                    "name": "Queso crema",
+                    "quantity": 80,
+                    "unit": "g"
+                }
+            ]
+        },
+        {
+            "category_id": 11,
+            "title": "Molletes Mexicanos",
+            "steps": "1. Tostar bolillo\n2. Untar frijoles\n3. Cubrir con queso\n4. Gratinar",
+            "image": "https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=600&q=80",
+            "difficulty": "EASY",
+            "prep_time": 15,
+            "portions": 4,
+            "user_id": 1,
+            "ingredients": [
+                {
+                    "name": "Bolillo",
+                    "quantity": 4,
+                    "unit": "unidades"
+                },
+                {
+                    "name": "Frijol refritos",
+                    "quantity": 300,
+                    "unit": "g"
+                },
+                {
+                    "name": "Queso Oaxaca",
+                    "quantity": 200,
+                    "unit": "g"
+                }
+            ]
+        },
+        {
+            "category_id": 12,
+            "title": "Empanadas de Queso",
+            "steps": "1. Preparar masa\n2. Rellenar con queso\n3. Sellar bordes\n4. Freír hasta dorar",
+            "image": "https://images.unsplash.com/photo-1601050690597-df0568f70950?w=600&q=80",
+            "difficulty": "MEDIUM",
+            "prep_time": 40,
+            "portions": 10,
+            "user_id": 1,
+            "ingredients": [
+                {
+                    "name": "Masa",
+                    "quantity": 500,
+                    "unit": "g"
+                },
+                {
+                    "name": "Queso mozzarella",
+                    "quantity": 300,
+                    "unit": "g"
+                },
+                {
+                    "name": "Cebolla",
+                    "quantity": 1,
+                    "unit": "unidades"
+                }
+            ]
+        },
+        {
+            "category_id": 12,
+            "title": "Bruschetta Italiana",
+            "steps": "1. Tostar pan italiano\n2. Frotar con ajo\n3. Picar tomate con albahaca\n4. Montar sobre el pan",
+            "image": "https://images.unsplash.com/photo-1572695157366-5e585ab2b69f?w=600&q=80",
+            "difficulty": "EASY",
+            "prep_time": 15,
+            "portions": 6,
+            "user_id": 1,
+            "ingredients": [
+                {
+                    "name": "Pan italiano",
+                    "quantity": 1,
+                    "unit": "unidades"
+                },
+                {
+                    "name": "Tomate",
+                    "quantity": 4,
+                    "unit": "unidades"
+                },
+                {
+                    "name": "Albahaca",
+                    "quantity": 20,
+                    "unit": "g"
+                }
+            ]
+        },
+        {
+            "category_id": 12,
+            "title": "Croquetas de Jamón",
+            "steps": "1. Hacer bechamel espesa\n2. Añadir jamón picado\n3. Enfriar y formar\n4. Empanizar y freír",
+            "image": "https://imag.bonviveur.com/croquetas-de-jamon-y-queso.webp?w=600&q=80",
+            "difficulty": "DIFFICULT",
+            "prep_time": 60,
+            "portions": 20,
+            "user_id": 1,
+            "ingredients": [
+                {
+                    "name": "Jamón",
+                    "quantity": 200,
+                    "unit": "g"
+                },
+                {
+                    "name": "Harina",
+                    "quantity": 100,
+                    "unit": "g"
+                },
+                {
+                    "name": "Leche",
+                    "quantity": 500,
+                    "unit": "ml"
+                }
+            ]
+        },
+        {
+            "category_id": 12,
+            "title": "Tabla de Quesos",
+            "steps": "1. Seleccionar variedad de quesos\n2. Acompañar con frutas\n3. Añadir frutos secos\n4. Servir con pan",
+            "image": "https://images.unsplash.com/photo-1486297678162-eb2a19b0a32d?w=600&q=80",
+            "difficulty": "EASY",
+            "prep_time": 15,
+            "portions": 6,
+            "user_id": 1,
+            "ingredients": [
+                {
+                    "name": "Queso variado",
+                    "quantity": 500,
+                    "unit": "g"
+                },
+                {
+                    "name": "Uva",
+                    "quantity": 200,
+                    "unit": "g"
+                },
+                {
+                    "name": "Nuez",
+                    "quantity": 100,
+                    "unit": "g"
+                }
+            ]
+        },
+        {
+            "category_id": 12,
+            "title": "Pinchos Caprese",
+            "steps": "1. Cortar tomate y mozzarella\n2. Insertar en palillos\n3. Añadir albahaca\n4. Rociar con balsámico",
+            "image": "https://images.unsplash.com/photo-1608897013039-887f21d8c804?w=600&q=80",
+            "difficulty": "EASY",
+            "prep_time": 15,
+            "portions": 8,
+            "user_id": 1,
+            "ingredients": [
+                {
+                    "name": "Tomate cherry",
+                    "quantity": 20,
+                    "unit": "unidades"
+                },
+                {
+                    "name": "Mozzarella",
+                    "quantity": 200,
+                    "unit": "g"
+                },
+                {
+                    "name": "Albahaca",
+                    "quantity": 30,
+                    "unit": "g"
+                }
+            ]
+        },
+        {
+            "category_id": 12,
+            "title": "Dedos de Queso Mozzarella",
+            "steps": "1. Cortar mozzarella en bastones\n2. Empanar con pan rallado\n3. Congelar 20 min\n4. Freír hasta dorar",
+            "image": "https://images.unsplash.com/photo-1531749668029-2db88e4276c7?w=600&q=80",
+            "difficulty": "MEDIUM",
+            "prep_time": 35,
+            "portions": 6,
+            "user_id": 1,
+            "ingredients": [
+                {
+                    "name": "Mozzarella",
+                    "quantity": 400,
+                    "unit": "g"
+                },
+                {
+                    "name": "Pan rallado",
+                    "quantity": 150,
+                    "unit": "g"
+                },
+                {
+                    "name": "Huevo",
+                    "quantity": 2,
+                    "unit": "unidades"
+                }
+            ]
+        },
+        {
+            "category_id": 12,
+            "title": "Guacamole con Totopos",
+            "steps": "1. Machacar aguacates\n2. Añadir tomate y cebolla\n3. Agregar cilantro y limón\n4. Servir con totopos",
+            "image": "https://plus.unsplash.com/premium_photo-1681406689566-98c727aedda2?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D?w=600&q=80",
+            "difficulty": "EASY",
+            "prep_time": 12,
+            "portions": 6,
+            "user_id": 1,
+            "ingredients": [
+                {
+                    "name": "Aguacate",
+                    "quantity": 3,
+                    "unit": "unidades"
+                },
+                {
+                    "name": "Tomate",
+                    "quantity": 2,
+                    "unit": "unidades"
+                },
+                {
+                    "name": "Totopos",
+                    "quantity": 200,
+                    "unit": "g"
+                }
+            ]
+        },
+        {
+            "category_id": 12,
+            "title": "Dip de Espinacas",
+            "steps": "1. Cocinar espinacas\n2. Mezclar con queso crema\n3. Añadir ajo y especias\n4. Hornear hasta burbujeante",
+            "image": "https://plus.unsplash.com/premium_photo-1664472700331-78d01345b6d7?q=80&w=1008&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D?w=600&q=80",
+            "difficulty": "EASY",
+            "prep_time": 25,
+            "portions": 8,
+            "user_id": 1,
+            "ingredients": [
+                {
+                    "name": "Espinaca",
+                    "quantity": 400,
+                    "unit": "g"
+                },
+                {
+                    "name": "Queso crema",
+                    "quantity": 250,
+                    "unit": "g"
+                },
+                {
+                    "name": "Ajo",
+                    "quantity": 3,
+                    "unit": "unidades"
+                }
+            ]
+        },
+        {
+            "category_id": 12,
+            "title": "Mini Quiches",
+            "steps": "1. Preparar masa quebrada\n2. Forrar moldes pequeños\n3. Rellenar con huevo y queso\n4. Hornear 20 min",
+            "image": "https://images.unsplash.com/photo-1591985666643-1ecc67616216?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D?w=600&q=80",
+            "difficulty": "MEDIUM",
+            "prep_time": 45,
+            "portions": 12,
+            "user_id": 1,
+            "ingredients": [
+                {
+                    "name": "Masa quebrada",
+                    "quantity": 300,
+                    "unit": "g"
+                },
+                {
+                    "name": "Huevo",
+                    "quantity": 4,
+                    "unit": "unidades"
+                },
+                {
+                    "name": "Queso gruyere",
+                    "quantity": 150,
+                    "unit": "g"
+                }
+            ]
+        },
+        {
+            "category_id": 12,
+            "title": "Tzatziki con Pan Pita",
+            "steps": "1. Rallar pepino\n2. Mezclar con yogurt griego\n3. Añadir ajo y eneldo\n4. Servir con pan pita",
+            "image": "https://plus.unsplash.com/premium_photo-1667215177072-6539146bc577?q=80&w=764&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D?w=600&q=80",
+            "difficulty": "EASY",
+            "prep_time": 15,
+            "portions": 6,
+            "user_id": 1,
+            "ingredients": [
+                {
+                    "name": "Yogurt griego",
+                    "quantity": 400,
+                    "unit": "g"
+                },
+                {
+                    "name": "Pepino",
+                    "quantity": 2,
+                    "unit": "unidades"
+                },
+                {
+                    "name": "Pan pita",
+                    "quantity": 6,
+                    "unit": "unidades"
+                }
+            ]
+        }
+    ],
+    "users": [
+        {
+            "username": "chefmaster",
+            "email": "chefmaster@example.com",
+            "fullname": "Chef Master",
+            "rol": "usuario",
+            "password": "securepassword123"
+        },
+        {
+            "username": "cvmeneses",
+            "email": "carlosocharly1@gmail.com",
+            "fullname": "Carlos Meneses",
+            "rol": "admin",
+            "password": "Admin123."
+        },
+        {
+            "username": "carlos.garcia",
+            "email": "carlos.garcia@example.com",
+            "fullname": "Carlos García",
+            "rol": "usuario",
+            "password": "Admin123."
+        },
+        {
+            "username": "maria.piedad",
+            "email": "maria.piedad@example.com",
+            "fullname": "María López",
+            "rol": "usuario",
+            "password": "Admin123."
+        },
+        {
+            "username": "ana.morales",
+            "email": "ana.morales@example.com",
+            "fullname": "Ana Morales",
+            "rol": "usuario",
+            "password": "Admin123."
+        },
+        {
+            "username": "jose.ramirez",
+            "email": "jose.ramirez@example.com",
+            "fullname": "José Ramírez",
+            "rol": "usuario",
+            "password": "Admin123."
+        },
+        {
+            "username": "ana.delgado",
+            "email": "ana.delgado@example.com",
+            "fullname": "Ana Morales",
+            "rol": "usuario",
+            "password": "Admin123."
+        },
+        {
+            "username": "jose.ramz",
+            "email": "jose.ramz@example.com",
+            "fullname": "José Ramírez",
+            "rol": "usuario",
+            "password": "Admin123."
+        },
+        {
+            "username": "maria.lopez",
+            "email": "maria.lopez@example.com",
+            "fullname": "María López",
+            "rol": "usuario",
+            "password": "Admin123."
+        },
+        {
+            "username": "carlos.perez",
+            "email": "carlos.perez@example.com",
+            "fullname": "Carlos Pérez",
+            "rol": "usuario",
+            "password": "Admin123."
+        },
+        {
+            "username": "luisa.garcia",
+            "email": "luisa.garcia@example.com",
+            "fullname": "Luisa García",
+            "rol": "usuario",
+            "password": "Admin123."
+        },
+        {
+            "username": "andres.sanchez",
+            "email": "andres.sanchez@example.com",
+            "fullname": "Andrés Sánchez",
+            "rol": "usuario",
+            "password": "Admin123."
+        },
+        {
+            "username": "paola.mendoza",
+            "email": "paola.mendoza@example.com",
+            "fullname": "Paola Mendoza",
+            "rol": "usuario",
+            "password": "Admin123."
+        },
+        {
+            "username": "diego.fernandez",
+            "email": "diego.fernandez@example.com",
+            "fullname": "Diego Fernández",
+            "rol": "usuario",
+            "password": "Admin123."
+        },
+        {
+            "username": "sofia.alvarez",
+            "email": "sofia.alvarez@example.com",
+            "fullname": "Sofía Álvarez",
+            "rol": "usuario",
+            "password": "Admin123."
+        },
+        {
+            "username": "ricardo.ortiz",
+            "email": "ricardo.ortiz@example.com",
+            "fullname": "Ricardo Ortiz",
+            "rol": "usuario",
+            "password": "Admin123."
+        },
+        {
+            "username": "valeria.castro",
+            "email": "valeria.castro@example.com",
+            "fullname": "Valeria Castro",
+            "rol": "usuario",
+            "password": "Admin123."
+        },
+        {
+            "username": "fernando.silva",
+            "email": "fernando.silva@example.com",
+            "fullname": "Fernando Silva",
+            "rol": "usuario",
+            "password": "Admin123."
+        },
+        {
+            "username": "laura.rojas",
+            "email": "laura.rojas@example.com",
+            "fullname": "Laura Rojas",
+            "rol": "usuario",
+            "password": "Admin123."
+        },
+        {
+            "username": "martin.guzman",
+            "email": "martin.guzman@example.com",
+            "fullname": "Martín Guzmán",
+            "rol": "usuario",
+            "password": "Admin123."
+        },
+        {
+            "username": "camila.vega",
+            "email": "camila.vega@example.com",
+            "fullname": "Camila Vega",
+            "rol": "usuario",
+            "password": "Admin123."
+        }
+    ]
+}
