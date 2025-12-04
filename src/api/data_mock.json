@@ -2589,7 +2589,7 @@
                 {
                     "name": "Pan",
                     "quantity": 4,
-                    "unit": "rebanadas"
+                    "unit": "unidades"
                 },
                 {
                     "name": "Aguacate",
@@ -3156,7 +3156,7 @@
                 {
                     "name": "Pan",
                     "quantity": 8,
-                    "unit": "rebanadas"
+                    "unit": "unidades"
                 },
                 {
                     "name": "Huevo",
