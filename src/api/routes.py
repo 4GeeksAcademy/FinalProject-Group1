@@ -52,7 +52,7 @@ def getUser(user_id):
 @api.route("/user", methods=["PUT"])
 @jwt_required()
 def updateUser():
-    current_user_id = get_jwt_identity()
+    current_user_id = int(get_jwt_identity())
     user = User.query.get(current_user_id)
     if not user:
         return jsonify({"message": "User not found"}), 404
@@ -84,7 +84,7 @@ def updateUser():
         # Verificar si ya existe el username
         existing_username_user = User.query.filter_by(
             username=username).first()
-        if existing_username_user and existing_username_user.id != current_user_id:
+        if existing_username_user and existing_username_user.id_user != current_user_id:
             return jsonify({"message": "This username is already in use"}), 400
 
         user.username = username

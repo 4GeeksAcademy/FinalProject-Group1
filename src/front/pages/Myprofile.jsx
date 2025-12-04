@@ -18,7 +18,6 @@ export const Myprofile = () => {
         profile: "",
         username: "",
         fullname: "",
-        email: ""
     });
 
     const handleImageUpload = async (event) => {
@@ -52,7 +51,6 @@ export const Myprofile = () => {
         image: false,
         username: false,
         fullname: false,
-        email: false,
     });
 
     const [showPasswordModal, setShowPasswordModal] = useState(false);
@@ -137,7 +135,7 @@ export const Myprofile = () => {
 
     const updateUser = async () => {
         try {
-            const response = await fetch(`${urlBase}/user/${store.user.id}`, {
+            const response = await fetch(`${urlBase}/user`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
@@ -146,26 +144,24 @@ export const Myprofile = () => {
                 body: JSON.stringify({
                     fullname: user.fullname,
                     username: user.username,
-                    email: user.email,
-                    profile: user.profile
                 })
             });
 
             const data = await response.json();
-            console.log("Usuario actualizado:", data);
 
             if (response.ok) {
-                setUser(data);
                 dispatch({ type: "SET_USER", payload: data.user });
                 localStorage.setItem("user", JSON.stringify(data.user));
+                setUser(data.user);
                 return data.user;
+            } else {
+                console.error("Error backend:", data.message);
             }
-
-
         } catch (error) {
             console.error("Error actualizando usuario:", error);
         }
     };
+
 
 
     return (
@@ -236,6 +232,8 @@ export const Myprofile = () => {
                                                 onKeyDown={async (event) => {
                                                     if (event.key === "Enter") {
                                                         event.preventDefault();
+                                                        const updated = await updateUser();
+                                                        if (updated) setUser(updated);
                                                         setEditing({ ...editing, fullname: false });
                                                     }
                                                 }}
@@ -282,9 +280,11 @@ export const Myprofile = () => {
                                                 onChange={(event) => {
                                                     setUser({ ...user, username: event.target.value });
                                                 }}
-                                                onKeyDown={(event) => {
+                                                onKeyDown={async (event) => {
                                                     if (event.key === "Enter") {
                                                         event.preventDefault();
+                                                        const updated = await updateUser();
+                                                        if (updated) setUser(updated);
                                                         setEditing({ ...editing, username: false });
                                                     }
                                                 }}
@@ -322,48 +322,12 @@ export const Myprofile = () => {
                                 {/* Email */}
                                 <div className="profile-field">
                                     <label className="profile-label">Correo</label>
-                                    {editing.email ? (
-                                        <div className="d-flex align-items-center gap-2">
-                                            <input
-                                                className="form-control profile-input"
-                                                type="email"
-                                                value={user.email}
-                                                onChange={(event) =>
-                                                    setUser({ ...user, email: event.target.value })
-                                                }
-                                                onKeyDown={(event) => {
-                                                    if (event.key === "Enter") {
-                                                        event.preventDefault();
-                                                        setEditing({ ...editing, email: false });
-                                                    }
-                                                }}
-                                                placeholder="Correo"
-                                                autoFocus
-                                            />
-                                            <button
-                                                className="btn btn-success btn-sm profile-save-btn"
-                                                onClick={async () => {
-                                                    const updated = await updateUser();
-                                                    if (updated) setUser(updated);
-                                                    setEditing({ ...editing, email: false });
-                                                }}
-                                            >
-                                                Guardar
-                                            </button>
+                                    <div className="profile-value-row">
+                                        <div className="profile-value">
+                                            {user.email || "Email"}
                                         </div>
-                                    ) : (
-                                        <div className="profile-value-row">
-                                            <div className="profile-value">
-                                                {user.email || "Email"}
-                                            </div>
-                                            <button
-                                                className="btn btn-outline-secondary btn-sm profile-edit-btn"
-                                                onClick={() => setEditing({ ...editing, email: true })}
-                                            >
-                                                Editar
-                                            </button>
-                                        </div>
-                                    )}
+
+                                    </div>
                                 </div>
 
                                 {/* Contraseña */}
