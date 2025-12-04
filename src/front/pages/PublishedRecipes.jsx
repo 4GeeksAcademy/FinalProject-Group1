@@ -5,6 +5,7 @@ import Pagination from "../components/Pagination"
 
 const urlBase = import.meta.env.VITE_BACKEND_URL;
 const RECIPES_PER_PAGE = 9;
+const STATUS_TYPE = 'published';
 
 const PublishedRecipes = () => {
     const [recipes, setRecipes] = useState([]);
@@ -12,15 +13,19 @@ const PublishedRecipes = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [totalRecipes, setTotalRecipes] = useState(0);
 
+    const [searchTerm, setSearchTerm] = useState('');
+    const [searchResults, setSearchResults] = useState([]);
+    const [loadingSearch, setLoadingSearch] = useState(false);
+    const [isSearching, setIsSearching] = useState(false);
+
     const paginate = (pageNumber) => {
         setCurrentPage(pageNumber);
     };
 
 
     const getRecipesByStatus = async (status, page = 1, limit = RECIPES_PER_PAGE) => {
-        setIsLoading(true);
+        if (!isSearching) setIsLoading(true);
         const token = localStorage.getItem('access_token');
-
         const url = `${urlBase}/admin/recipes/status?status=${status}&page=${page}&limit=${limit}`
 
         try {
@@ -42,14 +47,12 @@ const PublishedRecipes = () => {
             if (data.recipes && Array.isArray(data.recipes)) {
                 setRecipes(data.recipes);
                 setTotalRecipes(data.total_count);
-                toast.success(`Éxito: Se cargaron ${data.recipes.length} recetas de la página ${page}.`, { duration: 1500 });
             } else {
                 throw new Error("Respuesta del servidor inválida: No se encontró el array 'recipes'.");
             }
 
         } catch (error) {
             console.error(`Error al obtener recetas ${status}:`, error);
-            toast.error(`Error de carga. Verifica API/Network: ${error.message}`);
             setRecipes([]);
             setTotalRecipes(0);
         } finally {
@@ -90,7 +93,7 @@ const PublishedRecipes = () => {
                 setCurrentPage(pageToFetch);
             }
 
-            getRecipesByStatus('published', pageToFetch);
+            getRecipesByStatus(STATUS_TYPE, pageToFetch);
 
         } catch (error) {
             console.error("Error de eliminación:", error);
@@ -133,7 +136,7 @@ const PublishedRecipes = () => {
                 setCurrentPage(pageToFetch);
             }
 
-            getRecipesByStatus('published', pageToFetch);
+            getRecipesByStatus(STATUS_TYPE, pageToFetch);
 
         } catch (error) {
             console.error("Error de cambio de estado:", error);
@@ -142,30 +145,133 @@ const PublishedRecipes = () => {
     };
 
     useEffect(() => {
-        getRecipesByStatus('published', currentPage);
+        if (!isSearching) {
+            getRecipesByStatus(STATUS_TYPE, currentPage);
+        }
     }, [currentPage]);
 
+
+    useEffect(() => {
+        let controller = null;
+        let timer = null;
+        if (searchTerm.length >= 2) {
+            setLoadingSearch(true);
+            setIsSearching(true);
+
+            controller = new AbortController();
+            const signal = controller.signal;
+
+            timer = setTimeout(async () => {
+                const token = localStorage.getItem('access_token');
+
+                try {
+                    const url = `${urlBase}/admin/recipes/search_by_status?q=${searchTerm}&status=${STATUS_TYPE.toUpperCase()}`;
+
+                    const response = await fetch(url, {
+                        headers: { "Authorization": `Bearer ${token}` },
+                        signal: signal
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.message || 'Error al buscar en el panel.');
+                    }
+
+                    const data = await response.json();
+                    setSearchResults(data.recipes || []);
+
+
+                } catch (error) {
+                    if (error.name === 'AbortError') {
+                        return;
+                    }
+                    console.error('Error fetching admin search results:', error);
+                    toast.error(`Error en búsqueda: ${error.message}`);
+                    setSearchResults([]);
+                } finally {
+                    setLoadingSearch(false);
+                }
+            }, 500);
+
+            return () => {
+                clearTimeout(timer);
+                controller.abort();
+            };
+
+        } else {
+
+            if (isSearching) {
+                setIsSearching(false);
+            }
+
+            setSearchResults([]);
+            setLoadingSearch(false);
+        }
+
+    }, [searchTerm]);
+
+    const recipesToDisplay = isSearching ? searchResults : recipes;
+    const totalItems = isSearching ? recipesToDisplay.length : totalRecipes;
     if (isLoading) {
-        return <div className="text-center p-5">Cargando recetas...</div>;
+        return <div className="text-center p-5">Cargando recetas del panel de Publicadas...</div>;
     }
 
 
     return (
         <>
             <Toaster position="top-right" richColors />
+
+            <div className="container mt-4">
+                <div className="row justify-content-center">
+                    <div className="col-12 col-md-8 col-lg-6">
+                        <div className="input-group mb-3 shadow">
+                            <input
+                                type="text"
+                                className="form-control"
+                                placeholder="Buscar por título en Recetas Publicadas..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
+                            {loadingSearch && (
+                                <span className="input-group-text text-primary">
+                                    <i className="fa-solid fa-spinner fa-spin"></i>
+                                </span>
+                            )}
+                            {searchTerm && (
+                                <button className="btn btn-outline-secondary" type="button" onClick={() => setSearchTerm('')}>
+                                    <i className="fa-solid fa-times"></i>
+                                </button>
+                            )}
+                            <span className="input-group-text">
+                                <i className="fa-solid fa-search"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <AdminCardRecipe
-                recipes={recipes}
-                title="Recetas Publicadas"
+                recipes={recipesToDisplay}
+                title={isSearching ? `Resultados para "${searchTerm}"` : "Recetas Publicadas"}
                 icono="= devuelve la receta a pendientes"
                 handleDelete={handleDelete}
                 handleStatusChange={handleStatusChange}
             />
-            <Pagination
-                recipesPerPage={RECIPES_PER_PAGE}
-                totalRecipes={totalRecipes}
-                currentPage={currentPage}
-                paginate={paginate}
-            />
+
+            {!isSearching && (
+                <Pagination
+                    recipesPerPage={RECIPES_PER_PAGE}
+                    totalRecipes={totalItems}
+                    currentPage={currentPage}
+                    paginate={paginate}
+                />
+            )}
+
+            {isSearching && recipesToDisplay.length === 0 && (
+                <div className="container published p-5 text-center">
+                    <p className="mt-5 lead">No se encontraron recetas Publicadas con ese título.</p>
+                </div>
+            )}
         </>
     );
 }

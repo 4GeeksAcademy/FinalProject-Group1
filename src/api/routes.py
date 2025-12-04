@@ -1852,3 +1852,58 @@ def populate_database():
             db.session.rollback()
             print(f"Error en la populación: {error.args}" )
             return jsonify({"message": "Error populating database.", "details": str(error)}), 500
+
+
+@api.route("/admin/recipes/search_by_status", methods=["GET"])
+@admin_required() 
+def search_admin_recipes():
+    try:
+        query = request.args.get('q', '').strip()
+        status_str = request.args.get('status', 'PUBLISHED').upper() 
+
+        if not query or len(query) < 2:
+            return jsonify({
+                "message": "The search term must be at least 2 characters long",
+                "recipes": []
+            }), 400
+
+        required_status = getattr(stateRecipeEnum, status_str, None)
+
+        if required_status is None:
+            return jsonify({"message": f"Invalid prescription status: {status_str}"}), 400
+        recipes = (
+            db.session.query(Recipe)
+            .filter(
+                Recipe.title.ilike(f'%{query}%'), 
+                Recipe.state_recipe == required_status
+            )
+            .order_by(Recipe.created_at.desc())
+            .limit(50) 
+            .all()
+        )
+
+        recipes_list = [
+            {
+                "id": recipe.id_recipe,
+                "title": recipe.title,
+                "image": recipe.image,
+                "difficulty": recipe.difficulty.value,
+                "creator_name": recipe.user_recipe.username, 
+                "status": recipe.state_recipe.name.lower() 
+            }
+            for recipe in recipes
+        ]
+
+        return jsonify({
+            "message": "Administrator search completed successfully",
+            "recipes": recipes_list,
+            "total": len(recipes_list)
+        }), 200
+
+    except Exception as error:
+        print(f"Error UNEXPECTED searching admin recipes: {error}") 
+        return jsonify({
+            "message": "Error performing the search in the administrator panel",
+            "details": str(error),
+            "recipes": []
+        }), 500
