@@ -20,6 +20,7 @@ import cloudinary.uploader
 from datetime import datetime, timezone
 import requests
 from .unit_converter import converter
+import enum
 
 
 api = Blueprint('api', __name__)
@@ -1745,6 +1746,14 @@ def get_converted_ingredients(recipe_id):
             "details": str(e)
         }), 500
 
+
+def get_unit_enum(unit_str):
+    for member in UnitEnum:
+        if member.value == unit_str:
+            return member
+    raise ValueError(f"El valor '{unit_str}' no es una unidad válida en UnitEnum.")
+
+
 @api.route("/population", methods=["GET"])
 def populate_database():
     json_path = os.path.join(
@@ -1782,7 +1791,12 @@ def populate_database():
                 db.session.add(new_category)
             db.session.commit()
 
-            for recipe in data.get("recipes", []):
+            recipes_data = data.get("recipes", [])
+
+            ingredients_cache = {}
+            new_catalog_ingredients_to_add = []
+
+            for recipe in recipes_data:
                 new_recipe = Recipe(
                     title=recipe.get("title"),
                     steps=recipe.get("steps"),
@@ -1795,8 +1809,43 @@ def populate_database():
                     category_id=recipe.get("category_id")
                 )
                 db.session.add(new_recipe)
-            db.session.commit()
+                db.session.flush() 
+                recipe_id = new_recipe.id_recipe
+
+                for ingredient_data in recipe.get("ingredients", []):
+                    ingredient_name = ingredient_data.get("name")
+                    if ingredient_name not in ingredients_cache:
+                        existing_ingredient = db.session.scalar(db.select(Ingredient).filter_by(name=ingredient_name))
+
+                        if not existing_ingredient:
+                            new_catalog_ingredient = Ingredient(
+                                name=ingredient_name,)
+                            db.session.add(new_catalog_ingredient)
+                            ingredients_cache[ingredient_name] = new_catalog_ingredient
+                        else:
+                            ingredients_cache[ingredient_name] = existing_ingredient
+
+                    ingredient_object = ingredients_cache[ingredient_name]
+
+                    unit_string_from_json = ingredient_data.get("unit")
+
+                    try:
+                        unit_enum_object = get_unit_enum(unit_string_from_json)
+                    except ValueError as e:
+
+                        print(f"Error procesando unidad: {e}")
+                        raise
+                    new_recipe_ingredient_detail = RecipeIngredient(
+                        quantity=ingredient_data.get("quantity"),
+                        unit_measure=unit_enum_object, 
             
+                        recipe=new_recipe, 
+                        ingredient_catalog=ingredient_object 
+                    )
+                    db.session.add(new_recipe_ingredient_detail)
+
+            db.session.commit()
+                                
             return jsonify({"message": "Database populated successfully."}), 200
 
         except Exception as error:
