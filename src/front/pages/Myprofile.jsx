@@ -137,7 +137,7 @@ export const Myprofile = () => {
 
     const updateUser = async () => {
         try {
-            const response = await fetch(`${urlBase}/user/${store.user.id}`, {
+            const response = await fetch(`${urlBase}/user`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
@@ -146,26 +146,25 @@ export const Myprofile = () => {
                 body: JSON.stringify({
                     fullname: user.fullname,
                     username: user.username,
-                    email: user.email,
-                    profile: user.profile
+                    email: user.email
                 })
             });
 
             const data = await response.json();
-            console.log("Usuario actualizado:", data);
 
             if (response.ok) {
-                setUser(data);
                 dispatch({ type: "SET_USER", payload: data.user });
                 localStorage.setItem("user", JSON.stringify(data.user));
+                setUser(data.user);
                 return data.user;
+            } else {
+                console.error("Error backend:", data.message);
             }
-
-
         } catch (error) {
             console.error("Error actualizando usuario:", error);
         }
     };
+
 
 
     return (
