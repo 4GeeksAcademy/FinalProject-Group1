@@ -21,6 +21,7 @@ from datetime import datetime, timezone
 import requests
 from .unit_converter import converter
 
+
 api = Blueprint('api', __name__)
 
 
@@ -1743,3 +1744,62 @@ def get_converted_ingredients(recipe_id):
             "message": "Internal error retrieving converted ingredients",
             "details": str(e)
         }), 500
+
+@api.route("/population", methods=["GET"])
+def populate_database():
+    json_path = os.path.join(
+        os.path.dirname(__file__), "data_mock.json")
+
+    if json_path:
+        try:
+            with open(json_path, "r", encoding="utf-8") as file:
+                data = json.load(file)
+
+            users = data.get("users", [])
+            for user in users:
+                salt = b64encode(os.urandom(16)).decode("utf-8")
+                hashed_password = generate_password_hash(f"{user['password']}{salt}")
+                email = user.get("email")
+                fullname = user.get("fullname")
+                username = user.get("username")
+                rol = user.get("rol", "usuario")
+                new_user = User(
+                    email=email,
+                    password=hashed_password,
+                    fullname=fullname,
+                    username=username,
+                    salt=salt,
+                    rol=rol,
+                )
+                db.session.add(new_user)
+            db.session.commit()
+
+            for category in data.get("categories", []):
+                new_category = Category(
+                    name_category=category.get("name_category")
+                )
+                print(new_category)
+                db.session.add(new_category)
+            db.session.commit()
+
+            for recipe in data.get("recipes", []):
+                new_recipe = Recipe(
+                    title=recipe.get("title"),
+                    steps=recipe.get("steps"),
+                    image=recipe.get("image"),
+                    difficulty=recipe.get("difficulty"),
+                    preparation_time_min=recipe.get("prep_time"),
+                    portions=recipe.get("portions"),
+                    state_recipe=stateRecipeEnum.PUBLISHED,
+                    user_id=recipe.get("user_id"),
+                    category_id=recipe.get("category_id")
+                )
+                db.session.add(new_recipe)
+            db.session.commit()
+            
+            return jsonify({"message": "Database populated successfully."}), 200
+
+        except Exception as error:
+            db.session.rollback()
+            print(f"Error en la populación: {error.args}" )
+            return jsonify({"message": "Error populating database.", "details": str(error)}), 500
