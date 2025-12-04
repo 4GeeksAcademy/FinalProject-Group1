@@ -1,16 +1,16 @@
 """empty message
 
-Revision ID: 21e8b4f2e238
+Revision ID: 1721d8d28d5c
 Revises: 
-Create Date: 2025-11-24 23:56:30.467720
+Create Date: 2025-12-04 00:25:53.916425
 
 """
 from alembic import op
 import sqlalchemy as sa
-
+from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision = '21e8b4f2e238'
+revision = '1721d8d28d5c'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -31,6 +31,7 @@ def upgrade():
     sa.Column('name', sa.String(length=100), nullable=False),
     sa.Column('volume_to_mass_factor', sa.Float(), nullable=True),
     sa.Column('unit_to_mass_factor', sa.Float(), nullable=True),
+    sa.Column('nutrition_base_json', postgresql.JSON(astext_type=sa.Text()), nullable=True),
     sa.Column('calories_per_100', sa.Float(), nullable=False),
     sa.Column('protein_per_100', sa.Float(), nullable=False),
     sa.Column('carbs_per_100', sa.Float(), nullable=False),
@@ -63,6 +64,7 @@ def upgrade():
     sa.Column('preparation_time_min', sa.Integer(), nullable=False),
     sa.Column('portions', sa.Integer(), nullable=False),
     sa.Column('nutritional_data', sa.Text(), nullable=True),
+    sa.Column('nutritional_data_json', postgresql.JSON(astext_type=sa.Text()), nullable=True),
     sa.Column('state_recipe', sa.Enum('PENDING', 'PUBLISHED', 'REJECTED', name='staterecipeenum'), nullable=False),
     sa.Column('avg_rating', sa.Float(), nullable=True),
     sa.Column('vote_count', sa.Integer(), nullable=False),
@@ -71,9 +73,19 @@ def upgrade():
     sa.Column('user_id', sa.Integer(), nullable=False),
     sa.Column('category_id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['category_id'], ['categories.id_category'], ),
-    sa.ForeignKeyConstraint(['user_id'], ['user.id_user'], ),
+    sa.ForeignKeyConstraint(['user_id'], ['user.id_user'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id_recipe'),
     sa.UniqueConstraint('title')
+    )
+    op.create_table('comments',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('content', sa.Text(), nullable=False),
+    sa.Column('user_id', sa.Integer(), nullable=False),
+    sa.Column('recipe_id', sa.Integer(), nullable=False),
+    sa.Column('created_at', sa.DateTime(timezone=True), nullable=False),
+    sa.ForeignKeyConstraint(['recipe_id'], ['recipe.id_recipe'], ),
+    sa.ForeignKeyConstraint(['user_id'], ['user.id_user'], ),
+    sa.PrimaryKeyConstraint('id')
     )
     op.create_table('recipe_favorites',
     sa.Column('id_favorite', sa.Integer(), nullable=False),
@@ -82,7 +94,8 @@ def upgrade():
     sa.Column('created_at', sa.DateTime(timezone=True), nullable=False),
     sa.ForeignKeyConstraint(['recipe_id'], ['recipe.id_recipe'], ),
     sa.ForeignKeyConstraint(['user_id'], ['user.id_user'], ),
-    sa.PrimaryKeyConstraint('id_favorite')
+    sa.PrimaryKeyConstraint('id_favorite'),
+    sa.UniqueConstraint('user_id', 'recipe_id', name='uq_user_recipe_favorite')
     )
     op.create_table('recipe_ingredient',
     sa.Column('id_recipe_ingredient', sa.Integer(), nullable=False),
@@ -114,6 +127,7 @@ def downgrade():
     op.drop_table('recipe_ratings')
     op.drop_table('recipe_ingredient')
     op.drop_table('recipe_favorites')
+    op.drop_table('comments')
     op.drop_table('recipe')
     op.drop_table('user')
     op.drop_table('ingredient')
