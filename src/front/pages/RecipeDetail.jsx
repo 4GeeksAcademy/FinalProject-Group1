@@ -103,7 +103,7 @@ export const RecipeDetail = () => {
             ...(token ? { Authorization: `Bearer ${token}` } : {}),
           },
         });
- 
+
         const text = await res.text();
 
         let data;
@@ -121,9 +121,9 @@ export const RecipeDetail = () => {
           throw new Error(message);
         }
 
-        data.ingredients_original = data.ingredients; 
-        
-        setRecipe(data); 
+        data.ingredients_original = data.ingredients;
+
+        setRecipe(data);
         setIsFavorite(Boolean(data.is_favorite));
         setUserRating(data.user_rating || 0);
         setRecipeLoaded(true);
@@ -147,10 +147,10 @@ export const RecipeDetail = () => {
 
     if (conversionUnit === "original") {
       setRecipe(prevRecipe => {
-        if (!prevRecipe.ingredients_original) return prevRecipe; 
+        if (!prevRecipe.ingredients_original) return prevRecipe;
         return {
           ...prevRecipe,
-          ingredients: prevRecipe.ingredients_original 
+          ingredients: prevRecipe.ingredients_original
         };
       });
       return;
@@ -159,7 +159,7 @@ export const RecipeDetail = () => {
     const fetchConvertedIngredients = async () => {
       setLoadingIngredients(true);
 
-      const url = `${BACKEND_URL}/recetas/${recipeId}/ingredientes?unit=${conversionUnit}`; 
+      const url = `${BACKEND_URL}/recetas/${recipeId}/ingredientes?unit=${conversionUnit}`;
 
       try {
         const res = await fetch(url, {
@@ -177,10 +177,10 @@ export const RecipeDetail = () => {
           return {
             ...prevRecipe,
             ingredients: data,
-            ingredients_original: ingredientsOriginal 
+            ingredients_original: ingredientsOriginal
           };
         });
-      
+
       } catch (err) {
         console.error('Error en fetchConvertedIngredients:', err);
       } finally {
@@ -327,6 +327,7 @@ export const RecipeDetail = () => {
     prep_time_min,
     portions,
     category_name,
+    creator_name,
     avg_rating,
     vote_count,
     image,
@@ -412,6 +413,9 @@ export const RecipeDetail = () => {
                 : ' Añadir a favoritos'}
             </button>
           </div>
+          <span className="badge-item mt-3">
+            <i className="fa-solid fa-person"></i> Sugerido por: {creator_name}
+          </span>
         </div>
 
         <div className="recipe-hero-image">
