@@ -1,24 +1,30 @@
-from flask import Flask, request, jsonify, Blueprint
-from api.models import db, User, Recipe, Ingredient, RecipeIngredient, difficultyEnum, stateRecipeEnum, UnitEnum, Category, RecipeFavorite, RecipeRating, Comment, Reporte
-from api.utils import val_email, val_password
+"""
+This module takes care of starting the API Server, Loading the DB and Adding the endpoints
+"""
+from flask import Flask, request, jsonify, url_for, Blueprint
+from api.models import db, User, Recipe, Ingredient, RecipeIngredient, difficultyEnum, stateRecipeEnum, UnitEnum, Category, RecipeFavorite, RecipeRating, Comment
+from api.utils import generate_sitemap, APIException,  val_email, val_password
 from flask_cors import CORS
 import os
 from base64 import b64encode
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity, get_jwt
 from datetime import timedelta, datetime, timezone
+from functools import wraps
 import json
 from .cloudinary_service import cloudinary_service
-from sqlalchemy import func
+from sqlalchemy import select, func, text
 from .admin_decorator import admin_required
 import cloudinary
 import cloudinary.uploader
-from sqlalchemy.orm import joinedload
+from datetime import datetime, timezone
 import requests
-# Asumiendo que tienes este archivo para la conversión (si no, comenta esta línea)
 from .unit_converter import converter
+import enum
+
 
 api = Blueprint('api', __name__)
+
 
 # Allow CORS requests to this API
 CORS(api)
@@ -51,10 +57,12 @@ def updateUser():
     if not user:
         return jsonify({"message": "User not found"}), 404
 
-    data = request.get_json()
+    data = request.get_json()  # or {}
 
     if data is None:
         return jsonify({"message": "Invalid JSON or no data provided"}), 400
+
+    # Nos traemos los campos a actualizar
 
     email = data.get("email")
     fullname = data.get("fullname")
@@ -64,6 +72,8 @@ def updateUser():
         if not val_email(email):
             return jsonify({"message": "Email is invalid"}), 400
 
+        # Verificar si ya existe el email
+
         existing_email_user = User.query.filter_by(email=email).first()
         if existing_email_user and existing_email_user.id_user != user.id_user:
             return jsonify({"message": "This email is already registered"}), 400
@@ -71,6 +81,7 @@ def updateUser():
         user.email = email
 
     if username:
+        # Verificar si ya existe el username
         existing_username_user = User.query.filter_by(
             username=username).first()
         if existing_username_user and existing_username_user.id_user != current_user_id:
@@ -144,10 +155,12 @@ def register_user():
         db.session.rollback()
         return jsonify({"message": "Error creating user", "Error": f"{error.args}"}), 500
 
+# Endpoint para Category
+
 
 @api.route("/categories", methods=["GET"])
 def get_categories():
-    categories = Category.query.order_by(Category.name_category).all()
+    categories = Category.query.order_by(Category.id_category).all() 
     data = [category.serialize() for category in categories]
     return jsonify(data), 200
 
@@ -156,17 +169,17 @@ def get_categories():
 @jwt_required()
 def create_category():
     claims = get_jwt()
-    if not claims.get("rol") == "admin":
-        return jsonify({"message": "Admin role required"}), 403
+    if claims.get("rol") != "admin":
+        return jsonify({"message": "Admin rol requerido"}), 403
     data = request.get_json(silent=True)
 
     if data is None:
-        return jsonify({"message": "Data not provided"}), 400
+        return jsonify({"message": "Data no proveida"}), 400
 
     name_category = data.get("name_category")
 
     if not name_category or not name_category.strip():
-        return jsonify({"message": "Category name is required"}), 400
+        return jsonify({"message": "Nombre de categoría es requerido"}), 400
 
     name_category = name_category.strip()
 
@@ -175,7 +188,7 @@ def create_category():
     ).first()
 
     if existing_category:
-        return jsonify({"message": "Category already exists"}), 409
+        return jsonify({"message": "Categoría ya existe"}), 409
 
     new_category = Category(
         name_category=name_category,
@@ -187,13 +200,13 @@ def create_category():
     try:
         db.session.commit()
         return jsonify({
-            "message": "Category created successfully",
+            "message": "Categoría creada exitosamente",
             "category": new_category.serialize()
         }), 201
     except Exception as error:
         db.session.rollback()
         return jsonify({
-            "message": "Error creating category",
+            "message": "Error creando categoría",
             "error": f"{error.args}"
         }), 500
 
@@ -202,29 +215,27 @@ def create_category():
 @jwt_required()
 def edit_category(id):
     claims = get_jwt()
-    if not claims.get("rol") == "admin":
-        return jsonify({"message": "Admin role required"}), 403
+    if claims.get("rol") != "admin":
+        return jsonify({"message": "Admin rol requerido"}), 403
     data = request.get_json(silent=True)
 
     if data is None:
-        return jsonify({"message": "Data not provided"}), 400
-
+        return jsonify({"message": "Data no proveida"}), 400
     new_name = data.get("name_category")
 
     if not new_name or not new_name.strip():
-        return jsonify({"message": "Category name cannot be empty"}), 400
-
+        return jsonify({"message": "Nombre de categoría no puede estar vacío"}), 400
     new_name = new_name.strip()
 
     category = Category.query.get(id)
 
     if category is None:
-        return jsonify({"message": "Category not found"}), 404
+        return jsonify({"message": "Categoría no encontrada"}), 404
 
     if new_name != category.name_category:
         existing = Category.query.filter_by(name_category=new_name).first()
         if existing:
-            return jsonify({"message": "Category name already exists"}), 409
+            return jsonify({"message": "Nombre de categoría ya existe"}), 409
 
     category.name_category = new_name
 
@@ -246,19 +257,18 @@ def edit_category(id):
 @jwt_required()
 def delete_category(id):
     claims = get_jwt()
-    if not claims.get("rol") == "admin":
-        return jsonify({"message": "Admin role required"}), 403
+    if claims.get("rol") != "admin":
+        return jsonify({"message": "Admin rol requerido"}), 403
 
     category = Category.query.get(id)
     if category is None:
-        return jsonify({"message": "Category not found"}), 404
-
+        return jsonify({"message": "Categoría no encontrada"}), 404
     recipes_count = Recipe.query.filter_by(
         category_id=category.id_category).count()
 
     if recipes_count > 0:
         return jsonify({
-            "message": "Category cannot be deleted because it has related recipes",
+            "message": "Categoría no puede ser eliminada porque tiene recetas relacionadas",
             "recipes_count": recipes_count
         }), 400
 
@@ -266,13 +276,14 @@ def delete_category(id):
         db.session.delete(category)
         db.session.commit()
         return jsonify({
-            "message": "Category deleted successfully",
+            "message": "Categoría eliminada exitosamente",
         }), 200
     except Exception as error:
         db.session.rollback()
+        print("error al eliminar", repr(error))
         return jsonify({
-            "message": "Error deleting category",
-            "error": f"{error.args}"
+            "message": "Error eliminando categoría",
+            "error": str(error)
         }), 500
 
 
@@ -283,43 +294,47 @@ def change_password():
     user = User.query.get(current_user_id)
 
     if not user:
-        return jsonify({"message": "User not found"}), 404
+        return jsonify({"message": "Usuario no encontrado"}), 404
 
     data = request.get_json(silent=True)
     if data is None:
-        return jsonify({"message": "Invalid JSON"}), 400
-
+        return jsonify({"message": "JSON inválido"}), 400
     current_password = data.get("current_password")
     new_password = data.get("new_password")
 
     if not current_password or not new_password:
-        return jsonify({"message": "Current and new password are required"}), 400
+        return jsonify({"message": "Actual y nueva contraseña son requeridas"}), 400
 
+    # Verificar que la contraseña actual sea correcta
     is_valid = check_password_hash(
         user.password, f"{current_password}{user.salt}")
     if not is_valid:
-        return jsonify({"message": "Current password is incorrect"}), 401
+        return jsonify({"message": "Contraseña actual incorrecta"}), 401
 
+    # validar nueva contraseña
     from api.utils import val_password
     if not val_password(new_password):
-        return jsonify({"message": "New password does not meet requirements"}), 400
+        return jsonify({"message": "Nueva contraseña no cumple con los requisitos"}), 400
 
+    # generar nuevo salt
     import secrets
     new_salt = secrets.token_hex(16)
 
+    # hashear con nuevo salt
     new_hashed_password = generate_password_hash(f"{new_password}{new_salt}")
 
     user.password = new_hashed_password
     user.salt = new_salt
     db.session.commit()
 
+    # generar nuevo token
     from flask_jwt_extended import create_access_token
     additional_claims = {"rol": user.rol}
     new_token = create_access_token(identity=str(
         user.id_user), additional_claims=additional_claims)
 
     return jsonify({
-        "message": "Password updated successfully",
+        "message": "Contraseña actualizada exitosamente",
         "token": new_token,
         "user": user.serialize()
     }), 200
@@ -332,15 +347,24 @@ def login_user():
     password = data.get("password").strip()
 
     if not username or not password:
-        return jsonify({"message": "Username and password are required"}), 400
+        return jsonify({"message": "Usuario y contraseña son requeridos"}), 400
     user = User.query.filter_by(username=username).one_or_none()
     if user is None:
-        return jsonify({"message": "Invalid username"}), 401
+        return jsonify({"message": "Usuario inválido"}), 401
     if not check_password_hash(user.password, f"{password}{user.salt}"):
-        return jsonify({"message": "Invalid credentials"}), 401
+        return jsonify({"message": "Credenciales inválidas"}), 401
 
+    # Para bloquear el acceso si no está activo el usuario.
     if not user.is_active:
         return jsonify({"message": "Su cuenta está inhabilitada. Contacte al administrador."}), 403
+
+    # if not user.profile:
+    #     print("➡ NO TIENE PROFLE, GENERANDO AVATAR...")
+    #     initials = get_initials(user.fullname)
+    #     print("Iniciales detectadas:", initials)
+    #     user.profile = generate_initials_image(initials)
+    #     print("Avatar generado:", user.profile)
+        # db.session.commit()
 
     is_admin = user.rol == "admin"
     additional_claims = {"is_administrator": is_admin, "rol": user.rol}
@@ -686,10 +710,11 @@ def get_recipe_detail(recipe_id):
             "is_published": is_published
         })
 
+        recipe_data['conversion_applied'] = 'original'
         return jsonify(recipe_data), 200
 
     except Exception as error:
-        print("Error en get_recipe_detail:", error)
+        print("Error en get_recipe_detail:", e)
         return jsonify({
             "message": "Internal error retrieving recipe details",
             "details": str(error)
@@ -779,9 +804,15 @@ def get_user_favorites():
         }), 500
 
 
+#ENDPOINT FAVORITOS Y RATING
+
 @api.route("/recipes/top-rated", methods=["GET"])
 @jwt_required(optional=True)
 def get_top_rated_recipes():
+    """
+    Devuelve recetas mejor valoradas (con al menos 3 votos y rating >= 4.0)
+    Si hay usuario autenticado, también incluye sus favoritos aunque no cumplan el criterio
+    """
     try:
         current_user_id = get_jwt_identity()
         if current_user_id is not None:
@@ -864,6 +895,7 @@ def get_top_rated_recipes():
             "details": str(error)
         }), 500
 
+#endpoint Calidicacion recetas
 
 @api.route("/recetas/<int:recipe_id>/calificar", methods=["POST"])
 @jwt_required()
@@ -1074,8 +1106,7 @@ def get_recipe_comments(recipe_id):
     if not recipe or recipe.state_recipe != stateRecipeEnum.PUBLISHED:
         return jsonify({"message": "Receta no encontrada"}), 404
 
-    # Filtramos comentarios ocultos aquí para usuarios normales
-    comments = Comment.query.filter_by(recipe_id=recipe_id, is_hidden=False).order_by(
+    comments = Comment.query.filter_by(recipe_id=recipe_id).order_by(
         Comment.created_at.desc()).all()
     return jsonify([comment.serialize() for comment in comments]), 200
 
@@ -1162,17 +1193,24 @@ def delete_comment(comment_id):
         db.session.rollback()
         return jsonify({"message": "Error al eliminar comentario", "details": str(error)}), 500
 
-
 # RUTAS PARA HOME Y CATEGORÍAS
 
 
 @api.route("/recipes/resumen", methods=["GET"])
+@jwt_required(optional=True)
 def get_recipes_summary():
     """
     Devuelve un resumen con todas las categorías y 12 recetas publicadas por categoría
-    para los carruseles del home.
+    para los carruseles del home. Incluye información de favoritos si hay usuario logueado.
     """
     try:
+        current_user_id = get_jwt_identity()
+        if current_user_id is not None:
+            try:
+                current_user_id = int(current_user_id)
+            except (TypeError, ValueError):
+                current_user_id = None
+
         categories = Category.query.order_by(Category.id_category).all()
 
         summary = {}
@@ -1190,20 +1228,39 @@ def get_recipes_summary():
             )
 
             if recipes:
+                recipes_data = []
+                for recipe in recipes:
+                    meets_top_criteria = (
+                        recipe.vote_count is not None and 
+                        recipe.vote_count >= 3 and 
+                        recipe.avg_rating is not None and 
+                        recipe.avg_rating >= 4.0
+                    )
+                    
+                    recipe_dict = {
+                        "id": recipe.id_recipe,
+                        "title": recipe.title,
+                        "image": recipe.image,
+                        "portions": recipe.portions,
+                        "prep_time_min": recipe.preparation_time_min,
+                        "difficulty": recipe.difficulty.value,
+                        "is_top_rated": meets_top_criteria,
+                        "is_favorite": False
+                    }
+                    
+                    if current_user_id:
+                        is_fav = RecipeFavorite.query.filter_by(
+                            user_id=current_user_id,
+                            recipe_id=recipe.id_recipe
+                        ).first()
+                        recipe_dict["is_favorite"] = is_fav is not None
+                    
+                    recipes_data.append(recipe_dict)
+                
                 summary[category.name_category] = {
                     "category_id": category.id_category,
                     "category_name": category.name_category,
-                    "recipes": [
-                        {
-                            "id": recipe.id_recipe,
-                            "title": recipe.title,
-                            "image": recipe.image,
-                            "portions": recipe.portions,
-                            "prep_time_min": recipe.preparation_time_min,
-                            "difficulty": recipe.difficulty.value
-                        }
-                        for recipe in recipes
-                    ]
+                    "recipes": recipes_data
                 }
 
         return jsonify({
@@ -1218,20 +1275,22 @@ def get_recipes_summary():
             "details": str(error)
         }), 500
 
-
 @api.route("/recipes/category/<int:category_id>", methods=["GET"])
 def get_recipes_by_category(category_id):
     """
     Devuelve recetas de una categoría específica con paginación
+    Query params: page (default 1), per_page (default 12)
     """
     try:
         page = request.args.get('page', 1, type=int)
         per_page = request.args.get('per_page', 20, type=int)
 
+        # Verificar que la categoría existe
         category = Category.query.get(category_id)
         if not category:
-            return jsonify({"message": "Category not found"}), 404
+            return jsonify({"message": "Categoría no encontrada"}), 404
 
+        # Query con paginación
         pagination = (
             db.session.query(Recipe)
             .filter(
@@ -1271,17 +1330,21 @@ def get_recipes_by_category(category_id):
         }), 200
 
     except Exception as error:
-        print(f"Error getting recipes by category: {error}")
+        logger.error(f"Error getting recipes by category: {error}")
         return jsonify({
             "message": "Error retrieving recipes",
             "details": str(error)
         }), 500
+
+# ENDPOINT DE BÚSQUEDA DE RECETAS
+# Permite buscar recetas por título para el componente SearchResults
 
 
 @api.route("/recipes/search", methods=["GET"])
 def search_recipes():
     """
     Busca recetas por título
+    Query param: q (término de búsqueda)
     """
     try:
         query = request.args.get('q', '').strip()
@@ -1292,6 +1355,7 @@ def search_recipes():
                 "recipes": []
             }), 400
 
+        # Buscar recetas publicadas que coincidan con el término
         recipes = (
             db.session.query(Recipe)
             .filter(
@@ -1330,6 +1394,194 @@ def search_recipes():
             "details": str(error),
             "recipes": []
         }), 500
+
+
+@api.route("/admin/users", methods=["GET"])
+@admin_required()
+def get_all_users():
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 15, type=int)
+    try:
+        query = db.select(User).order_by(User.created_at.desc())
+        pagination = db.paginate(
+            query, page=page, per_page=per_page, error_out=False)
+        user_list = [user.serialize() for user in pagination.items]
+
+        return jsonify({
+            "users": user_list,
+            "total_users": pagination.total,
+            "total_pages": pagination.pages,
+            "current_page": pagination.page,
+            "per_page": pagination.per_page,
+            "has_next": pagination.has_next,
+            "has_prev": pagination.has_prev
+        }), 200
+
+    except Exception as error:
+        print(f"Error al obtener usuarios: {error}")
+        return jsonify({"message": "Server error fetching users.", "Details": str(error)}), 500
+
+
+@api.route("/admin/user/role/<int:user_id>", methods=["PUT"])
+@admin_required()
+def update_user_role(user_id):
+    data = request.get_json()
+    new_role = data.get("rol")
+
+    if new_role not in ["admin", "usuario"]:
+        return jsonify({"message": "Invalid role value."}), 400
+
+    user = db.session.get(User, user_id)
+    if not user:
+        return jsonify({"message": "User not found."}), 404
+
+    try:
+        user.rol = new_role
+        user.updated_at = datetime.now(timezone.utc)
+        db.session.commit()
+        return jsonify({"message": f"Role for user {user.username} updated to {new_role}."}), 200
+    except Exception as error:
+        db.session.rollback()
+        return jsonify({"message": "Database error while updating role.", "Details": str(error)}), 500
+
+
+@api.route("/admin/user/change-active/<int:user_id>", methods=["PUT"])
+@admin_required()
+def change_user_active(user_id):
+    user = db.session.get(User, user_id)
+    if not user:
+        return jsonify({"message": "User not found."}), 404
+
+    try:
+        user.is_active = not user.is_active
+        user.updated_at = datetime.now(timezone.utc)
+        db.session.commit()
+        # se hizo esto para usar en el mensaje del estatus a activo o inactivo, solo par ainformar
+        if user.is_active:
+            status = "Active"
+        else:
+            status = "Inactive"
+        return jsonify({"message": f"User {user.username} status changed to {status}."}), 200
+    except Exception as error:
+        db.session.rollback()
+        return jsonify({"message": "Database error while toggling status.", "Details": str(error)}), 500
+
+
+@api.route("/admin/user/<int:user_id>", methods=["DELETE"])
+@admin_required()
+def delete_user(user_id):
+    user = db.session.get(User, user_id)
+    if not user:
+        return jsonify({"message": "User not found."}), 404
+
+    try:
+        db.session.delete(user)
+        db.session.commit()
+        return jsonify({"message": f"User {user.username} deleted successfully."}), 200
+    except Exception as error:
+        db.session.rollback()
+        return jsonify({"message": "Database error while deleting user.", "Details": str(error)}), 500
+
+
+@api.route("/my-recipes", methods=["GET"])
+@jwt_required()
+def get_my_recipes():
+    try:
+        current_user_id = get_jwt_identity()
+        status_param = request.args.get('status')
+        base_query = db.select(Recipe).filter(
+            Recipe.user_id == current_user_id)
+
+        if status_param == "pending":
+            base_query = base_query.filter(
+                Recipe.state_recipe == stateRecipeEnum.PENDING)
+        elif status_param == "published":
+            base_query = base_query.filter(
+                Recipe.state_recipe == stateRecipeEnum.PUBLISHED)
+        elif status_param == "rejected":
+            base_query = base_query.filter(
+                Recipe.state_recipe == stateRecipeEnum.REJECTED)
+
+        page = int(request.args.get('page', 1, type=int))
+        limit = int(request.args.get('limit', 9, type=int))
+        offset = (page - 1) * limit
+
+        total_query = db.select(db.func.count()).select_from(base_query)
+        total_count = db.session.execute(total_query).scalar()
+
+        recipes_query = (
+            base_query
+            .order_by(Recipe.created_at.desc())
+            .offset(offset)
+            .limit(limit)
+        )
+
+        recipes = db.session.execute(recipes_query).scalars().all()
+        response_body = [recipe.serialize() for recipe in recipes]
+
+        return jsonify({
+            "message": "User recipes fetched successfully",
+            "recipes": response_body,
+            "total_count": total_count
+        }), 200
+
+    except Exception as error:
+        print(f"Error fetching user recipes: {error}")
+        return jsonify({"message": "Internal Server Error"}), 500
+
+
+@api.route("/recipe/<int:recipe_id>/rate", methods=["POST"])
+@jwt_required()
+def rate_recipes(recipe_id):
+    user_id = int(get_jwt_identity())
+    data = request.get_json()
+    rating_value = data.get("rating")
+
+    if rating_value is None or not 1 <= rating_value <= 5:
+        return jsonify({"message": "The grade must be a whole number between 1 and 5."}), 400
+
+    recipe = db.session.get(Recipe, recipe_id)
+    if recipe is None or recipe.state_recipe != stateRecipeEnum.PUBLISHED:
+        return jsonify({"message": "Recipe not found or not published."}), 404
+
+    existing_rating = RecipeRating.query.filter_by(
+        user_id=user_id,
+        recipe_id=recipe_id
+    ).one_or_none()
+
+    if existing_rating:
+        old_value = existing_rating.value
+        existing_rating.value = rating_value
+        action_msg = "Rating successfully updated."
+        db.session.add(existing_rating)
+    else:
+        new_rating = RecipeRating(
+            user_id=user_id,
+            recipe_id=recipe_id,
+            value=rating_value,
+        )
+        db.session.add(new_rating)
+        action_msg = "Recipe successfully rated."
+
+    rating_summary = db.session.query(
+        func.sum(RecipeRating.value).label('total_sum'),
+        func.count(RecipeRating.id_rating).label('total_count')
+    ).filter(RecipeRating.recipe_id == recipe_id).first()
+
+    total_sum = rating_summary.total_sum
+    total_count = rating_summary.total_count
+
+    recipe.vote_count = total_count
+
+    if total_count > 0:
+        recipe.avg_rating = total_sum / total_count
+    else:
+        recipe.avg_rating = None
+
+    db.session.add(recipe)
+    db.session.commit()
+
+    return jsonify({"message": action_msg, "avg_rating": recipe.avg_rating, "vote_count": recipe.vote_count}), 200
 
 
 CALORIAS_ID = 1008
@@ -1448,158 +1700,6 @@ def get_recipe_nutrition(recipe_id):
         return jsonify({"message": "Internal error in obtaining nutrition"}), 500
 
 
-# =========================================================================
-# RUTAS DE MANEJO DE REPORTES
-# =========================================================================
-
-# 1. POST: Crear Reporte (Usuario)
-@api.route('/comentarios/reportar/<int:comment_id>', methods=['POST'])
-@jwt_required()
-def report_comment(comment_id):
-    user_id = get_jwt_identity() 
-    
-    comment = db.session.get(Comment, comment_id)
-    if not comment:
-        return jsonify({"message": "Comentario no encontrado."}), 404
-
-    data = request.get_json(silent=True)
-    if data is None:
-        return jsonify({"message": "JSON inválido o no enviado."}), 400
-        
-    razon = data.get("razon", "").strip()
-    
-    if not razon:
-        return jsonify({"message": "La razón del reporte es requerida."}), 400
-    
-    new_report = Reporte(
-        comentario_id=comment_id,
-        razon=razon
-    )
-
-    try:
-        db.session.add(new_report)
-        db.session.commit()
-        return jsonify({"message": "Comentario reportado con éxito. Gracias por tu colaboración."}), 201
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({"message": "Error al procesar el reporte.", "error": str(e)}), 500
-
-
-# 2. GET: Obtener Reportes Pendientes (Administrador)
-@api.route('/admin/reportes', methods=['GET'])
-@admin_required()
-def get_reported_comments():
-    reported_comment_ids = db.session.scalars(
-        db.select(Reporte.comentario_id)
-        .filter(Reporte.fecha_revision == None) 
-        .group_by(Reporte.comentario_id)
-    ).all()
-    
-    if not reported_comment_ids:
-        return jsonify({"message": "No hay comentarios reportados pendientes de revisión."}), 200
-
-    reported_comments = db.session.scalars(
-        db.select(Comment)
-        .filter(Comment.id.in_(reported_comment_ids))
-        .options(
-            joinedload(Comment.user),
-            joinedload(Comment.recipe).joinedload(Recipe.user_recipe)
-        )
-    ).all()
-
-    result = []
-    for comment in reported_comments:
-        report_count = db.session.scalar(
-            db.select(func.count(Reporte.id))
-            .filter(Reporte.comentario_id == comment.id, Reporte.fecha_revision == None)
-        )
-        
-        top_reasons = db.session.scalars(
-            db.select(Reporte.razon)
-            .filter(Reporte.comentario_id == comment.id, Reporte.fecha_revision == None)
-            .limit(3) 
-        ).all()
-        
-        result.append({
-            "id": comment.id,
-            "content": comment.content,
-            "is_hidden": comment.is_hidden,
-            "num_reportes_pendientes": report_count,
-            "razones": top_reasons,
-            "usuario": comment.user.serialize(),
-            "receta": {
-                "id": comment.recipe.id_recipe,
-                "title": comment.recipe.title,
-                "creator_name": comment.recipe.user_recipe.username 
-            }
-        })
-
-    return jsonify(result), 200
-
-
-# 3. PUT: Ocultar Comentario (Administrador)
-@api.route('/admin/comentarios/ocultar/<int:comment_id>', methods=['PUT'])
-@admin_required()
-def hide_comment(comment_id):
-    admin_id = get_jwt_identity()
-    
-    comment_to_hide = db.session.get(Comment, comment_id)
-
-    if not comment_to_hide:
-        return jsonify({"message": "Comentario no encontrado."}), 404
-    
-    try:
-        comment_to_hide.is_hidden = True
-
-        reports_to_update = db.session.scalars(
-            db.select(Reporte).filter(Reporte.comentario_id == comment_id)
-        ).all()
-        
-        for report in reports_to_update:
-            if report.fecha_revision is None:
-                report.administrador_id = admin_id
-                report.fecha_revision = datetime.now(timezone.utc)
-
-        db.session.commit()
-        return jsonify({"message": f"Comentario ID {comment_id} ha sido OCULTADO y sus reportes registrados."}), 200
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({"message": "Error al ocultar el comentario.", "error": str(e)}), 500
-
-
-# 4. PUT: Marcar como Revisado/Visible (Administrador)
-@api.route('/admin/reportes/revisado/<int:comment_id>', methods=['PUT'])
-@admin_required()
-def mark_reports_as_reviewed(comment_id):
-    admin_id = get_jwt_identity()
-    
-    comment = db.session.get(Comment, comment_id)
-    if not comment:
-        return jsonify({"message": "Comentario no encontrado."}), 404
-
-    try:
-        comment.is_hidden = False
-        reports_to_update = db.session.scalars(
-            db.select(Reporte).filter(Reporte.comentario_id == comment_id)
-        ).all()
-        
-        if reports_to_update:
-            for report in reports_to_update:
-                if report.fecha_revision is None:
-                    report.administrador_id = admin_id
-                    report.fecha_revision = datetime.now(timezone.utc)
-            
-            db.session.commit()
-            return jsonify({"message": f"Reportes para el comentario ID {comment_id} marcados como revisados y comentario VISIBLE."}), 200
-        else:
-             db.session.commit()
-             return jsonify({"message": f"No se encontraron reportes pendientes. Comentario ID {comment_id} visible."}), 200
-             
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({"message": "Error al marcar los reportes como revisados.", "error": str(e)}), 500
-
-
 @api.route("/recetas/<int:recipe_id>/ingredientes", methods=["GET"])
 def get_converted_ingredients(recipe_id):
     try:
@@ -1694,7 +1794,6 @@ def populate_database():
             recipes_data = data.get("recipes", [])
 
             ingredients_cache = {}
-            # new_catalog_ingredients_to_add = [] # unused variable
 
             for recipe in recipes_data:
                 new_recipe = Recipe(
@@ -1710,7 +1809,6 @@ def populate_database():
                 )
                 db.session.add(new_recipe)
                 db.session.flush() 
-                # recipe_id = new_recipe.id_recipe # unused variable
 
                 for ingredient_data in recipe.get("ingredients", []):
                     ingredient_name = ingredient_data.get("name")
@@ -1738,7 +1836,7 @@ def populate_database():
                     new_recipe_ingredient_detail = RecipeIngredient(
                         quantity=ingredient_data.get("quantity"),
                         unit_measure=unit_enum_object, 
-                        
+            
                         recipe=new_recipe, 
                         ingredient_catalog=ingredient_object 
                     )
@@ -1807,3 +1905,5 @@ def search_admin_recipes():
             "details": str(error),
             "recipes": []
         }), 500
+
+

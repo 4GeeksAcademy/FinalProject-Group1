@@ -7,6 +7,7 @@ from datetime import datetime, timezone
 from typing import Optional
 import enum
 
+
 db = SQLAlchemy()
 
 
@@ -82,6 +83,7 @@ class Category(db.Model):
             "name_category": self.name_category,
         }
 
+
 class difficultyEnum(enum.Enum):
     EASY = "fácil"
     MEDIUM = "medio"
@@ -102,8 +104,8 @@ class UnitEnum(enum.Enum):
     LITERS = "l"
     MILLILITERS = "ml"
     CUPS = "tazas"
-    TABLESPOONS = "cucharadas_sopera"
-    TEASPOONS = "cucharaditas"
+    TABLESPOONS = "tbsp"
+    TEASPOONS = "tsp"
     UNITS = "unidades"
     PINCH = "pizca"
 
@@ -191,55 +193,11 @@ class Recipe(db.Model):
             "created_at": self.created_at.isoformat(),
         }
 
-# =========================================================================
-# CLASE REPORTE - MOVIDA AQUÍ PARA EVITAR ERRORES DE MAPEO CON COMMENT
-# =========================================================================
-class Reporte(db.Model):
-    __tablename__ = "reportes"
-    
-    id: Mapped[int] = mapped_column(primary_key=True)
-    comentario_id: Mapped[int] = mapped_column(
-        db.ForeignKey("comments.id", ondelete='CASCADE'), 
-        nullable=False
-    )
-    razon: Mapped[str] = mapped_column(String(255), nullable=False) 
-    fecha: Mapped[datetime] = mapped_column(DateTime(
-        timezone=True), default=lambda: datetime.now(timezone.utc), nullable=False)
-        
-    administrador_id: Mapped[Optional[int]] = mapped_column(
-        db.ForeignKey("user.id_user"), nullable=True) 
-    fecha_revision: Mapped[Optional[datetime]] = mapped_column(
-        DateTime(timezone=True), nullable=True)
 
-    # Relación: Apunta a la clase Comment (definida más adelante)
-    comentario: Mapped["Comment"] = relationship("Comment", back_populates="reportes")
-    administrador: Mapped["User"] = relationship("User", foreign_keys=[administrador_id])
-
-    def __repr__(self):
-        return f'<Reporte ID={self.id} Comentario ID={self.comentario_id}>'
-
-    def serialize(self):
-        return {
-            "id": self.id,
-            "comentario_id": self.comentario_id,
-            "razon": self.razon,
-            "fecha": self.fecha.isoformat(),
-            "administrador_id": self.administrador_id,
-            "fecha_revision": self.fecha_revision.isoformat() if self.fecha_revision else None,
-        }
-# =========================================================================
-
-
-# =========================================================================
-# CLASE COMMENT - CORREGIDA Y ACTUALIZADA
-# =========================================================================
 class Comment(db.Model):
     __tablename__ = "comments"
     id: Mapped[int] = mapped_column(primary_key=True)
     content: Mapped[str] = mapped_column(Text, nullable=False)
-    
-    # NUEVO CAMPO: Para ocultar el comentario
-    is_hidden: Mapped[bool] = mapped_column(Boolean(), nullable=False, default=False) 
 
     user_id: Mapped[int] = mapped_column(
         db.ForeignKey("user.id_user"), nullable=False)
@@ -248,21 +206,14 @@ class Comment(db.Model):
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
 
-    recipe: Mapped["Recipe"] = relationship("Recipe", back_populates="comments")
-    user: Mapped["User"] = relationship("User",back_populates="comments")
-    
-    # NUEVA RELACIÓN: Los reportes de este comentario (back_populates="comentario")
-    reportes: Mapped[List["Reporte"]] = relationship(
-        "Reporte", 
-        back_populates="comentario", 
-        cascade="all, delete-orphan"
-    ) 
+    recipe: Mapped["Recipe"] = relationship(
+        "Recipe", back_populates="comments")
+    user: Mapped["User"] = relationship("User", back_populates="comments")
 
     def serialize(self):
         return {
             "id": self.id,
             "content": self.content,
-            "is_hidden": self.is_hidden, # Incluido el nuevo estado
             "recipe_id": self.recipe_id,
             "user_id": self.user_id,
             "created_at": self.created_at.isoformat(),
@@ -272,7 +223,6 @@ class Comment(db.Model):
                 "image": self.user.profile or f"https://ui-avatars.com/api/?name={self.user.username}&size=128&background=random&rounded=true"
             }
         }
-# =========================================================================
 
 
 # Clase ingrediente (el catálogo)
@@ -283,7 +233,7 @@ class Ingredient(db.Model):
     name: Mapped[str] = mapped_column(String(100), unique=True, nullable=False)
     # lo coloco por si nos da tiempo de hacer lo de las conversiones
     volume_to_mass_factor: Mapped[Optional[float]
-                                 ] = mapped_column(Float, nullable=True)
+                                  ] = mapped_column(Float, nullable=True)
     unit_to_mass_factor: Mapped[Optional[float]
                                 ] = mapped_column(Float, nullable=True)
     # Para valores nutricionales por 100g/ml
@@ -383,6 +333,10 @@ class RecipeRating(db.Model):
 
 class RecipeFavorite(db.Model):
     __tablename__ = "recipe_favorites"
+    __table_args__ = (
+        db.UniqueConstraint("user_id", "recipe_id",
+                            name="uq_user_recipe_favorite"),
+    )
 
     id_favorite: Mapped[int] = mapped_column(primary_key=True)
     user_id: Mapped[int] = mapped_column(

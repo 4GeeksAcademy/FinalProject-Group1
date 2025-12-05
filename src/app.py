@@ -3,8 +3,9 @@ This module takes care of starting the API Server, Loading the DB and Adding the
 """
 import os
 import logging
-from flask import Flask, jsonify, send_from_directory
+from flask import Flask, request, jsonify, url_for, send_from_directory
 from flask_migrate import Migrate
+from flask_swagger import swagger
 from api.utils import APIException, generate_sitemap
 from api.models import db
 from api.routes import api
@@ -13,7 +14,8 @@ from api.commands import setup_commands
 from api.password_recovery import bp as password_recovery_bp
 from flask_cors import CORS 
 from flask_jwt_extended import JWTManager
-from sqlalchemy.orm import configure_mappers # <--- Importación clave añadida
+
+# from models import Person
 
 ENV = "development" if os.getenv("FLASK_DEBUG") == "1" else "production"
 static_file_dir = os.path.join(os.path.dirname(
@@ -53,14 +55,6 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 MIGRATE = Migrate(app, db, compare_type=True)
 db.init_app(app)
 
-# ----------------------------------------------------------------------
-# CORRECCIÓN DE BUG: InvalidRequestError en Flask-Admin
-# Forzamos la configuración de los mappers antes de iniciar el admin
-# ----------------------------------------------------------------------
-with app.app_context():
-    configure_mappers()
-# ----------------------------------------------------------------------
-
 # Add the admin
 setup_admin(app)
 
@@ -75,8 +69,10 @@ app.register_blueprint(password_recovery_bp)
 
 logger.info(f"Aplicación iniciada en modo: {ENV}")
 
+# Handle/serialize errors like a JSON object
+
 # Setup the Flask-JWT-Extended extension
-app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY")
+app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY")  # Change this!
 jwt = JWTManager(app)
 
 # Handle/serialize errors like a JSON object

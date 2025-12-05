@@ -72,7 +72,7 @@
             "difficulty": "EASY",
             "prep_time": 25,
             "portions": 4,
-            "user_id": 1,
+            "user_id": 2,
             "category_id": 1,
             "ingredients": [
                 {
@@ -99,7 +99,7 @@
             "difficulty": "DIFFICULT",
             "prep_time": 90,
             "portions": 8,
-            "user_id": 1,
+            "user_id": 3,
             "category_id": 1,
             "ingredients": [
                 {
@@ -126,7 +126,7 @@
             "difficulty": "EASY",
             "prep_time": 25,
             "portions": 4,
-            "user_id": 1,
+            "user_id": 4,
             "category_id": 1,
             "ingredients": [
                 {
@@ -153,7 +153,7 @@
             "difficulty": "EASY",
             "prep_time": 20,
             "portions": 6,
-            "user_id": 1,
+            "user_id": 5,
             "category_id": 1,
             "ingredients": [
                 {
@@ -180,7 +180,7 @@
             "difficulty": "MEDIUM",
             "prep_time": 30,
             "portions": 4,
-            "user_id": 1,
+            "user_id": 6,
             "category_id": 1,
             "ingredients": [
                 {
@@ -207,7 +207,7 @@
             "difficulty": "EASY",
             "prep_time": 28,
             "portions": 4,
-            "user_id": 1,
+            "user_id": 7,
             "category_id": 1,
             "ingredients": [
                 {
@@ -261,7 +261,7 @@
             "difficulty": "EASY",
             "prep_time": 22,
             "portions": 4,
-            "user_id": 1,
+            "user_id": 2,
             "category_id": 1,
             "ingredients": [
                 {
@@ -288,7 +288,7 @@
             "difficulty": "DIFFICULT",
             "prep_time": 75,
             "portions": 4,
-            "user_id": 1,
+            "user_id": 3,
             "category_id": 1,
             "ingredients": [
                 {
@@ -315,7 +315,7 @@
             "difficulty": "EASY",
             "prep_time": 30,
             "portions": 4,
-            "user_id": 1,
+            "user_id": 4,
             "category_id": 2,
             "ingredients": [
                 {
@@ -342,7 +342,7 @@
             "difficulty": "EASY",
             "prep_time": 45,
             "portions": 6,
-            "user_id": 1,
+            "user_id": 5,
             "category_id": 2,
             "ingredients": [
                 {
@@ -369,7 +369,7 @@
             "difficulty": "EASY",
             "prep_time": 20,
             "portions": 6,
-            "user_id": 1,
+            "user_id": 6,
             "category_id": 2,
             "ingredients": [
                 {
@@ -423,7 +423,7 @@
             "difficulty": "EASY",
             "prep_time": 40,
             "portions": 6,
-            "user_id": 1,
+            "user_id": 2,
             "category_id": 2,
             "ingredients": [
                 {
@@ -450,7 +450,7 @@
             "difficulty": "EASY",
             "prep_time": 60,
             "portions": 6,
-            "user_id": 1,
+            "user_id": 3,
             "category_id": 2,
             "ingredients": [
                 {
@@ -477,7 +477,7 @@
             "difficulty": "EASY",
             "prep_time": 25,
             "portions": 4,
-            "user_id": 1,
+            "user_id": 4,
             "category_id": 2,
             "ingredients": [
                 {
@@ -504,7 +504,7 @@
             "difficulty": "EASY",
             "prep_time": 30,
             "portions": 4,
-            "user_id": 1,
+            "user_id": 5,
             "category_id": 2,
             "ingredients": [
                 {
@@ -531,7 +531,7 @@
             "difficulty": "MEDIUM",
             "prep_time": 35,
             "portions": 6,
-            "user_id": 1,
+            "user_id": 6,
             "category_id": 2,
             "ingredients": [
                 {
@@ -558,7 +558,7 @@
             "difficulty": "EASY",
             "prep_time": 35,
             "portions": 6,
-            "user_id": 1,
+            "user_id": 7,
             "category_id": 2,
             "ingredients": [
                 {
@@ -612,7 +612,7 @@
             "difficulty": "EASY",
             "prep_time": 25,
             "portions": 4,
-            "user_id": 1,
+            "user_id": 2,
             "category_id": 2,
             "ingredients": [
                 {
@@ -639,7 +639,7 @@
             "difficulty": "EASY",
             "prep_time": 15,
             "portions": 2,
-            "user_id": 1,
+            "user_id": 3,
             "category_id": 3,
             "ingredients": [
                 {
@@ -666,7 +666,7 @@
             "difficulty": "EASY",
             "prep_time": 15,
             "portions": 4,
-            "user_id": 1,
+            "user_id": 4,
             "category_id": 3,
             "ingredients": [
                 {
@@ -693,7 +693,7 @@
             "difficulty": "EASY",
             "prep_time": 10,
             "portions": 2,
-            "user_id": 1,
+            "user_id": 5,
             "category_id": 3,
             "ingredients": [
                 {
@@ -747,7 +747,7 @@
             "difficulty": "EASY",
             "prep_time": 15,
             "portions": 4,
-            "user_id": 1,
+            "user_id": 2,
             "category_id": 3,
             "ingredients": [
                 {
@@ -774,7 +774,7 @@
             "difficulty": "MEDIUM",
             "prep_time": 30,
             "portions": 4,
-            "user_id": 1,
+            "user_id": 3,
             "category_id": 3,
             "ingredients": [
                 {
@@ -801,7 +801,7 @@
             "difficulty": "EASY",
             "prep_time": 10,
             "portions": 2,
-            "user_id": 1,
+            "user_id": 4,
             "category_id": 3,
             "ingredients": [
                 {
@@ -828,7 +828,7 @@
             "difficulty": "EASY",
             "prep_time": 15,
             "portions": 4,
-            "user_id": 1,
+            "user_id": 5,
             "category_id": 3,
             "ingredients": [
                 {
@@ -855,7 +855,7 @@
             "difficulty": "MEDIUM",
             "prep_time": 25,
             "portions": 4,
-            "user_id": 1,
+            "user_id": 6,
             "category_id": 3,
             "ingredients": [
                 {
@@ -882,7 +882,7 @@
             "difficulty": "EASY",
             "prep_time": 15,
             "portions": 4,
-            "user_id": 1,
+            "user_id": 7,
             "category_id": 3,
             "ingredients": [
                 {
@@ -936,7 +936,7 @@
             "difficulty": "EASY",
             "prep_time": 15,
             "portions": 8,
-            "user_id": 1,
+            "user_id": 2,
             "category_id": 3,
             "ingredients": [
                 {
@@ -964,7 +964,7 @@
             "difficulty": "MEDIUM",
             "prep_time": 40,
             "portions": 4,
-            "user_id": 1,
+            "user_id": 3,
             "ingredients": [
                 {
                     "name": "Pollo",
@@ -1018,7 +1018,7 @@
             "difficulty": "MEDIUM",
             "prep_time": 50,
             "portions": 6,
-            "user_id": 1,
+            "user_id": 2,
             "ingredients": [
                 {
                     "name": "Arroz",
@@ -1045,7 +1045,7 @@
             "difficulty": "EASY",
             "prep_time": 20,
             "portions": 2,
-            "user_id": 1,
+            "user_id": 3,
             "ingredients": [
                 {
                     "name": "Pollo",
@@ -1072,7 +1072,7 @@
             "difficulty": "EASY",
             "prep_time": 35,
             "portions": 4,
-            "user_id": 1,
+            "user_id": 4,
             "ingredients": [
                 {
                     "name": "Pollo",
@@ -1099,7 +1099,7 @@
             "difficulty": "MEDIUM",
             "prep_time": 45,
             "portions": 4,
-            "user_id": 1,
+            "user_id": 5,
             "ingredients": [
                 {
                     "name": "Alitas de pollo",
@@ -1126,7 +1126,7 @@
             "difficulty": "MEDIUM",
             "prep_time": 40,
             "portions": 4,
-            "user_id": 1,
+            "user_id": 6,
             "ingredients": [
                 {
                     "name": "Pollo",
@@ -1153,7 +1153,7 @@
             "difficulty": "EASY",
             "prep_time": 30,
             "portions": 4,
-            "user_id": 1,
+            "user_id": 7,
             "ingredients": [
                 {
                     "name": "Pollo",
@@ -1207,7 +1207,7 @@
             "difficulty": "MEDIUM",
             "prep_time": 45,
             "portions": 4,
-            "user_id": 1,
+            "user_id": 2,
             "ingredients": [
                 {
                     "name": "Pechuga de pollo",
@@ -1261,7 +1261,7 @@
             "difficulty": "MEDIUM",
             "prep_time": 40,
             "portions": 4,
-            "user_id": 1,
+            "user_id": 2,
             "ingredients": [
                 {
                     "name": "Pollo",
@@ -1287,7 +1287,7 @@
             "difficulty": "MEDIUM",
             "prep_time": 45,
             "portions": 6,
-            "user_id": 1,
+            "user_id": 3,
             "category_id": 5,
             "ingredients": [
                 {
@@ -1314,7 +1314,7 @@
             "difficulty": "MEDIUM",
             "prep_time": 45,
             "portions": 4,
-            "user_id": 1,
+            "user_id": 4,
             "category_id": 5,
             "ingredients": [
                 {
@@ -1341,7 +1341,7 @@
             "difficulty": "EASY",
             "prep_time": 10,
             "portions": 2,
-            "user_id": 1,
+            "user_id": 5,
             "category_id": 5,
             "ingredients": [
                 {
@@ -1368,7 +1368,7 @@
             "difficulty": "MEDIUM",
             "prep_time": 50,
             "portions": 6,
-            "user_id": 1,
+            "user_id": 6,
             "category_id": 5,
             "ingredients": [
                 {
@@ -1395,7 +1395,7 @@
             "difficulty": "EASY",
             "prep_time": 15,
             "portions": 4,
-            "user_id": 1,
+            "user_id": 7,
             "category_id": 5,
             "ingredients": [
                 {
@@ -1422,7 +1422,7 @@
             "difficulty": "DIFFICULT",
             "prep_time": 180,
             "portions": 10,
-            "user_id": 1,
+            "user_id": 8,
             "category_id": 5,
             "ingredients": [
                 {
@@ -1449,7 +1449,7 @@
             "difficulty": "EASY",
             "prep_time": 25,
             "portions": 4,
-            "user_id": 1,
+            "user_id": 9,
             "category_id": 5,
             "ingredients": [
                 {
@@ -1476,7 +1476,7 @@
             "difficulty": "MEDIUM",
             "prep_time": 35,
             "portions": 4,
-            "user_id": 1,
+            "user_id": 10,
             "category_id": 5,
             "ingredients": [
                 {
@@ -1530,7 +1530,7 @@
             "difficulty": "DIFFICULT",
             "prep_time": 120,
             "portions": 12,
-            "user_id": 1,
+            "user_id": 2,
             "category_id": 5,
             "ingredients": [
                 {
@@ -1557,7 +1557,7 @@
             "difficulty": "EASY",
             "prep_time": 30,
             "portions": 6,
-            "user_id": 1,
+            "user_id": 3,
             "category_id": 5,
             "ingredients": [
                 {
@@ -1584,7 +1584,7 @@
             "difficulty": "MEDIUM",
             "prep_time": 35,
             "portions": 4,
-            "user_id": 1,
+            "user_id": 4,
             "category_id": 5,
             "ingredients": [
                 {
@@ -1611,7 +1611,7 @@
             "difficulty": "DIFFICULT",
             "prep_time": 60,
             "portions": 4,
-            "user_id": 1,
+            "user_id": 5,
             "category_id": 6,
             "ingredients": [
                 {
@@ -1638,7 +1638,7 @@
             "difficulty": "MEDIUM",
             "prep_time": 35,
             "portions": 4,
-            "user_id": 1,
+            "user_id": 6,
             "category_id": 6,
             "ingredients": [
                 {
@@ -1665,7 +1665,7 @@
             "difficulty": "DIFFICULT",
             "prep_time": 120,
             "portions": 4,
-            "user_id": 1,
+            "user_id": 7,
             "category_id": 6,
             "ingredients": [
                 {
@@ -1719,7 +1719,7 @@
             "difficulty": "MEDIUM",
             "prep_time": 30,
             "portions": 4,
-            "user_id": 1,
+            "user_id": 2,
             "category_id": 6,
             "ingredients": [
                 {
@@ -1746,7 +1746,7 @@
             "difficulty": "EASY",
             "prep_time": 15,
             "portions": 3,
-            "user_id": 1,
+            "user_id": 3,
             "category_id": 6,
             "ingredients": [
                 {
@@ -1773,7 +1773,7 @@
             "difficulty": "MEDIUM",
             "prep_time": 30,
             "portions": 4,
-            "user_id": 1,
+            "user_id": 4,
             "category_id": 6,
             "ingredients": [
                 {
@@ -1800,7 +1800,7 @@
             "difficulty": "EASY",
             "prep_time": 20,
             "portions": 4,
-            "user_id": 1,
+            "user_id": 5,
             "category_id": 6,
             "ingredients": [
                 {
@@ -1827,7 +1827,7 @@
             "difficulty": "DIFFICULT",
             "prep_time": 55,
             "portions": 6,
-            "user_id": 1,
+            "user_id": 6,
             "category_id": 6,
             "ingredients": [
                 {
@@ -1881,7 +1881,7 @@
             "difficulty": "EASY",
             "prep_time": 25,
             "portions": 4,
-            "user_id": 1,
+            "user_id": 2,
             "category_id": 6,
             "ingredients": [
                 {
@@ -1908,7 +1908,7 @@
             "difficulty": "MEDIUM",
             "prep_time": 40,
             "portions": 4,
-            "user_id": 1,
+            "user_id": 3,
             "category_id": 6,
             "ingredients": [
                 {
@@ -1936,7 +1936,7 @@
             "difficulty": "MEDIUM",
             "prep_time": 45,
             "portions": 4,
-            "user_id": 1,
+            "user_id": 4,
             "ingredients": [
                 {
                     "name": "Camarón",
@@ -1963,7 +1963,7 @@
             "difficulty": "EASY",
             "prep_time": 20,
             "portions": 4,
-            "user_id": 1,
+            "user_id": 5,
             "ingredients": [
                 {
                     "name": "Camarón",
@@ -1990,7 +1990,7 @@
             "difficulty": "MEDIUM",
             "prep_time": 40,
             "portions": 4,
-            "user_id": 1,
+            "user_id": 6,
             "ingredients": [
                 {
                     "name": "Pescado blanco",
@@ -2044,7 +2044,7 @@
             "difficulty": "EASY",
             "prep_time": 10,
             "portions": 4,
-            "user_id": 1,
+            "user_id": 2,
             "ingredients": [
                 {
                     "name": "Atún en lata",
@@ -2071,7 +2071,7 @@
             "difficulty": "DIFFICULT",
             "prep_time": 90,
             "portions": 4,
-            "user_id": 1,
+            "user_id": 3,
             "ingredients": [
                 {
                     "name": "Langosta",
@@ -2098,7 +2098,7 @@
             "difficulty": "EASY",
             "prep_time": 30,
             "portions": 4,
-            "user_id": 1,
+            "user_id": 4,
             "ingredients": [
                 {
                     "name": "Salmón",
@@ -2125,7 +2125,7 @@
             "difficulty": "MEDIUM",
             "prep_time": 35,
             "portions": 4,
-            "user_id": 1,
+            "user_id": 5,
             "ingredients": [
                 {
                     "name": "Tilapia",
@@ -2152,7 +2152,7 @@
             "difficulty": "MEDIUM",
             "prep_time": 50,
             "portions": 6,
-            "user_id": 1,
+            "user_id": 10,
             "ingredients": [
                 {
                     "name": "Pulpo",
@@ -2179,7 +2179,7 @@
             "difficulty": "EASY",
             "prep_time": 25,
             "portions": 4,
-            "user_id": 1,
+            "user_id": 11,
             "ingredients": [
                 {
                     "name": "Camarón",
@@ -2206,7 +2206,7 @@
             "difficulty": "DIFFICULT",
             "prep_time": 40,
             "portions": 4,
-            "user_id": 1,
+            "user_id": 12,
             "ingredients": [
                 {
                     "name": "Bacalao",
@@ -2233,7 +2233,7 @@
             "difficulty": "EASY",
             "prep_time": 25,
             "portions": 4,
-            "user_id": 1,
+            "user_id": 13,
             "ingredients": [
                 {
                     "name": "Carne molida",
@@ -2260,7 +2260,7 @@
             "difficulty": "MEDIUM",
             "prep_time": 150,
             "portions": 4,
-            "user_id": 1,
+            "user_id": 14,
             "ingredients": [
                 {
                     "name": "Costillas de cerdo",
@@ -2287,7 +2287,7 @@
             "difficulty": "EASY",
             "prep_time": 35,
             "portions": 3,
-            "user_id": 1,
+            "user_id": 15,
             "ingredients": [
                 {
                     "name": "Carne",
@@ -2314,7 +2314,7 @@
             "difficulty": "MEDIUM",
             "prep_time": 25,
             "portions": 4,
-            "user_id": 1,
+            "user_id": 6,
             "ingredients": [
                 {
                     "name": "Lomo de res",
@@ -2341,7 +2341,7 @@
             "difficulty": "MEDIUM",
             "prep_time": 60,
             "portions": 12,
-            "user_id": 1,
+            "user_id": 7,
             "ingredients": [
                 {
                     "name": "Masa para empanadas",
@@ -2368,7 +2368,7 @@
             "difficulty": "MEDIUM",
             "prep_time": 30,
             "portions": 4,
-            "user_id": 1,
+            "user_id": 8,
             "ingredients": [
                 {
                     "name": "Churrasco",
@@ -2395,7 +2395,7 @@
             "difficulty": "MEDIUM",
             "prep_time": 25,
             "portions": 6,
-            "user_id": 1,
+            "user_id": 9,
             "ingredients": [
                 {
                     "name": "Carne de res",
@@ -2422,7 +2422,7 @@
             "difficulty": "MEDIUM",
             "prep_time": 45,
             "portions": 4,
-            "user_id": 1,
+            "user_id": 8,
             "ingredients": [
                 {
                     "name": "Carne molida",
@@ -2449,7 +2449,7 @@
             "difficulty": "DIFFICULT",
             "prep_time": 80,
             "portions": 4,
-            "user_id": 1,
+            "user_id": 7,
             "ingredients": [
                 {
                     "name": "Filete de res",
@@ -2476,7 +2476,7 @@
             "difficulty": "EASY",
             "prep_time": 30,
             "portions": 4,
-            "user_id": 1,
+            "user_id": 6,
             "ingredients": [
                 {
                     "name": "Garbanzo",
@@ -2503,7 +2503,7 @@
             "difficulty": "EASY",
             "prep_time": 20,
             "portions": 6,
-            "user_id": 1,
+            "user_id": 5,
             "ingredients": [
                 {
                     "name": "Garbanzo",
@@ -2530,7 +2530,7 @@
             "difficulty": "MEDIUM",
             "prep_time": 30,
             "portions": 8,
-            "user_id": 1,
+            "user_id": 4,
             "ingredients": [
                 {
                     "name": "Papel de arroz",
@@ -2557,7 +2557,7 @@
             "difficulty": "MEDIUM",
             "prep_time": 35,
             "portions": 8,
-            "user_id": 1,
+            "user_id": 3,
             "ingredients": [
                 {
                     "name": "Champiñón grande",
@@ -2584,7 +2584,7 @@
             "difficulty": "EASY",
             "prep_time": 10,
             "portions": 2,
-            "user_id": 1,
+            "user_id": 2,
             "ingredients": [
                 {
                     "name": "Pan",
@@ -2638,7 +2638,7 @@
             "difficulty": "MEDIUM",
             "prep_time": 60,
             "portions": 4,
-            "user_id": 1,
+            "user_id": 3,
             "ingredients": [
                 {
                     "name": "Harina",
@@ -2665,7 +2665,7 @@
             "difficulty": "MEDIUM",
             "prep_time": 55,
             "portions": 6,
-            "user_id": 1,
+            "user_id": 5,
             "ingredients": [
                 {
                     "name": "Berenjena",
@@ -2692,7 +2692,7 @@
             "difficulty": "MEDIUM",
             "prep_time": 40,
             "portions": 6,
-            "user_id": 1,
+            "user_id": 7,
             "ingredients": [
                 {
                     "name": "Garbanzo",
@@ -2719,7 +2719,7 @@
             "difficulty": "EASY",
             "prep_time": 35,
             "portions": 2,
-            "user_id": 1,
+            "user_id": 9,
             "ingredients": [
                 {
                     "name": "Quinoa",
@@ -2746,7 +2746,7 @@
             "difficulty": "EASY",
             "prep_time": 25,
             "portions": 4,
-            "user_id": 1,
+            "user_id": 8,
             "ingredients": [
                 {
                     "name": "Frijol negro",
@@ -2773,7 +2773,7 @@
             "difficulty": "EASY",
             "prep_time": 40,
             "portions": 12,
-            "user_id": 1,
+            "user_id": 6,
             "ingredients": [
                 {
                     "name": "Chocolate",
@@ -2800,7 +2800,7 @@
             "difficulty": "MEDIUM",
             "prep_time": 30,
             "portions": 8,
-            "user_id": 1,
+            "user_id": 4,
             "ingredients": [
                 {
                     "name": "Mascarpone",
@@ -2827,7 +2827,7 @@
             "difficulty": "MEDIUM",
             "prep_time": 60,
             "portions": 8,
-            "user_id": 1,
+            "user_id": 2,
             "ingredients": [
                 {
                     "name": "Huevo",
@@ -2908,7 +2908,7 @@
             "difficulty": "EASY",
             "prep_time": 20,
             "portions": 4,
-            "user_id": 1,
+            "user_id": 3,
             "ingredients": [
                 {
                     "name": "Harina",
@@ -2935,7 +2935,7 @@
             "difficulty": "DIFFICULT",
             "prep_time": 50,
             "portions": 6,
-            "user_id": 1,
+            "user_id": 5,
             "ingredients": [
                 {
                     "name": "Crema",
@@ -2962,7 +2962,7 @@
             "difficulty": "MEDIUM",
             "prep_time": 65,
             "portions": 8,
-            "user_id": 1,
+            "user_id": 7,
             "ingredients": [
                 {
                     "name": "Manzana",
@@ -2989,7 +2989,7 @@
             "difficulty": "MEDIUM",
             "prep_time": 45,
             "portions": 8,
-            "user_id": 1,
+            "user_id": 9,
             "ingredients": [
                 {
                     "name": "Crema",
@@ -3016,7 +3016,7 @@
             "difficulty": "EASY",
             "prep_time": 30,
             "portions": 24,
-            "user_id": 1,
+            "user_id": 11,
             "ingredients": [
                 {
                     "name": "Harina",
@@ -3043,7 +3043,7 @@
             "difficulty": "MEDIUM",
             "prep_time": 50,
             "portions": 12,
-            "user_id": 1,
+            "user_id": 13,
             "ingredients": [
                 {
                     "name": "Leche evaporada",
@@ -3070,7 +3070,7 @@
             "difficulty": "MEDIUM",
             "prep_time": 35,
             "portions": 6,
-            "user_id": 1,
+            "user_id": 15,
             "ingredients": [
                 {
                     "name": "Harina",
@@ -3097,7 +3097,7 @@
             "difficulty": "DIFFICULT",
             "prep_time": 30,
             "portions": 2,
-            "user_id": 1,
+            "user_id": 14,
             "ingredients": [
                 {
                     "name": "Muffin inglés",
@@ -3124,7 +3124,7 @@
             "difficulty": "EASY",
             "prep_time": 12,
             "portions": 2,
-            "user_id": 1,
+            "user_id": 12,
             "ingredients": [
                 {
                     "name": "Huevo",
@@ -3151,7 +3151,7 @@
             "difficulty": "EASY",
             "prep_time": 15,
             "portions": 4,
-            "user_id": 1,
+            "user_id": 10,
             "ingredients": [
                 {
                     "name": "Pan",
@@ -3178,7 +3178,7 @@
             "difficulty": "EASY",
             "prep_time": 25,
             "portions": 6,
-            "user_id": 1,
+            "user_id": 8,
             "ingredients": [
                 {
                     "name": "Harina",
@@ -3205,7 +3205,7 @@
             "difficulty": "EASY",
             "prep_time": 18,
             "portions": 2,
-            "user_id": 1,
+            "user_id": 6,
             "ingredients": [
                 {
                     "name": "Tortilla de harina",
@@ -3232,7 +3232,7 @@
             "difficulty": "EASY",
             "prep_time": 10,
             "portions": 2,
-            "user_id": 1,
+            "user_id": 4,
             "ingredients": [
                 {
                     "name": "Banana congelada",
@@ -3259,7 +3259,7 @@
             "difficulty": "EASY",
             "prep_time": 8,
             "portions": 2,
-            "user_id": 1,
+            "user_id": 2,
             "ingredients": [
                 {
                     "name": "Bagel",
@@ -3313,7 +3313,7 @@
             "difficulty": "MEDIUM",
             "prep_time": 40,
             "portions": 10,
-            "user_id": 1,
+            "user_id": 2,
             "ingredients": [
                 {
                     "name": "Masa",
@@ -3340,7 +3340,7 @@
             "difficulty": "EASY",
             "prep_time": 15,
             "portions": 6,
-            "user_id": 1,
+            "user_id": 3,
             "ingredients": [
                 {
                     "name": "Pan italiano",
@@ -3367,7 +3367,7 @@
             "difficulty": "DIFFICULT",
             "prep_time": 60,
             "portions": 20,
-            "user_id": 1,
+            "user_id": 4,
             "ingredients": [
                 {
                     "name": "Jamón",
@@ -3394,7 +3394,7 @@
             "difficulty": "EASY",
             "prep_time": 15,
             "portions": 6,
-            "user_id": 1,
+            "user_id": 5,
             "ingredients": [
                 {
                     "name": "Queso variado",
@@ -3421,7 +3421,7 @@
             "difficulty": "EASY",
             "prep_time": 15,
             "portions": 8,
-            "user_id": 1,
+            "user_id": 6,
             "ingredients": [
                 {
                     "name": "Tomate cherry",
@@ -3448,7 +3448,7 @@
             "difficulty": "MEDIUM",
             "prep_time": 35,
             "portions": 6,
-            "user_id": 1,
+            "user_id": 7,
             "ingredients": [
                 {
                     "name": "Mozzarella",
@@ -3475,7 +3475,7 @@
             "difficulty": "EASY",
             "prep_time": 12,
             "portions": 6,
-            "user_id": 1,
+            "user_id": 8,
             "ingredients": [
                 {
                     "name": "Aguacate",
@@ -3502,7 +3502,7 @@
             "difficulty": "EASY",
             "prep_time": 25,
             "portions": 8,
-            "user_id": 1,
+            "user_id": 9,
             "ingredients": [
                 {
                     "name": "Espinaca",
@@ -3529,7 +3529,7 @@
             "difficulty": "MEDIUM",
             "prep_time": 45,
             "portions": 12,
-            "user_id": 1,
+            "user_id": 10,
             "ingredients": [
                 {
                     "name": "Masa quebrada",
@@ -3556,7 +3556,7 @@
             "difficulty": "EASY",
             "prep_time": 15,
             "portions": 6,
-            "user_id": 1,
+            "user_id": 11,
             "ingredients": [
                 {
                     "name": "Yogurt griego",

@@ -3,7 +3,6 @@ export const initialStore = () => {
     token: localStorage.getItem("access_token") ?? null,
     user: JSON.parse(localStorage.getItem("user")) ?? null,
     recipe_published: JSON.parse(localStorage.getItem("recipes")) || [],
-    reportedComments: [], // <--- NUEVO: Estado para guardar los reportes
     currentUserId: null,
     message: null,
     todos: [
@@ -11,7 +10,7 @@ export const initialStore = () => {
         token: null,
         user: null,
       },
-      {
+      { 
         id: 1,
         title: "Make the bed",
         background: null,
@@ -54,20 +53,12 @@ export default function storeReducer(store, action = {}) {
         ...store,
         user: action.payload,
       };
-
+      
     case "SET_RECIPES":
       return {
         ...store,
         recipe_published: action.payload
       }
-
-    // --- NUEVO CASO PARA ACTUALIZAR REPORTES ---
-    case "SET_REPORTED_COMMENTS":
-      return {
-        ...store,
-        reportedComments: action.payload
-      };
-    // -------------------------------------------
 
     case "add_task":
       const { id, color } = action.payload;
