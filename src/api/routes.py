@@ -46,7 +46,7 @@ def getUser(user_id):
 @api.route("/user", methods=["PUT"])
 @jwt_required()
 def updateUser():
-    current_user_id = get_jwt_identity()
+    current_user_id = int(get_jwt_identity())
     user = User.query.get(current_user_id)
     if not user:
         return jsonify({"message": "User not found"}), 404
@@ -73,8 +73,8 @@ def updateUser():
     if username:
         existing_username_user = User.query.filter_by(
             username=username).first()
-        if existing_username_user and existing_username_user.id != current_user_id:
-            return jsonify({"message": "This username is already in use"}), 409
+        if existing_username_user and existing_username_user.id_user != current_user_id:
+            return jsonify({"message": "This username is already in use"}), 400
 
         user.username = username
 
@@ -1752,3 +1752,58 @@ def populate_database():
             db.session.rollback()
             print(f"Error en la populación: {error.args}" )
             return jsonify({"message": "Error populating database.", "details": str(error)}), 500
+
+
+@api.route("/admin/recipes/search_by_status", methods=["GET"])
+@admin_required() 
+def search_admin_recipes():
+    try:
+        query = request.args.get('q', '').strip()
+        status_str = request.args.get('status', 'PUBLISHED').upper() 
+
+        if not query or len(query) < 2:
+            return jsonify({
+                "message": "The search term must be at least 2 characters long",
+                "recipes": []
+            }), 400
+
+        required_status = getattr(stateRecipeEnum, status_str, None)
+
+        if required_status is None:
+            return jsonify({"message": f"Invalid prescription status: {status_str}"}), 400
+        recipes = (
+            db.session.query(Recipe)
+            .filter(
+                Recipe.title.ilike(f'%{query}%'), 
+                Recipe.state_recipe == required_status
+            )
+            .order_by(Recipe.created_at.desc())
+            .limit(50) 
+            .all()
+        )
+
+        recipes_list = [
+            {
+                "id": recipe.id_recipe,
+                "title": recipe.title,
+                "image": recipe.image,
+                "difficulty": recipe.difficulty.value,
+                "creator_name": recipe.user_recipe.username, 
+                "status": recipe.state_recipe.name.lower() 
+            }
+            for recipe in recipes
+        ]
+
+        return jsonify({
+            "message": "Administrator search completed successfully",
+            "recipes": recipes_list,
+            "total": len(recipes_list)
+        }), 200
+
+    except Exception as error:
+        print(f"Error UNEXPECTED searching admin recipes: {error}") 
+        return jsonify({
+            "message": "Error performing the search in the administrator panel",
+            "details": str(error),
+            "recipes": []
+        }), 500
