@@ -1794,7 +1794,6 @@ def populate_database():
             recipes_data = data.get("recipes", [])
 
             ingredients_cache = {}
-            new_catalog_ingredients_to_add = []
 
             for recipe in recipes_data:
                 new_recipe = Recipe(
@@ -1810,7 +1809,6 @@ def populate_database():
                 )
                 db.session.add(new_recipe)
                 db.session.flush() 
-                recipe_id = new_recipe.id_recipe
 
                 for ingredient_data in recipe.get("ingredients", []):
                     ingredient_name = ingredient_data.get("name")
@@ -1909,115 +1907,3 @@ def search_admin_recipes():
         }), 500
 
 
-# @api.route("/population", methods=["POST"]) 
-# def populates_databases():
-#     try:
-#         db.session.query(RecipeIngredient).delete() 
-#         db.session.query(Recipe).delete()
-#         db.session.query(Ingredient).delete()
-#         db.session.query(Category).delete()
-#         db.session.query(User).delete()
-
-#         db.session.execute(text('ALTER SEQUENCE user_id_seq RESTART WITH 1'))
-
-#         db.session.commit()
-#         print("Datos anteriores eliminados exitosamente.")
-
-#     except Exception as error:
-#         db.session.rollback()
-#         return jsonify({"message": "Error al limpiar la DB.", "details": str(error)}), 500
-    
-#     json_path = os.path.join(
-#         os.path.dirname(__file__), "data_mock.json")
-
-#     if json_path:
-#         try:
-#             with open(json_path, "r", encoding="utf-8") as file:
-#                 data = json.load(file)
-
-#             users = data.get("users", [])
-#             for user in users:
-#                 salt = b64encode(os.urandom(16)).decode("utf-8")
-#                 hashed_password = generate_password_hash(f"{user['password']}{salt}")
-#                 email = user.get("email")
-#                 fullname = user.get("fullname")
-#                 username = user.get("username")
-#                 rol = user.get("rol", "usuario")
-#                 new_user = User(
-#                     email=email,
-#                     password=hashed_password,
-#                     fullname=fullname,
-#                     username=username,
-#                     salt=salt,
-#                     rol=rol,
-#                 )
-#                 db.session.add(new_user)
-#             db.session.commit()
-
-#             for category in data.get("categories", []):
-#                 new_category = Category(
-#                     name_category=category.get("name_category")
-#                 )
-#                 print(new_category)
-#                 db.session.add(new_category)
-#             db.session.commit()
-
-#             recipes_data = data.get("recipes", [])
-
-#             ingredients_cache = {}
-
-#             for recipe in recipes_data:
-#                 new_recipe = Recipe(
-#                     title=recipe.get("title"),
-#                     steps=recipe.get("steps"),
-#                     image=recipe.get("image"),
-#                     difficulty=recipe.get("difficulty"),
-#                     preparation_time_min=recipe.get("prep_time"),
-#                     portions=recipe.get("portions"),
-#                     state_recipe=stateRecipeEnum.PUBLISHED,
-#                     user_id=recipe.get("user_id"),
-#                     category_id=recipe.get("category_id")
-#                 )
-#                 db.session.add(new_recipe)
-#                 db.session.flush() 
-
-#                 for ingredient_data in recipe.get("ingredients", []):
-#                     ingredient_name = ingredient_data.get("name")
-#                     if ingredient_name not in ingredients_cache:
-#                         existing_ingredient = db.session.scalar(db.select(Ingredient).filter_by(name=ingredient_name))
-
-#                         if not existing_ingredient:
-#                             new_catalog_ingredient = Ingredient(
-#                                 name=ingredient_name,)
-#                             db.session.add(new_catalog_ingredient)
-#                             ingredients_cache[ingredient_name] = new_catalog_ingredient
-#                         else:
-#                             ingredients_cache[ingredient_name] = existing_ingredient
-
-#                     ingredient_object = ingredients_cache[ingredient_name]
-
-#                     unit_string_from_json = ingredient_data.get("unit")
-
-#                     try:
-#                         unit_enum_object = get_unit_enum(unit_string_from_json)
-#                     except ValueError as e:
-
-#                         print(f"Error procesando unidad: {e}")
-#                         raise
-#                     new_recipe_ingredient_detail = RecipeIngredient(
-#                         quantity=ingredient_data.get("quantity"),
-#                         unit_measure=unit_enum_object, 
-            
-#                         recipe=new_recipe, 
-#                         ingredient_catalog=ingredient_object 
-#                     )
-#                     db.session.add(new_recipe_ingredient_detail)
-
-#             db.session.commit()
-                                
-#             return jsonify({"message": "Database populated successfully."}), 200
-
-#         except Exception as error:
-#             db.session.rollback()
-#             print(f"Error en la populación: {error.args}" )
-#             return jsonify({"message": "Error populating database.", "details": str(error)}), 500
