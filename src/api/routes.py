@@ -13,13 +13,14 @@ from datetime import timedelta, datetime, timezone
 from functools import wraps
 import json
 from .cloudinary_service import cloudinary_service
-from sqlalchemy import select, func
+from sqlalchemy import select, func, text
 from .admin_decorator import admin_required
 import cloudinary
 import cloudinary.uploader
 from datetime import datetime, timezone
 import requests
 from .unit_converter import converter
+import enum
 
 
 api = Blueprint('api', __name__)
@@ -51,7 +52,7 @@ def getUser(user_id):
 @api.route("/user", methods=["PUT"])
 @jwt_required()
 def updateUser():
-    current_user_id = get_jwt_identity()
+    current_user_id = int(get_jwt_identity())
     user = User.query.get(current_user_id)
     if not user:
         return jsonify({"message": "User not found"}), 404
@@ -83,7 +84,7 @@ def updateUser():
         # Verificar si ya existe el username
         existing_username_user = User.query.filter_by(
             username=username).first()
-        if existing_username_user and existing_username_user.id != current_user_id:
+        if existing_username_user and existing_username_user.id_user != current_user_id:
             return jsonify({"message": "This username is already in use"}), 400
 
         user.username = username
@@ -1745,6 +1746,14 @@ def get_converted_ingredients(recipe_id):
             "details": str(e)
         }), 500
 
+
+def get_unit_enum(unit_str):
+    for member in UnitEnum:
+        if member.value == unit_str:
+            return member
+    raise ValueError(f"El valor '{unit_str}' no es una unidad válida en UnitEnum.")
+
+
 @api.route("/population", methods=["GET"])
 def populate_database():
     json_path = os.path.join(
@@ -1782,7 +1791,11 @@ def populate_database():
                 db.session.add(new_category)
             db.session.commit()
 
-            for recipe in data.get("recipes", []):
+            recipes_data = data.get("recipes", [])
+
+            ingredients_cache = {}
+
+            for recipe in recipes_data:
                 new_recipe = Recipe(
                     title=recipe.get("title"),
                     steps=recipe.get("steps"),
@@ -1795,11 +1808,102 @@ def populate_database():
                     category_id=recipe.get("category_id")
                 )
                 db.session.add(new_recipe)
-            db.session.commit()
+                db.session.flush() 
+
+                for ingredient_data in recipe.get("ingredients", []):
+                    ingredient_name = ingredient_data.get("name")
+                    if ingredient_name not in ingredients_cache:
+                        existing_ingredient = db.session.scalar(db.select(Ingredient).filter_by(name=ingredient_name))
+
+                        if not existing_ingredient:
+                            new_catalog_ingredient = Ingredient(
+                                name=ingredient_name,)
+                            db.session.add(new_catalog_ingredient)
+                            ingredients_cache[ingredient_name] = new_catalog_ingredient
+                        else:
+                            ingredients_cache[ingredient_name] = existing_ingredient
+
+                    ingredient_object = ingredients_cache[ingredient_name]
+
+                    unit_string_from_json = ingredient_data.get("unit")
+
+                    try:
+                        unit_enum_object = get_unit_enum(unit_string_from_json)
+                    except ValueError as e:
+
+                        print(f"Error procesando unidad: {e}")
+                        raise
+                    new_recipe_ingredient_detail = RecipeIngredient(
+                        quantity=ingredient_data.get("quantity"),
+                        unit_measure=unit_enum_object, 
             
+                        recipe=new_recipe, 
+                        ingredient_catalog=ingredient_object 
+                    )
+                    db.session.add(new_recipe_ingredient_detail)
+
+            db.session.commit()
+                                
             return jsonify({"message": "Database populated successfully."}), 200
 
         except Exception as error:
             db.session.rollback()
             print(f"Error en la populación: {error.args}" )
             return jsonify({"message": "Error populating database.", "details": str(error)}), 500
+
+
+@api.route("/admin/recipes/search_by_status", methods=["GET"])
+@admin_required() 
+def search_admin_recipes():
+    try:
+        query = request.args.get('q', '').strip()
+        status_str = request.args.get('status', 'PUBLISHED').upper() 
+
+        if not query or len(query) < 2:
+            return jsonify({
+                "message": "The search term must be at least 2 characters long",
+                "recipes": []
+            }), 400
+
+        required_status = getattr(stateRecipeEnum, status_str, None)
+
+        if required_status is None:
+            return jsonify({"message": f"Invalid prescription status: {status_str}"}), 400
+        recipes = (
+            db.session.query(Recipe)
+            .filter(
+                Recipe.title.ilike(f'%{query}%'), 
+                Recipe.state_recipe == required_status
+            )
+            .order_by(Recipe.created_at.desc())
+            .limit(50) 
+            .all()
+        )
+
+        recipes_list = [
+            {
+                "id": recipe.id_recipe,
+                "title": recipe.title,
+                "image": recipe.image,
+                "difficulty": recipe.difficulty.value,
+                "creator_name": recipe.user_recipe.username, 
+                "status": recipe.state_recipe.name.lower() 
+            }
+            for recipe in recipes
+        ]
+
+        return jsonify({
+            "message": "Administrator search completed successfully",
+            "recipes": recipes_list,
+            "total": len(recipes_list)
+        }), 200
+
+    except Exception as error:
+        print(f"Error UNEXPECTED searching admin recipes: {error}") 
+        return jsonify({
+            "message": "Error performing the search in the administrator panel",
+            "details": str(error),
+            "recipes": []
+        }), 500
+
+
