@@ -3,7 +3,6 @@ import useGlobalReducer from "../hooks/useGlobalReducer.jsx";
 import useTheme from '../hooks/useTheme.jsx';
 import "../styles/navbar.css"
 
-// AHORA USA EXPORTACIÓN NOMBRADA para coincidir con import { Navbar } de Layout.jsx
 export const Navbar = () => {
     const { store, dispatch } = useGlobalReducer();
     const { theme, toggleTheme } = useTheme();
@@ -57,6 +56,13 @@ export const Navbar = () => {
                                         <span>Usuarios</span>
                                     </Link>
                                 </li>
+                                {/* --- NUEVO BOTÓN REPORTES --- */}
+                                <li className="py-2">
+                                    <Link to={"/admin/reportes"}>
+                                        <span>Reportes</span>
+                                    </Link>
+                                </li>
+                                {/* --------------------------- */}
                             </ul>
                         </div>
 
