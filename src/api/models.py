@@ -7,7 +7,6 @@ from datetime import datetime, timezone
 from typing import Optional
 import enum
 
-
 db = SQLAlchemy()
 
 
@@ -39,7 +38,8 @@ class User(db.Model):
     favorites: Mapped[List["RecipeFavorite"]] = relationship(
         back_populates="user", cascade="all, delete-orphan")
 
-    comments: Mapped[List["Comment"]] = relationship("Comment", back_populates="user", cascade="all, delete-orphan")
+    comments: Mapped[List["Comment"]] = relationship(
+        "Comment", back_populates="user", cascade="all, delete-orphan")
 
     def __repr__(self):
         return f'<User {self.username}>'
@@ -168,7 +168,8 @@ class Recipe(db.Model):
             else self.state_recipe
         )
 
-        ingredients_list = [item.serialize() for item in self.recipe_ingredients_details]
+        ingredients_list = [item.serialize()
+                            for item in self.recipe_ingredients_details]
         creator_display_name = self.user_recipe.fullname if self.user_recipe.fullname else self.user_recipe.username
         return {
             "id": self.id_recipe,
@@ -382,10 +383,6 @@ class RecipeRating(db.Model):
 
 class RecipeFavorite(db.Model):
     __tablename__ = "recipe_favorites"
-    __table_args__ = (
-        db.UniqueConstraint("user_id", "recipe_id",
-                            name="uq_user_recipe_favorite"),
-    )
 
     id_favorite: Mapped[int] = mapped_column(primary_key=True)
     user_id: Mapped[int] = mapped_column(

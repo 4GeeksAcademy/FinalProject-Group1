@@ -7,7 +7,6 @@ const Comment = ({ recipeId, initialComments, isPublished }) => {
     const [editingContent, setEditingContent] = useState("");
     const [openMenuId, setOpenMenuId] = useState(null);
 
-
     const URL_BASE = import.meta.env.VITE_BACKEND_URL;
 
     const getUserIdFromToken = () => {
@@ -131,9 +130,40 @@ const Comment = ({ recipeId, initialComments, isPublished }) => {
         }
     };
 
+    // --- NUEVA FUNCIÓN PARA REPORTAR ---
+    const handleReport = async (commentId) => {
+        const token = localStorage.getItem("access_token");
+        if (!token) return alert("Debes iniciar sesión para reportar.");
+
+        const reason = prompt("Por favor, indica la razón del reporte:");
+        if (!reason) return; // Si cancela o no escribe nada
+
+        try {
+            const response = await fetch(`${URL_BASE}/comentarios/reportar/${commentId}`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`,
+                },
+                body: JSON.stringify({ razon: reason }),
+            });
+
+            if (response.ok) {
+                alert("Reporte enviado con éxito. Gracias por tu colaboración.");
+                setOpenMenuId(null); // Cerrar el menú
+            } else {
+                alert("Hubo un error al enviar el reporte.");
+            }
+        } catch (error) {
+            console.error("Error enviando reporte:", error);
+            alert("Error de conexión.");
+        }
+    };
+    // -----------------------------------
+
     useEffect(() => {
         const handleClickOutside = (event) => {
-            if (!event.target.closest(".comment-menu")) {
+            if (!event.target.closest(".comment-menu-container")) {
                 setOpenMenuId(null);
             }
         };
@@ -207,9 +237,13 @@ const Comment = ({ recipeId, initialComments, isPublished }) => {
                                     ) : (
                                         <p className="mt-1">{comment.content}</p>
                                     )}
-                                    {(Number(currentUserId) === Number(comment.user?.id ?? comment.user_id)) &&
-                                        editingCommentId !== comment.id && (
-                                            <div className="d-flex gap-2 mt-1 justify-content-between">
+                                    
+                                    {/* Lógica de Botones (Editar/Borrar vs Reportar) */}
+                                    <div className="d-flex gap-2 mt-1 justify-content-between align-items-center">
+                                        
+                                        {/* Botones para el dueño del comentario */}
+                                        {(Number(currentUserId) === Number(comment.user?.id ?? comment.user_id)) ? (
+                                            editingCommentId !== comment.id && (
                                                 <div>
                                                     <button
                                                         className="btn btn-outline-primary btn-sm mx-2"
@@ -225,26 +259,40 @@ const Comment = ({ recipeId, initialComments, isPublished }) => {
                                                         Eliminar
                                                     </button>
                                                 </div>
-                                                <div className="comment-menu-container">
-                                                    <button
-                                                        className="btn"
-                                                        onClick={() => setOpenMenuId(openMenuId === comment.id ? null : comment.id)}
+                                            )
+                                        ) : (
+                                            /* Espacio vacío para mantener alineación si no es el dueño */
+                                            <div></div>
+                                        )}
+
+                                        {/* Menú de Reportar (Solo visible si NO es mi comentario) */}
+                                        {(Number(currentUserId) !== Number(comment.user?.id ?? comment.user_id)) && (
+                                            <div className="comment-menu-container position-relative">
+                                                <button
+                                                    className="btn btn-link text-muted p-0"
+                                                    style={{ textDecoration: "none" }}
+                                                    onClick={() => setOpenMenuId(openMenuId === comment.id ? null : comment.id)}
+                                                >
+                                                    <i className="fa-solid fa-ellipsis-vertical"></i>
+                                                </button>
+
+                                                {openMenuId === comment.id && (
+                                                    <div 
+                                                        className="comment-dropdown bg-white border rounded shadow-sm p-1 position-absolute end-0"
+                                                        style={{ zIndex: 1000, minWidth: "120px" }}
                                                     >
-                                                        <i className="fa-solid fa-ellipsis-vertical"></i>
-                                                    </button>
-
-                                                    {openMenuId === comment.id && (
-                                                        <div className="comment-dropdown bg-white border rounded shadow-sm p-1">
-                                                            <button className="btn btn-sm w-100 text-start">
-                                                                Denunciar
-                                                            </button>
-                                                        </div>
-                                                    )}
-                                                </div>
-
-
+                                                        <button 
+                                                            className="btn btn-sm w-100 text-start text-danger"
+                                                            onClick={() => handleReport(comment.id)}
+                                                        >
+                                                            <i className="fa-solid fa-flag me-2"></i> Denunciar
+                                                        </button>
+                                                    </div>
+                                                )}
                                             </div>
                                         )}
+                                    </div>
+
                                 </div>
                             </div>
                         </div>
