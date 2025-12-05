@@ -1,0 +1,39 @@
+/* Estilos Base del Footer */
+.footer-container {
+    background-color: var(--color-background-card); /* Usa un fondo claro/medio */
+    color: var(--color-text-main);
+    padding: 40px 20px;
+    border-top: 1px solid var(--color-border-main);
+    transition: background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease;
+}
+
+.footer-social-links a {
+    color: var(--color-text-highlight);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.footer-social-links a:hover {
+    color: var(--color-btn-primary-hover);
+}
+
+.footer-text {
+    color: var(--color-text-meta); /* Texto sutil */
+    font-size: 0.9rem;
+}
+
+/* --- MODO OSCURO --- */
+
+.dark-mode .footer-container {
+    background-color: var(--color-background-main); /* Usar el color más oscuro de la app */
+    color: var(--color-text-main);
+    border-top: 1px solid var(--color-border-main);
+}
+
+.dark-mode .footer-social-links a {
+    color: var(--color-text-highlight);
+}
+
+.dark-mode .footer-text {
+    color: var(--color-text-meta);
+}
