@@ -1751,7 +1751,7 @@ def get_unit_enum(unit_str):
     for member in UnitEnum:
         if member.value == unit_str:
             return member
-    raise ValueError(f"El valor '{unit_str}' no es una unidad válida en UnitEnum.")
+    raise ValueError(f"The value '{unit_str}' It is not a valid unit in UnitEnum.")
 
 
 @api.route("/population", methods=["GET"])
@@ -1829,9 +1829,9 @@ def populate_database():
 
                     try:
                         unit_enum_object = get_unit_enum(unit_string_from_json)
-                    except ValueError as e:
+                    except ValueError as error:
 
-                        print(f"Error procesando unidad: {e}")
+                        print(f"Error processing unit: {error}")
                         raise
                     new_recipe_ingredient_detail = RecipeIngredient(
                         quantity=ingredient_data.get("quantity"),
