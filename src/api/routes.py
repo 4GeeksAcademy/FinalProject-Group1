@@ -1104,7 +1104,7 @@ def upload_profile_image():
 def get_recipe_comments(recipe_id):
     recipe = Recipe.query.get(recipe_id)
     if not recipe or recipe.state_recipe != stateRecipeEnum.PUBLISHED:
-        return jsonify({"message": "Receta no encontrada"}), 404
+        return jsonify({"message": "Recipe not found"}), 404
 
     comments = Comment.query.filter_by(recipe_id=recipe_id).order_by(
         Comment.created_at.desc()).all()
@@ -1118,13 +1118,13 @@ def create_comment(recipe_id):
 
     recipe = Recipe.query.get(recipe_id)
     if not recipe or recipe.state_recipe != stateRecipeEnum.PUBLISHED:
-        return jsonify({"message": "Receta no encontrada"}), 404
+        return jsonify({"message": "Recipe not found"}), 404
 
     data = request.get_json()
     content = data.get("content", "").strip()
 
     if not content:
-        return jsonify({"message": "El comentario no puede estar vacío"}), 400
+        return jsonify({"message": "The comment cannot be empty."}), 400
 
     new_comment = Comment(
         content=content,
@@ -1136,12 +1136,12 @@ def create_comment(recipe_id):
     try:
         db.session.commit()
         return jsonify({
-            "message": "Comentario creado",
+            "message": "Comment created",
             "comment": new_comment.serialize()
         }), 201
     except Exception as error:
         db.session.rollback()
-        return jsonify({"message": "Error al crear comentario", "details": str(error)}), 500
+        return jsonify({"message": "Error creating comment", "details": str(error)}), 500
 
 
 @api.route('/comments/<int:comment_id>', methods=['PUT'])
@@ -1151,22 +1151,22 @@ def update_comment(comment_id):
     updated_text = update_data.get("content", "").strip()
 
     if not updated_text:
-        return jsonify({"error": "El comentario no puede estar vacío."}), 400
+        return jsonify({"error": "The comment cannot be empty."}), 400
 
     user_id = int(get_jwt_identity())
 
     existing_comment = Comment.query.get(comment_id)
     if not existing_comment:
-        return jsonify({"error": "Comentario no encontrado."}), 404
+        return jsonify({"error": "Comment not found."}), 404
 
     if existing_comment.user_id != user_id:
-        return jsonify({"error": "No tienes permiso para editar este comentario."}), 403
+        return jsonify({"error": "You do not have permission to edit this comment.."}), 403
 
     existing_comment.content = updated_text
     db.session.commit()
 
     return jsonify({
-        "message": "Comentario actualizado",
+        "message": "Updated comment",
         "comment": existing_comment.serialize()
     }), 200
 
@@ -1180,29 +1180,24 @@ def delete_comment(comment_id):
 
     comment = Comment.query.get(comment_id)
     if not comment:
-        return jsonify({"message": "Comentario no encontrado"}), 404
+        return jsonify({"message": "Comment not found"}), 404
 
     if comment.user_id != current_user_id and not is_admin:
-        return jsonify({"message": "No autorizado"}), 403
+        return jsonify({"message": "Unauthorized"}), 403
 
     try:
         db.session.delete(comment)
         db.session.commit()
-        return jsonify({"message": "Comentario eliminado"}), 200
+        return jsonify({"message": "Comment deleted"}), 200
     except Exception as error:
         db.session.rollback()
-        return jsonify({"message": "Error al eliminar comentario", "details": str(error)}), 500
+        return jsonify({"message": "Error deleting comment", "details": str(error)}), 500
 
-# RUTAS PARA HOME Y CATEGORÍAS
 
 
 @api.route("/recipes/resumen", methods=["GET"])
 @jwt_required(optional=True)
 def get_recipes_summary():
-    """
-    Devuelve un resumen con todas las categorías y 12 recetas publicadas por categoría
-    para los carruseles del home. Incluye información de favoritos si hay usuario logueado.
-    """
     try:
         current_user_id = get_jwt_identity()
         if current_user_id is not None:
@@ -1277,20 +1272,14 @@ def get_recipes_summary():
 
 @api.route("/recipes/category/<int:category_id>", methods=["GET"])
 def get_recipes_by_category(category_id):
-    """
-    Devuelve recetas de una categoría específica con paginación
-    Query params: page (default 1), per_page (default 12)
-    """
     try:
         page = request.args.get('page', 1, type=int)
         per_page = request.args.get('per_page', 20, type=int)
 
-        # Verificar que la categoría existe
         category = Category.query.get(category_id)
         if not category:
-            return jsonify({"message": "Categoría no encontrada"}), 404
+            return jsonify({"message": "Category not found"}), 404
 
-        # Query con paginación
         pagination = (
             db.session.query(Recipe)
             .filter(
@@ -1336,16 +1325,10 @@ def get_recipes_by_category(category_id):
             "details": str(error)
         }), 500
 
-# ENDPOINT DE BÚSQUEDA DE RECETAS
-# Permite buscar recetas por título para el componente SearchResults
 
 
 @api.route("/recipes/search", methods=["GET"])
 def search_recipes():
-    """
-    Busca recetas por título
-    Query param: q (término de búsqueda)
-    """
     try:
         query = request.args.get('q', '').strip()
 
@@ -1355,7 +1338,6 @@ def search_recipes():
                 "recipes": []
             }), 400
 
-        # Buscar recetas publicadas que coincidan con el término
         recipes = (
             db.session.query(Recipe)
             .filter(
@@ -1418,7 +1400,7 @@ def get_all_users():
         }), 200
 
     except Exception as error:
-        print(f"Error al obtener usuarios: {error}")
+        print(f"Error getting users: {error}")
         return jsonify({"message": "Server error fetching users.", "Details": str(error)}), 500
 
 
@@ -1456,7 +1438,6 @@ def change_user_active(user_id):
         user.is_active = not user.is_active
         user.updated_at = datetime.now(timezone.utc)
         db.session.commit()
-        # se hizo esto para usar en el mensaje del estatus a activo o inactivo, solo par ainformar
         if user.is_active:
             status = "Active"
         else:
@@ -1656,7 +1637,7 @@ def calculate_and_save_nutrition(recipe_id):
                 total_nutrition["carbs"] += carbs_per_100 * quantity_factor
 
         except requests.exceptions.RequestException as error:
-            print(f"Error de API para {ingredient_name}: {str(error)}")
+            print(f"API error for{ingredient_name}: {str(error)}")
             continue
 
     final_nutrition_data = {"total_nutrition": {
@@ -1670,7 +1651,7 @@ def calculate_and_save_nutrition(recipe_id):
         return final_nutrition_data["total_nutrition"]
     except Exception as db_error:
         db.session.rollback()
-        print(f"Error al guardar en BD: {db_error}")
+        print(f"Error saving to DB: {db_error}")
         return None
 
 
@@ -1739,11 +1720,11 @@ def get_converted_ingredients(recipe_id):
 
         return jsonify(converted_ingredients), 200
 
-    except Exception as e:
-        print("Error en get_converted_ingredients:", e)
+    except Exception as error:
+        print("Error en get_converted_ingredients:", error)
         return jsonify({
             "message": "Internal error retrieving converted ingredients",
-            "details": str(e)
+            "details": str(error)
         }), 500
 
 
