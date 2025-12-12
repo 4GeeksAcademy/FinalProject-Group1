@@ -354,17 +354,8 @@ def login_user():
     if not check_password_hash(user.password, f"{password}{user.salt}"):
         return jsonify({"message": "Credenciales inválidas"}), 401
 
-    # Para bloquear el acceso si no está activo el usuario.
     if not user.is_active:
         return jsonify({"message": "Su cuenta está inhabilitada. Contacte al administrador."}), 403
-
-    # if not user.profile:
-    #     print("➡ NO TIENE PROFLE, GENERANDO AVATAR...")
-    #     initials = get_initials(user.fullname)
-    #     print("Iniciales detectadas:", initials)
-    #     user.profile = generate_initials_image(initials)
-    #     print("Avatar generado:", user.profile)
-        # db.session.commit()
 
     is_admin = user.rol == "admin"
     additional_claims = {"is_administrator": is_admin, "rol": user.rol}
@@ -626,7 +617,6 @@ def edit_recipe(recipe_id):
 
 
 @api.route("/recipes/<int:recipe_id>", methods=["GET"])
-# @jwt_required()
 def get_one_recipe(recipe_id):
     recipe = db.session.get(Recipe, recipe_id)
     if recipe is None:
@@ -650,7 +640,6 @@ def get_recipe_detail(recipe_id):
 
         recipe = Recipe.query.filter_by(
             id_recipe=recipe_id
-            # state_recipe=stateRecipeEnum.PUBLISHED
         ).first()
 
         if recipe is None:
@@ -732,7 +721,7 @@ def toggle_favorite(recipe_id):
 
     recipe = db.session.get(Recipe, recipe_id)
     if recipe is None or recipe.state_recipe != stateRecipeEnum.PUBLISHED:
-        return jsonify({"message": "Receta no encontrada o no disponible"}), 404
+        return jsonify({"message": "Recipe not found or unavailable"}), 404
 
     try:
         favorite = RecipeFavorite.query.filter_by(
@@ -744,7 +733,7 @@ def toggle_favorite(recipe_id):
             db.session.delete(favorite)
             db.session.commit()
             return jsonify({
-                "message": "Receta eliminada de favoritos",
+                "message": "Recipe removed from favorites",
                 "is_favorite": False
             }), 200
         else:
@@ -755,14 +744,14 @@ def toggle_favorite(recipe_id):
             db.session.add(new_favorite)
             db.session.commit()
             return jsonify({
-                "message": "Receta añadida a favoritos",
+                "message": "Recipe added to favorites",
                 "is_favorite": True
             }), 201
 
     except Exception as error:
         db.session.rollback()
         return jsonify({
-            "message": "Error al actualizar favorito",
+            "message": "Error updating favorite",
             "details": str(error)
         }), 500
 
@@ -799,20 +788,14 @@ def get_user_favorites():
     except Exception as e:
         print("Error en get_user_favorites:", e)
         return jsonify({
-            "message": "Error interno al obtener los favoritos",
+            "message": "Internal error retrieving favorites",
             "details": str(e)
         }), 500
 
 
-#ENDPOINT FAVORITOS Y RATING
-
 @api.route("/recipes/top-rated", methods=["GET"])
 @jwt_required(optional=True)
 def get_top_rated_recipes():
-    """
-    Devuelve recetas mejor valoradas (con al menos 3 votos y rating >= 4.0)
-    Si hay usuario autenticado, también incluye sus favoritos aunque no cumplan el criterio
-    """
     try:
         current_user_id = get_jwt_identity()
         if current_user_id is not None:
@@ -891,11 +874,10 @@ def get_top_rated_recipes():
     except Exception as error:
         print("Error en get_top_rated_recipes:", error)
         return jsonify({
-            "message": "Error interno al obtener recetas mejor valoradas",
+            "message": "Internal error when obtaining top-rated recipes",
             "details": str(error)
         }), 500
 
-#endpoint Calidicacion recetas
 
 @api.route("/recetas/<int:recipe_id>/calificar", methods=["POST"])
 @jwt_required()
@@ -908,11 +890,11 @@ def rate_recipe(recipe_id):
 
     recipe = db.session.get(Recipe, recipe_id)
     if recipe is None or recipe.state_recipe != stateRecipeEnum.PUBLISHED:
-        return jsonify({"message": "Receta no encontrada o no disponible"}), 404
+        return jsonify({"message": "Recipe not found or unavailable"}), 404
 
     data = request.get_json(silent=True)
     if data is None:
-        return jsonify({"message": "JSON inválido o no enviado"}), 400
+        return jsonify({"message": "JSON invalid or not sent"}), 400
 
     value = data.get("value")
     comment = data.get("comment")
@@ -920,10 +902,10 @@ def rate_recipe(recipe_id):
     try:
         value = int(value)
     except (TypeError, ValueError):
-        return jsonify({"message": "La calificación debe ser un número entero"}), 400
+        return jsonify({"message": "The grade must be a whole number."}), 400
 
     if value < 1 or value > 5:
-        return jsonify({"message": "La calificación debe estar entre 1 y 5"}), 400
+        return jsonify({"message": "The rating must be between 1 and 5"}), 400
 
     try:
         rating = RecipeRating.query.filter_by(
@@ -959,7 +941,7 @@ def rate_recipe(recipe_id):
         db.session.commit()
 
         return jsonify({
-            "message": "Calificación registrada correctamente",
+            "message": "Rating registered correctly",
             "rating": rating.serialize(),
             "avg_rating": avg,
             "vote_count": total_votes
@@ -968,7 +950,7 @@ def rate_recipe(recipe_id):
     except Exception as error:
         db.session.rollback()
         return jsonify({
-            "message": "Error al registrar la calificación",
+            "message": "Error recording the grade",
             "details": str(error)
         }), 500
 
@@ -995,7 +977,7 @@ def delete_recipe(recipe_id):
         cloudinary_service.delete_image(recipe.image)
     except Exception as image_error:
         print(
-            f"Error al eliminar imagen de Cloudinary para Receta ID {recipe_id}: {str(image_error)}")
+            f"Error deleting Cloudinary image for Recipe ID {recipe_id}: {str(image_error)}")
         pass
 
     try:
@@ -1016,7 +998,7 @@ def update_recipe_status(recipe_id):
         new_status_param = data.get('new_status')
 
         if not new_status_param:
-            return jsonify({"message": "Falta el parámetro 'new_status'."}), 400
+            return jsonify({"message": "The parameter 'new_status' is missing."}), 400
 
         status_map = {
             "published": stateRecipeEnum.PUBLISHED,
@@ -1025,21 +1007,21 @@ def update_recipe_status(recipe_id):
         }
 
         if new_status_param not in status_map:
-            return jsonify({"message": "Estado no válido."}), 400
+            return jsonify({"message": "Invalid status."}), 400
 
         recipe = db.session.get(Recipe, recipe_id)
         if recipe is None:
-            return jsonify({"message": "Receta no encontrada."}), 404
+            return jsonify({"message": "Recipe not found."}), 404
 
         recipe.state_recipe = status_map[new_status_param]
         db.session.commit()
 
-        return jsonify({"message": f"Estado de receta {recipe_id} actualizado a {new_status_param}."}), 200
+        return jsonify({"message": f"prescription status {recipe_id} updated to{new_status_param}."}), 200
 
     except Exception as error:
-        print(f"Error al actualizar el estado de la receta: {error}")
+        print(f"Error updating recipe status: {error}")
         db.session.rollback()
-        return jsonify({"message": "Error interno del servidor.", "Details": str(error)}), 500
+        return jsonify({"message": "Internal Server Error.", "Details": str(error)}), 500
 
 
 @api.route("/admin/recipes/counts", methods=["GET"])
@@ -1062,14 +1044,14 @@ def get_admin_recipe_counts():
             counts[state_enum.value] = count
 
         return jsonify({
-            "message": "Conteo de recetas por estado exitoso",
+            "message": "Recipe count by successful status",
             "counts": counts
         }), 200
 
     except Exception as error:
         print(f"Error al obtener conteos de recetas: {error}")
         return jsonify({
-            "message": "Error interno del servidor al obtener conteos.",
+            "message": "Internal server error when obtaining counts.",
             "Details": str(error)
         }), 500
 
