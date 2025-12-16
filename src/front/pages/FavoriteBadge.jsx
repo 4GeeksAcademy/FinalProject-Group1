@@ -1,25 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink } from "react-router-dom";
-// 🛑 CORRECCIÓN: Se eliminó la extensión .jsx para resolver la importación 🛑
-import useGlobalReducer from "../hooks/useGlobalReducer"; // Para obtener el token
-// Asegúrate de que esta URL de backend esté bien configurada
+import useGlobalReducer from "../hooks/useGlobalReducer"; 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL; 
 
-// Componente para el ícono de favoritos con conteo
 const FavoriteBadge = ({ theme }) => {
     const { store } = useGlobalReducer();
     const token = store.token;
     const [count, setCount] = useState(0);
     const [loading, setLoading] = useState(true);
-    // Señal para forzar la recarga desde otros componentes (ej: RecipeDetail)
     const [refreshSignal, setRefreshSignal] = useState(0); 
 
-    // Clase de texto para el badge (se ajusta al tema, usando Bootstrap)
     const badgeClass = theme === 'dark' 
         ? 'text-white' 
         : 'text-black';
 
-    // Hook para obtener el conteo de favoritos
     useEffect(() => {
         const fetchCount = async () => {
             if (!token) {
@@ -30,7 +24,6 @@ const FavoriteBadge = ({ theme }) => {
 
             setLoading(true);
             try {
-                // 🛑 Llamamos al ENDPOINT LIGERO que creamos en el backend
                 const url = `${BACKEND_URL}/user/favorites/count`; 
                 const res = await fetch(url, { 
                     headers: { Authorization: `Bearer ${token}` },
@@ -40,7 +33,6 @@ const FavoriteBadge = ({ theme }) => {
                     const data = await res.json();
                     setCount(data.count || 0);
                 } else {
-                    // Si el token es inválido o hay otro error, mostramos 0
                     console.error("No se pudo obtener el conteo de favoritos", res.status);
                     setCount(0); 
                 }
@@ -54,25 +46,18 @@ const FavoriteBadge = ({ theme }) => {
         };
 
         fetchCount();
-        
-        // 🧪 CREAMOS LA FUNCIÓN GLOBAL DE ACTUALIZACIÓN 🧪
-        // Esta función será llamada desde RecipeDetail cuando se añada/quite un favorito
         window.refreshFavoritesCount = () => {
-            setRefreshSignal(prev => prev + 1); // Incrementa la señal para forzar el useEffect
+            setRefreshSignal(prev => prev + 1); 
         };
 
-        // Limpieza: importante al desmontar
         return () => {
              delete window.refreshFavoritesCount;
         };
 
-    // La dependencia 'refreshSignal' hace que este useEffect se ejecute de nuevo
-    // cada vez que RecipeDetail llama a window.refreshFavoritesCount().
     }, [token, refreshSignal]); 
 
 
     if (loading) {
-        // Opcional: mostrar un ícono de carga
         return (
             <div className={`favorites-btn me-2 ${badgeClass}`} aria-label="Cargando favoritos">
                 <i className="fa-solid fa-spinner fa-spin-pulse"></i>
@@ -82,7 +67,6 @@ const FavoriteBadge = ({ theme }) => {
 
     return (
         <div className="favorites-badge-container me-2">
-            {/* NavLink envuelve el componente para hacerlo clickeable */}
             <NavLink
                 to="/favoritos"
                 className={`favorites-btn ${badgeClass}`}
@@ -90,7 +74,6 @@ const FavoriteBadge = ({ theme }) => {
             >
                 <i className="fa-solid fa-heart"></i>
                 
-                {/* 🎯 EL BADGE DE CONTEO */}
                 {count > 0 && (
                     <span className="badge-count">
                         {count > 99 ? '99+' : count}
@@ -98,7 +81,6 @@ const FavoriteBadge = ({ theme }) => {
                 )}
             </NavLink>
 
-            {/* Este CSS es crucial para posicionar el badge */}
             <style jsx="true">{`
                 .favorites-badge-container {
                     position: relative;

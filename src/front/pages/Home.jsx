@@ -69,11 +69,9 @@ export const Home = () => {
         try {
           const apiUrl = getApiUrl();
 
-          // Buscar recetas
           const recipesResponse = await fetch(`${apiUrl}/recipes/search?q=${searchTerm}`);
           const recipesData = await recipesResponse.json();
 
-          // Buscar categorías
           const categoriesResponse = await fetch(`${apiUrl}/categories`);
           const categoriesData = await categoriesResponse.json();
 
@@ -276,7 +274,6 @@ export const Home = () => {
 
   return (
     <div className="home-modern-container">
-      {/* Decorative Background Elements */}
       <div className="decoration-circle circle-0"></div>
       <div className="decoration-circle circle-1"></div>
       <div className="decoration-circle circle-2"></div>
@@ -290,7 +287,6 @@ export const Home = () => {
       <div className="decoration-circle circle-10"></div>
       <div className="decoration-circle circle-11"></div>
 
-      {/* Hero Section */}
       <section className="hero-modern-full">
         <div className="hero-modern">
           <div className="hero-content-modern">
@@ -301,7 +297,6 @@ export const Home = () => {
               Descubre recetas deliciosas para cada momento del día
             </p>
 
-            {/* Buscador con Dropdown */}
             <div className="hero-search-container" ref={dropdownRef}>
               <div className="hero-search-wrapper">
                 <i className="fa-solid fa-search hero-search-icon"></i>
@@ -322,7 +317,6 @@ export const Home = () => {
                   <i className="fa-solid fa-search"></i>
                 </button>
               </div>
-              {/* Dropdown de resultados */}
               {showDropdown && (
                 <div className="search-dropdown">
                   {loadingSearch ? (
@@ -339,7 +333,6 @@ export const Home = () => {
                     </div>
                   ) : (
                     <div className="dropdown-results">
-                      {/* Categorías */}
                       {searchResults.categories.length > 0 && (
                         <div className="dropdown-section">
                           <div className="dropdown-section-title">
@@ -369,7 +362,6 @@ export const Home = () => {
                         </div>
                       )}
 
-                      {/* Recetas */}
                       {searchResults.recipes.length > 0 && (
                         <div className="dropdown-section">
                           <div className="dropdown-section-title">
@@ -403,7 +395,6 @@ export const Home = () => {
                         </div>
                       )}
 
-                      {/* Ver todos los resultados */}
                       <div
                         className="dropdown-view-all"
                         onClick={(e) => {
@@ -432,7 +423,6 @@ export const Home = () => {
         </div>
       </section>
 
-      {/* Category Filter Section */}
       <section className="category-filter-modern">
         <div className="filter-header">
           <h2 className="filter-title-modern">
@@ -450,7 +440,6 @@ export const Home = () => {
             <span>Todos</span>
           </button>
           
-          {/* Botón de Favoritos - Siempre visible si hay recetas top rated */}
           {topRatedRecipes.length > 0 && (
             <button
               className={`pill-btn ${selectedCategory === 'favorites' ? 'active' : ''}`}
@@ -479,7 +468,6 @@ export const Home = () => {
         </div>
       </section>
 
-      {/* Recipes Section */}
       <div className="recipes-section-modern">
         {topRatedRecipes.length > 0 && (
           <div
@@ -604,7 +592,6 @@ export const Home = () => {
         )}
       </div>
 
-      {/* Botón Scroll to Top */}
       <button
         className={`scroll-to-top ${showScrollTop ? 'visible' : ''}`}
         onClick={scrollToTop}

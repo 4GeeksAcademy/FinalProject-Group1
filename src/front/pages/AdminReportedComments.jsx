@@ -5,7 +5,6 @@ export const AdminReportedComments = () => {
     const [loading, setLoading] = useState(true);
     const URL_BASE = import.meta.env.VITE_BACKEND_URL;
 
-    // Función para cargar los reportes
     const fetchReports = async () => {
         const token = localStorage.getItem("access_token");
         if (!token) return;
@@ -20,7 +19,6 @@ export const AdminReportedComments = () => {
 
             if (response.ok) {
                 const data = await response.json();
-                // Si el backend devuelve un mensaje de texto (no hay reportes), seteamos array vacío
                 if (data.message) {
                     setReports([]);
                 } else {
@@ -36,12 +34,10 @@ export const AdminReportedComments = () => {
         }
     };
 
-    // Al cargar la página
     useEffect(() => {
         fetchReports();
     }, []);
 
-    // Acción: Ocultar Comentario (Inapropiado)
     const handleHideComment = async (commentId) => {
         const token = localStorage.getItem("access_token");
         if (!confirm("¿Estás seguro de ocultar este comentario? Se marcará como inapropiado.")) return;
@@ -56,7 +52,7 @@ export const AdminReportedComments = () => {
 
             if (response.ok) {
                 alert("Comentario ocultado correctamente.");
-                fetchReports(); // Recargar la lista
+                fetchReports(); 
             } else {
                 alert("Error al ocultar el comentario.");
             }
@@ -65,7 +61,6 @@ export const AdminReportedComments = () => {
         }
     };
 
-    // Acción: Marcar como Revisado (Falso Positivo / No eliminar)
     const handleMarkReviewed = async (commentId) => {
         const token = localStorage.getItem("access_token");
         if (!confirm("¿Marcar reporte como revisado? El comentario permanecerá visible.")) return;
@@ -129,7 +124,6 @@ export const AdminReportedComments = () => {
                                         "{item.content}"
                                     </td>
                                     <td>
-                                        {/* Mostramos las razones. Como viene un array de strings, las unimos */}
                                         {item.razones.map((r, i) => (
                                             <div key={i} className="badge bg-warning text-dark d-block mb-1 text-wrap">
                                                 {r}
