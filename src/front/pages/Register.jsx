@@ -15,8 +15,6 @@ const initialUserState = {
 
 const urlBase = import.meta.env.VITE_BACKEND_URL
 
-
-// Definición de los requisitos de la contraseña con sus RegEx correspondientes
 const passwordRequirements = [
     { key: 'minLength', label: 'Mínimo 8 caracteres', regex: /.{8,}/ },
     { key: 'lowerCase', label: 'Al menos una letra minúscula', regex: /[a-z]/ },
@@ -29,8 +27,6 @@ const Register = () => {
     const [user, setUser] = useState(initialUserState)
     const [showPassword, setShowPassword] = useState(false)
     const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-
-    // Nuevo estado para la validación de la contraseña
     const [passwordValidity, setPasswordValidity] = useState({
         minLength: false,
         lowerCase: false,
@@ -39,12 +35,10 @@ const Register = () => {
         specialChar: false,
     });
 
-    // Estado para controlar si el campo de contraseña está actualmente enfocado (activo)
     const [isPasswordFocused, setIsPasswordFocused] = useState(false);
 
     const navigate = useNavigate()
 
-    // Función para validar la contraseña y actualizar el estado de validez
     const validatePassword = (password) => {
         const newValidity = {};
         let isAllValid = true;
@@ -71,7 +65,6 @@ const Register = () => {
         setShowConfirmPassword(!showConfirmPassword);
     };
 
-    // Maneja los cambios en los inputs del formulario
     const handleChange = ({ target }) => {
         const { name, value } = target;
 
@@ -80,8 +73,6 @@ const Register = () => {
                 ...prevUser,
                 [name]: value
             };
-
-            // Si el cambio es en la contraseña, actualiza la validación
             if (name === 'password') {
                 validatePassword(value);
             }
@@ -90,14 +81,8 @@ const Register = () => {
         });
     }
 
-
-    // Determina si el panel de requisitos debe estar visible
-    // Será visible si el campo está enfocado O si el usuario ha escrito al menos un carácter.
     const shouldShowRequirements = isPasswordFocused || user.password.length > 0;
-
-    // Calcula si la contraseña es válida basándose en el estado de validez
     const isPasswordValid = Object.values(passwordValidity).every(isValid => isValid);
-    // Controla si el botón de Guardar debe estar deshabilitado
     const isFormIncompleteOrInvalid = !user.email || !user.username || !isPasswordValid || user.password !== user.confirmPassword;
 
 
@@ -241,12 +226,10 @@ const Register = () => {
                                                 return (
                                                     <li
                                                         key={req.key}
-                                                        // Clases condicionales para el feedback progresivo
                                                         className={`flex items-center transition-colors duration-300 ${isCompleted ? 'text-green-600 line-through opacity-75 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}
                                                     >
                                                         <i
                                                             className={`fa-solid ${isCompleted ? 'fa-circle-check' : 'fa-circle-xmark'} w-4 mr-2`}
-                                                            // Aseguramos que el color del icono sea siempre visible
                                                             style={{ color: isCompleted ? '#10B981' : '#EF4444' }}
                                                         ></i>
                                                         {req.label}

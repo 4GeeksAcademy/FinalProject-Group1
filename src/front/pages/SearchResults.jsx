@@ -25,12 +25,8 @@ export const SearchResults = () => {
         setLoading(true);
         try {
             const apiUrl = getApiUrl();
-            
-            // Buscar recetas
             const recipesResponse = await fetch(`${apiUrl}/recipes/search?q=${query}`);
             const recipesData = await recipesResponse.json();
-            
-            // Buscar categorías
             const categoriesResponse = await fetch(`${apiUrl}/categories`);
             const categoriesData = await categoriesResponse.json();
             
@@ -63,7 +59,6 @@ export const SearchResults = () => {
 
     return (
         <div className="search-results-modern">
-            {/* Decorative Background Elements */}
             <div className="decoration-circle circle-1"></div>
             <div className="decoration-circle circle-2"></div>
             <div className="decoration-circle circle-3"></div>
@@ -71,7 +66,6 @@ export const SearchResults = () => {
             <div className="decoration-circle circle-5"></div>
             <div className="decoration-circle circle-6"></div>
 
-            {/* Header Section */}
             <div className="search-header-modern">
                 <Link to="/" className="back-link-modern">
                     <i className="fa-solid fa-arrow-left"></i>
@@ -89,7 +83,6 @@ export const SearchResults = () => {
                 </div>
             </div>
 
-            {/* No Results */}
             {totalResults === 0 ? (
                 <div className="no-results-modern">
                     <div className="empty-state-search">
@@ -104,7 +97,6 @@ export const SearchResults = () => {
                 </div>
             ) : (
                 <>
-                    {/* Categories Results */}
                     {categories.length > 0 && (
                         <div className="results-section">
                             <h2 className="section-title-results">
@@ -134,7 +126,6 @@ export const SearchResults = () => {
                         </div>
                     )}
 
-                    {/* Recipes Results */}
                     {recipes.length > 0 && (
                         <div className="results-section">
                             <h2 className="section-title-results">
