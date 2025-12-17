@@ -241,8 +241,6 @@ const Comment = ({ recipeId, initialComments, isPublished }) => {
                                                         </div>
                                                     )}
                                                 </div>
-
-
                                             </div>
                                         )}
                                 </div>

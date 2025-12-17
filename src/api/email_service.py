@@ -11,7 +11,6 @@ def send_recovery_email(email, token):
     frontend_url = os.getenv('FRONTEND_URL')
     recovery_link = f"{frontend_url}/reset-password?token={token}"
     
-    
     logger.debug(f"Preparando email de recuperación para: {email}")
     
     message = Mail(
@@ -30,17 +29,17 @@ def send_recovery_email(email, token):
         api_key = os.getenv('SENDGRID_API_KEY')
         
         if not api_key:
-            logger.error("SENDGRID_API_KEY no configurado en variables de entorno")
+            logger.error("SENDGRID_API_KEY not configured in environment variables")
             return False
         
         sg = SendGridAPIClient(api_key)
         response = sg.send(message)
         
         if response.status_code == 202:
-            logger.info(f"Email enviado exitosamente a {email} (Status: {response.status_code})")
+            logger.info(f"Email successfully sent to {email} (Status: {response.status_code})")
             return True
         else:
-            logger.warning(f"Email enviado con status inesperado: {response.status_code}")
+            logger.warning(f"Email sent with unexpected status: {response.status_code}")
             return False
             
     except Exception as e:

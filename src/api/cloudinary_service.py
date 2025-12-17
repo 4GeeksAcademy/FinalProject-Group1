@@ -57,7 +57,7 @@ class CloudinaryService:
 
         except Exception as error:
 
-            print(f"Cloudinary Delete Error: Falló al eliminar {image_url}. Detalles: {error}")
+            print(f"Cloudinary Delete Error: Failed to delete {image_url}. Detalles: {error}")
             return False
 
 cloudinary_service = CloudinaryService()

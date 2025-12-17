@@ -38,12 +38,10 @@ export const CategoriesListView = () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-    // Filtrar categorías según búsqueda
     const filteredCategories = categories.filter(category =>
         category.name_category.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-    // Calcular categorías para la página actual
     const indexOfLastCategory = currentPage * categoriesPerPage;
     const indexOfFirstCategory = indexOfLastCategory - categoriesPerPage;
     const currentCategories = filteredCategories.slice(indexOfFirstCategory, indexOfLastCategory);
@@ -91,7 +89,6 @@ export const CategoriesListView = () => {
                     </p>
                 </div>
 
-                {/* Search Bar */}
                 <div className="search-dropdown-container">
                     <div className="search-input-wrapper">
                         <i className="fa-solid fa-search search-icon"></i>
@@ -111,7 +108,6 @@ export const CategoriesListView = () => {
                 </div>
             </div>
 
-            {/* Categories Grid */}
             {filteredCategories.length === 0 ? (
                 <div className="no-recipes-modern">
                     <div className="empty-state-category">
@@ -165,7 +161,6 @@ export const CategoriesListView = () => {
                         ))}
                     </div>
 
-                    {/* Pagination */}
                     {!searchTerm && totalPages > 1 && (
                         <div className="pagination-modern">
                             <button

@@ -57,7 +57,6 @@ export const CategoryView = () => {
         });
     };
 
-    // Filtrar recetas según búsqueda y dificultad
     const filteredRecipes = recipes.filter(recipe => {
         const matchesSearch = recipe.title.toLowerCase().includes(searchTerm.toLowerCase());
         const matchesDifficulty = selectedDifficulties.length === 0 || 
@@ -85,7 +84,6 @@ export const CategoryView = () => {
             <div className="decoration-circle circle-5"></div>
             <div className="decoration-circle circle-6"></div>
 
-            {/* Header Section */}
             <div className="category-header-modern">
                 <div className="header-navigation">
                     <Link to="/" className="back-link-modern">
@@ -107,7 +105,6 @@ export const CategoryView = () => {
                     </p>
                 </div>
 
-                {/* Search Bar */}
                 <div className="category-search-container">
                     <div className="category-search-wrapper">
                         <i className="fa-solid fa-search category-search-icon"></i>
@@ -126,7 +123,6 @@ export const CategoryView = () => {
                     </div>
                 </div>
 
-                {/* Filtro de Dificultad */}
                 <div className="difficulty-filter">
                     <div className="filter-label">
                         <i className="fa-solid fa-filter filter-icon"></i>
@@ -167,7 +163,6 @@ export const CategoryView = () => {
                 </div>
             </div>
 
-            {/* Recipes Grid */}
             {filteredRecipes.length === 0 ? (
                 <div className="no-recipes-modern">
                     <div className="empty-state-category">
@@ -252,7 +247,6 @@ export const CategoryView = () => {
                         ))}
                     </div>
 
-                    {/* Pagination */}
                     {!searchTerm && selectedDifficulties.length === 0 && pagination.pages > 1 && (
                         <div className="pagination-modern">
                             <button

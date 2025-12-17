@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
 
-// Definición de los requisitos de la contraseña
 const passwordRequirements = [
     { key: 'minLength', label: 'Mínimo 8 caracteres', regex: /.{8,}/ },
     { key: 'lowerCase', label: 'Al menos una letra minúscula', regex: /[a-z]/ },
@@ -24,7 +23,6 @@ const ResetPassword = () => {
     const [showConfirmation, setShowConfirmation] = useState(false);
     const [isPasswordFocused, setIsPasswordFocused] = useState(false);
 
-    // Estado para la validación de la contraseña
     const [passwordValidity, setPasswordValidity] = useState({
         minLength: false,
         lowerCase: false,
@@ -36,7 +34,6 @@ const ResetPassword = () => {
     const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
     useEffect(() => {
-        // Obtener el token de la URL
         const tokenFromUrl = searchParams.get("token");
 
         if (!tokenFromUrl) {
@@ -46,8 +43,6 @@ const ResetPassword = () => {
         }
 
         setToken(tokenFromUrl);
-
-        // Validar el token
         validateToken(tokenFromUrl);
     }, [searchParams]);
 
@@ -77,7 +72,6 @@ const ResetPassword = () => {
         }
     };
 
-    // Función para validar la contraseña
     const validatePasswordRequirements = (password) => {
         const newValidity = {};
         let isAllValid = true;
@@ -118,7 +112,6 @@ const ResetPassword = () => {
         setMessage("");
         setError("");
 
-        // Validaciones
         if (password !== confirmation) {
             setError("Las contraseñas no coinciden");
             return;
@@ -238,7 +231,6 @@ const ResetPassword = () => {
                         )}
 
                         <form onSubmit={handleSubmit}>
-                            {/* Campo oculto para accesibilidad */}
                             <input
                                 type="email"
                                 name="username"

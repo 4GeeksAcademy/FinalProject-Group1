@@ -162,14 +162,11 @@ export const Myprofile = () => {
         }
     };
 
-
-
     return (
         <div className="container my-profile">
             <div className="row justify-content-center">
                 <div className="col-12">
                     <div className="row mt-5 g-4">
-                        {/* LADO IZQUIERDO */}
                         <div className="col-12 col-md-4">
                             <div className="profile-card profile-card--side">
                                 <h2 className="profile-title">Mi perfil</h2>
@@ -182,14 +179,12 @@ export const Myprofile = () => {
                             </div>
                         </div>
 
-                        {/* LADO DERECHO */}
                         <div className="col-12 col-md-8">
                             <div className="profile-card profile-card--main">
                                 <div className="profile-header">
                                     <h2 className="profile-title">Detalles de mi perfil</h2>
                                 </div>
 
-                                {/* Avatar + input */}
                                 <div className="profile-avatar-row">
                                     <div className="profile-avatar-wrapper">
                                         <img
@@ -216,8 +211,6 @@ export const Myprofile = () => {
                                         />
                                     </label>
                                 </div>
-
-                                {/* Nombre completo */}
                                 <div className="profile-field">
                                     <label className="profile-label">Nombre Completo</label>
                                     {editing.fullname ? (
@@ -268,7 +261,6 @@ export const Myprofile = () => {
                                     )}
                                 </div>
 
-                                {/* Nombre de usuario */}
                                 <div className="profile-field">
                                     <label className="profile-label">Nombre de Usuario</label>
                                     {editing.username ? (
@@ -319,7 +311,6 @@ export const Myprofile = () => {
                                     )}
                                 </div>
 
-                                {/* Email */}
                                 <div className="profile-field">
                                     <label className="profile-label">Correo</label>
                                     <div className="profile-value-row">
@@ -330,7 +321,6 @@ export const Myprofile = () => {
                                     </div>
                                 </div>
 
-                                {/* Contraseña */}
                                 <div className="profile-field">
                                     <label className="profile-label">Contraseña</label>
                                     <div className="profile-value-row">

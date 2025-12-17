@@ -57,8 +57,6 @@ class User(db.Model):
             "image": self.profile or f"https://ui-avatars.com/api/?name={self.username}&size=128&background=random&rounded=true"
         }
 
-# Empieza código de categoría
-
 
 class Category(db.Model):
     __tablename__ = "categories"
@@ -225,18 +223,13 @@ class Comment(db.Model):
         }
 
 
-# Clase ingrediente (el catálogo)
-
 class Ingredient(db.Model):
     id_ingredient: Mapped[int] = mapped_column(primary_key=True)
-    # es para el nombre, para que no haya dos ingredientes repetidos
     name: Mapped[str] = mapped_column(String(100), unique=True, nullable=False)
-    # lo coloco por si nos da tiempo de hacer lo de las conversiones
     volume_to_mass_factor: Mapped[Optional[float]
                                   ] = mapped_column(Float, nullable=True)
     unit_to_mass_factor: Mapped[Optional[float]
                                 ] = mapped_column(Float, nullable=True)
-    # Para valores nutricionales por 100g/ml
     nutrition_base_json: Mapped[Optional[dict]
                                 ] = mapped_column(JSON, nullable=True)
     calories_per_100: Mapped[float] = mapped_column(
@@ -266,8 +259,6 @@ class Ingredient(db.Model):
             "fat_per_100": self.fat_per_100,
         }
 
-
-# Para presentar el detalle de la Receta - Una clase intermedia, de enlace entre las dos tablas, ingredientes y recetas
 
 class RecipeIngredient(db.Model):
     id_recipe_ingredient: Mapped[int] = mapped_column(primary_key=True)
@@ -346,7 +337,6 @@ class RecipeFavorite(db.Model):
     created_at: Mapped[datetime] = mapped_column(DateTime(
         timezone=True), default=lambda: datetime.now(timezone.utc), nullable=False)
 
-    # Relaciones
     user: Mapped["User"] = relationship(back_populates="favorites")
     recipe: Mapped["Recipe"] = relationship(back_populates="favorites")
 

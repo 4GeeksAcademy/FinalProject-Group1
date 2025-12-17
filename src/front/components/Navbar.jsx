@@ -3,7 +3,6 @@ import useGlobalReducer from "../hooks/useGlobalReducer.jsx";
 import useTheme from '../hooks/useTheme.jsx';
 import "../styles/navbar.css"
 
-// AHORA USA EXPORTACIÓN NOMBRADA para coincidir con import { Navbar } de Layout.jsx
 export const Navbar = () => {
     const { store, dispatch } = useGlobalReducer();
     const { theme, toggleTheme } = useTheme();
@@ -40,8 +39,6 @@ export const Navbar = () => {
                     </div>
                 </div>
 
-
-                {/* CENTRO: Gestionar / Crear (solo admin) */}
                 {isAdmin && (
                     <div className="d-flex align-items-center justify-content-center flex-grow-1">
                         <div className="menus me-4 mt-2">
@@ -78,9 +75,7 @@ export const Navbar = () => {
                     </div>
                 )}
 
-                {/* DERECHA: modo, favoritos, perfil */}
                 <div className="d-flex align-items-center ms-auto">
-                    {/* BOTÓN MODO OSCURO */}
                     <button
                         className={`btn btn-outline-secondary py-1 px-3 ${buttonTextClass} theme-toggle-button me-2`}
                         onClick={toggleTheme}
@@ -88,8 +83,6 @@ export const Navbar = () => {
                     >
                         {icon}
                     </button>
-
-                    {/* FAVORITOS */}
                     {store.token && (
                         <NavLink
                             to="/favoritos"
@@ -100,7 +93,6 @@ export const Navbar = () => {
                         </NavLink>
                     )}
 
-                    {/* PERFIL / LOGIN */}
                     {!store.token ? (
                         <NavLink
                             to={"/login"}
@@ -153,7 +145,6 @@ export const Navbar = () => {
                     )}
                 </div>
             </div>
-            {/* FIN LAYOUT */}
         </nav >
     );
 };
