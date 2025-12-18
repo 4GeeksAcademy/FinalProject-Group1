@@ -2,6 +2,7 @@ import { Link, NavLink, useNavigate } from "react-router-dom";
 import useGlobalReducer from "../hooks/useGlobalReducer.jsx";
 import useTheme from '../hooks/useTheme.jsx';
 import "../styles/navbar.css"
+import FavoriteBadge from "../pages/FavoriteBadge.jsx"
 
 export const Navbar = () => {
     const { store, dispatch } = useGlobalReducer();
@@ -84,13 +85,7 @@ export const Navbar = () => {
                         {icon}
                     </button>
                     {store.token && (
-                        <NavLink
-                            to="/favoritos"
-                            className="favorites-btn me-2"
-                            aria-label="Ver favoritos"
-                        >
-                            <i className="fa-solid fa-heart"></i>
-                        </NavLink>
+                       <FavoriteBadge theme={theme} />
                     )}
 
                     {!store.token ? (
