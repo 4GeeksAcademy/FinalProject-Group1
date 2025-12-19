@@ -1844,3 +1844,9 @@ def search_admin_recipes():
         }), 500
 
 
+@api.route("/user/favorites/count", methods=["GET"])
+@jwt_required()
+def get_favorites_count():
+    current_user_id = int(get_jwt_identity())
+    total = RecipeFavorite.query.filter_by(user_id=current_user_id).count()
+    return jsonify({"count": total}), 200

@@ -268,6 +268,9 @@ export const RecipeDetail = () => {
       }
 
       setIsFavorite(Boolean(data.is_favorite));
+      if (window.refreshFavoritesCount) {
+        window.refreshFavoritesCount();
+      }
     } catch (err) {
       console.error('Error en favorito:', err);
       alert(err.message || 'Error al actualizar favorito');

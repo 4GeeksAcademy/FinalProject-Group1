@@ -2,6 +2,7 @@ import { Link, NavLink, useNavigate } from "react-router-dom";
 import useGlobalReducer from "../hooks/useGlobalReducer.jsx";
 import useTheme from '../hooks/useTheme.jsx';
 import "../styles/navbar.css"
+import FavoriteBadge from "../pages/FavoriteBadge.jsx"
 
 export const Navbar = () => {
     const { store, dispatch } = useGlobalReducer();
@@ -16,7 +17,7 @@ export const Navbar = () => {
         navigate("/");
     };
 
-    const navbarThemeClass = theme === 'dark' ? 'bg-dark navbar-dark' : 'bg-body-tertiary';
+    // const navbarThemeClass = theme === 'dark' ? 'bg-dark navbar-dark' : 'bg-body-tertiary';
     const icon = theme === 'light' ? '🌙' : '☀️';
     const buttonLabel = theme === 'light' ? 'Cambiar a modo oscuro' : 'Cambiar a modo claro';
     const buttonTextClass = theme === 'dark' ? 'text-white' : 'text-black';
@@ -24,9 +25,13 @@ export const Navbar = () => {
     const userRole = store.user ? store.user.rol : null;
     const isAdmin = userRole === "admin";
 
+    const navbarThemeClass = theme === 'dark'
+        ? 'navbar-dark bg-dark'
+        : 'navbar-light color-pink';
+
     return (
-        <nav className={`navbar navbar-expand-lg p-0 w-100 ${navbarThemeClass}`} data-bs-theme={theme}>
-            <div className="container-fluid">
+        <nav className={`navbar navbar-expand-lg p-0 w-100 py-1 ${navbarThemeClass}`} data-bs-theme={theme}>
+            <div className="container">
                 <div className="d-flex align-items-center">
                     <div className="brand-group">
                         <Link className="navbar-brand m-0" to="/">Saborify</Link>
@@ -41,8 +46,10 @@ export const Navbar = () => {
 
                 {isAdmin && (
                     <div className="d-flex align-items-center justify-content-center flex-grow-1">
-                        <div className="menus me-4 mt-2">
-                            <a href="#">Gestionar</a>
+                        <div className="menus me-4">
+                            <span className="nav-link brand-link" role="button">
+                                Gestionar
+                            </span>
                             <ul className="sub-menu sin-estilo">
                                 <li className="py-2">
                                     <Link to={"/status"}>
@@ -57,8 +64,10 @@ export const Navbar = () => {
                             </ul>
                         </div>
 
-                        <div className="menus me-4 mt-2">
-                            <a href="#">Crear</a>
+                        <div className="menus me-4">
+                            <span className="nav-link brand-link" role="button">
+                                Crear
+                            </span>
                             <ul className="sub-menu sin-estilo">
                                 <li className="py-2">
                                     <Link to={"/recipes/create"}>
@@ -77,20 +86,14 @@ export const Navbar = () => {
 
                 <div className="d-flex align-items-center ms-auto">
                     <button
-                        className={`btn btn-outline-secondary py-1 px-3 ${buttonTextClass} theme-toggle-button me-2`}
+                        className={`btn btn-outline-secondary py-1 px-3 ${buttonTextClass} theme-toggle-button me-4`}
                         onClick={toggleTheme}
                         aria-label={buttonLabel}
                     >
                         {icon}
                     </button>
                     {store.token && (
-                        <NavLink
-                            to="/favoritos"
-                            className="favorites-btn me-2"
-                            aria-label="Ver favoritos"
-                        >
-                            <i className="fa-solid fa-heart"></i>
-                        </NavLink>
+                        <FavoriteBadge theme={theme} />
                     )}
 
                     {!store.token ? (
@@ -101,7 +104,7 @@ export const Navbar = () => {
                             Iniciar Sesión
                         </NavLink>
                     ) : (
-                        <div className="dropdown ms-2">
+                        <div className="dropdown ms-4">
                             <a
                                 className="nav-link dropdown-toggle p-0"
                                 href="#"

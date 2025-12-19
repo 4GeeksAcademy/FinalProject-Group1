@@ -1,48 +1,53 @@
-/* FavoriteBadge.css */
-
-/* El contenedor que reemplazará tu corazón actual */
 .favorite-icon-wrapper {
     position: relative;
-    display: inline-flex; /* Para que el div ocupe solo el espacio del icono */
-    /* Asegúrate de que el tamaño coincida con tu diseño */
-    height: 40px; 
-    width: 40px; 
+    display: flex;
     align-items: center;
     justify-content: center;
+    width: 50px; 
+    height: 50px;
 }
 
-/* Estilos para el número superpuesto */
-.favorite-badge {
-    position: absolute;
-    top: 0;           /* Ajustar para posicionar en la esquina superior */
-    right: 0;
-    
-    /* Apariencia del badge: fondo rojo, texto blanco, circular */
-    background-color: #ff0000; /* Color que contraste, como rojo */
-    color: white;
-    font-size: 10px;
-    font-weight: bold;
-    
-    /* Forma y padding */
-    border-radius: 50%; /* Para hacerlo circular */
-    padding: 2px 5px;   /* Ajusta el padding para el tamaño */
-    min-width: 20px;    /* Asegura que el círculo sea visible */
-    height: 20px;
-    line-height: 14px; /* Centra el texto verticalmente */
-    text-align: center;
-    
-    /* Asegura que esté por encima de otros elementos */
-    z-index: 10; 
-}
-
-/* Opcional: Estilos para el ícono de corazón */
-.favorite-icon {
-    /* Aquí irían los estilos de tu círculo color durazno */
-    height: 30px;
-    width: 30px;
-    background-color: #f0e6e6; /* Ejemplo de color durazno */
+.favorite-circle-btn {
+    position: relative;
+    width: 42px;
+    height: 42px;
+    background-color: #fce4ec;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
+    text-decoration: none;
+    transition: transform 0.2s ease;
+}
+
+.favorite-circle-btn:hover {
+    transform: scale(1.1); 
+}
+
+
+.main-heart-icon {
+    font-size: 1.4rem;
+    color: #e91e63;
+    margin: 0;
+    padding: 0;
+}
+
+.badge-count-floating {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    background-color: #ffc107;
+    color: #000;
+    font-size: 0.7rem;
+    font-weight: 800;
+    min-width: 20px;
+    height: 20px;
+    border-radius: 10px; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4px;
+    border: 2px solid white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    z-index: 5;
 }
