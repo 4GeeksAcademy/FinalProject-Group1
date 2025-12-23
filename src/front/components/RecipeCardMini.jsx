@@ -2,6 +2,10 @@ import React from "react";
 import { Link } from "react-router-dom";
 
 export const RecipeCardMini = ({ recipe, showOnlyStars = false, showHeartOnlyIfFavorite = false }) => {
+
+  const displayHeart = recipe.is_favorite;
+  const displayStar = recipe.is_top_rated;
+
   return (
     <div className="recipe-card-modern">
       <div className="card-image-wrapper">
@@ -10,35 +14,19 @@ export const RecipeCardMini = ({ recipe, showOnlyStars = false, showHeartOnlyIfF
           <div className="image-overlay">
             <span className="difficulty-tag">{recipe.difficulty}</span>
           </div>
-        
-          {showOnlyStars ? (
-            recipe.is_top_rated && (
-              <div className="favorite-badge star-badge single-badge">
+
+          <div className="badges-container">
+            {!showOnlyStars && displayHeart && (
+              <div className="favorite-badge heart-badge">
+                <i className="fa-solid fa-heart"></i>
+              </div>
+            )}
+            {displayStar && (
+              <div className={`favorite-badge star-badge ${(!displayHeart || showOnlyStars) ? 'single-badge' : ''}`}>
                 <i className="fa-solid fa-star"></i>
               </div>
-            )
-          ) : (
-            <>
-              {showHeartOnlyIfFavorite ? (
-                recipe.is_favorite && (
-                  <div className="favorite-badge heart-badge">
-                    <i className="fa-solid fa-heart"></i>
-                  </div>
-                )
-              ) : (
-                recipe.is_favorite && (
-                  <div className="favorite-badge heart-badge">
-                    <i className="fa-solid fa-heart"></i>
-                  </div>
-                )
-              )}
-              {recipe.is_top_rated && (
-                <div className={`favorite-badge star-badge ${!recipe.is_favorite ? 'single-badge' : ''}`}>
-                  <i className="fa-solid fa-star"></i>
-                </div>
-              )}
-            </>
-          )}
+            )}
+          </div>
         </Link>
       </div>
 
