@@ -34,6 +34,7 @@ export const RecipeDetail = () => {
   const [userRating, setUserRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
   const [isRatingLoading, setIsRatingLoading] = useState(false);
+  const [desiredPortions, setDesiredPortions] = useState(0);
 
 
   if (!token) {
@@ -82,7 +83,6 @@ export const RecipeDetail = () => {
     );
   }
 
-  // Detalle de receta
   useEffect(() => {
     const fetchRecipe = async () => {
       setLoading(true);
@@ -240,7 +240,20 @@ export const RecipeDetail = () => {
     }
   };
 
-  // Favoritos
+
+  useEffect(() => {
+    if (recipe) {
+      setDesiredPortions(recipe.portions);
+    }
+  }, [recipeLoaded]);
+
+  const getScaledQuantity = (originalQuantity) => {
+    if (!recipe || !recipe.portions) return originalQuantity;
+    const scaled = (originalQuantity / recipe.portions) * desiredPortions;
+    return parseFloat(scaled.toFixed(2)); 
+  };
+
+
   const handleToggleFavorite = async () => {
     if (!token) {
       alert('Debes iniciar sesión para añadir a favoritos.');
@@ -362,7 +375,14 @@ export const RecipeDetail = () => {
               <i className="bi bi-clock"></i> {prep_time_min} min
             </span>
             <span className="badge-item">
-              <i className="bi bi-people"></i> {portions} porciones
+              <i className="bi bi-people"></i>
+              <input
+                type="number"
+                min="1"
+                value={desiredPortions}
+                onChange={(e) => setDesiredPortions(parseInt(e.target.value) || 1)}
+                style={{ width: '50px', border: 'none', background: 'transparent', fontWeight: 'bold' }}
+              /> porciones
             </span>
             <span className="badge-item category">
               <i className="bi bi-tag"></i> {category_name}
@@ -428,25 +448,41 @@ export const RecipeDetail = () => {
 
       <div className="recipe-content">
         <div className="ingredients-section">
-          <h2 className="section-title">
-            <i className="bi bi-basket"></i> Ingredientes
-          </h2>
+          <div className="d-flex justify-content-between align-items-center mb-3">
+            <h2 className="section-title mb-0">
+              <i className="bi bi-basket"></i> Ingredientes
+            </h2>
+
+            <div className="portions-stepper">
+              <span className="me-2 text-muted small">Porciones:</span>
+              <button
+                className="btn-stepper"
+                onClick={() => setDesiredPortions(Math.max(1, desiredPortions - 1))}
+              >
+                <i className="bi bi-dash"></i>
+              </button>
+              <span className="portion-number">{desiredPortions}</span>
+              <button
+                className="btn-stepper"
+                onClick={() => setDesiredPortions(desiredPortions + 1)}
+              >
+                <i className="bi bi-plus"></i>
+              </button>
+            </div>
+          </div>
 
           <div className="unit-converter-selector mb-4">
-            <label htmlFor="unitSelect" className="form-label d-block fw-bold text-success">
-              Mostrar unidades de MASA en:
+            <label htmlFor="unitSelect" className="form-label d-block fw-bold text-success small">
+              Mostrar masa en:
             </label>
             <select
               id="unitSelect"
-              className="form-select form-select-sm w-auto d-inline-block"
+              className="form-select form-select-sm w-auto"
               value={conversionUnit}
               onChange={(e) => setConversionUnit(e.target.value)}
-              disabled={loading}
             >
               {ALL_CONVERSION_UNITS.map(unit => (
-                <option key={unit.value} value={unit.value}>
-                  {unit.label}
-                </option>
+                <option key={unit.value} value={unit.value}>{unit.label}</option>
               ))}
             </select>
           </div>
@@ -454,12 +490,9 @@ export const RecipeDetail = () => {
           <div className="ingredients-list">
             {ingredients.map((ingredient) => (
               <div key={ingredient.id} className="ingredient-item">
-                <span className="ingredient-bullet">•</span>
-                <span className="ingredient-name">
-                  {ingredient.name}
-                </span>
+                <span className="ingredient-name">{ingredient.name}</span>
                 <span className="ingredient-quantity">
-                  {ingredient.quantity} {ingredient.unit_measure}
+                  {((ingredient.quantity / recipe.portions) * desiredPortions).toFixed(2)} {ingredient.unit_measure}
                 </span>
               </div>
             ))}
