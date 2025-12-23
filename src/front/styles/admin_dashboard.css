@@ -37,3 +37,33 @@
   transform: translateY(-5px);
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2), 0 0 15px 5px #ccd5ae;
 }
+
+.card-admin-custom {
+  transition: transform 0.3s ease;
+  border-radius: 15px !important;
+  background-color: #ffffff !important;
+}
+
+.icon-dashboard {
+  height: 100px;
+  object-fit: contain;
+  margin-top: 10px;
+}
+
+.status-published {
+  border-left: 8px solid #28a745 !important; 
+}
+
+.status-pending {
+  border-left: 8px solid #ffc107 !important; 
+}
+
+.status-rejected {
+  border-left: 8px solid #dc3545 !important; 
+}
+
+
+.card-efect:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
+}
